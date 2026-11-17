@@ -9,33 +9,41 @@ recap: |
   networks need graphics processors (GPUs), which should switch off when idle. Spot machines are 70–90% cheaper
   but can be taken back at short notice, so use them for training that saves its progress, and for batch jobs.
 traps:
-  - "Serving a small XGBoost model on an always-on GPU. A cheap CPU is fast enough, and the GPU bills every hour."
-  - "Running a live service that must always answer on Spot machines with no backup. They can disappear with two
-    minutes' warning."
+  - Serving a small XGBoost model on an always-on GPU. A cheap CPU is fast enough, and the GPU bills every
+    hour.
+  - Running a live service that must always answer on Spot machines with no backup. They can disappear with
+    two minutes' warning.
   - "Mixing up PaaS and IaaS. Ask: who looks after the operating system?"
+  - "Do not quote cloud prices as permanent: always label them with the date checked and say they change
+    often."
+  - "Do not forget what a compute quote leaves out: load balancer, data transfer and registry storage are
+    billed separately."
+  - "Do not pick a platform by provider name: choose by workload complexity, traffic, team capacity, and cost,
+    control and portability."
 lesson:
   checkpointStep: 3
   steps:
-    - "Running a model on a personal laptop or one server in the building means suffering power cuts, network drops
-      and fixed limits. Cloud computing rents you computers over the internet that can grow or shrink on demand."
-    - "The US standards body NIST defines five essential features of cloud computing: on-demand self-service, broad
-      network access, resource pooling, rapid elasticity and measured service."
-    - "We group services into IaaS (renting bare virtual machines, like EC2 or Compute Engine), PaaS (managed
-      platforms like App Engine or Render), SaaS (finished apps for end users) and MLaaS (ready-made AI platforms
-      like SageMaker and Vertex AI)."
+    - Running a model on a personal laptop or one server in the building means suffering power cuts, network
+      drops and fixed limits. Cloud computing rents you computers over the internet that can grow or shrink on
+      demand.
+    - "The US standards body NIST defines five essential features of cloud computing: on-demand self-service,
+      broad network access, resource pooling, rapid elasticity and measured service."
+    - We group services into IaaS (renting bare virtual machines, like EC2 or Compute Engine), PaaS (managed
+      platforms like App Engine or Render), SaaS (finished apps for end users) and MLaaS (ready-made AI
+      platforms like SageMaker and Vertex AI).
     - "Checkpoint: how do CPUs and GPUs differ in cost and speed for making predictions, and how do Spot
       (preemptible) machines save up to 80% on training?"
-    - "Table-data models like random forests and XGBoost run fast and cheaply on ordinary processors (CPUs): about 20
-      ms per prediction, for pennies a month. Huge neural networks need graphics processors (GPUs), which cost a lot
-      per hour, so they should scale down to zero when nobody is using them."
-    - "Spot machines are spare data-centre capacity sold at 70–90% off. The provider can take them back with a
-      2-minute warning, so they suit training that saves checkpoints and batch jobs that can be restarted."
+    - "Table-data models like random forests and XGBoost run fast and cheaply on ordinary processors (CPUs):
+      about 20 ms per prediction, for pennies a month. Huge neural networks need graphics processors (GPUs),
+      which cost a lot per hour, so they should scale down to zero when nobody is using them."
+    - Spot machines are spare data-centre capacity sold at 70–90% off. The provider can take them back with a
+      2-minute warning, so they suit training that saves checkpoints and batch jobs that can be restarted.
 checkpoint:
   question: Differentiate IaaS, PaaS, and MLaaS in the context of deploying an ML model, and explain how Spot
     instances reduce cloud costs while managing termination risk.
-  hint: "For each model, ask who looks after the operating system and software versus the model itself. For Spot:
-    what do you gain (a big discount) and what do you risk (being shut down at short notice)? How can a job survive
-    that?"
+  hint: "For each model, ask who looks after the operating system and software versus the model itself. For
+    Spot: what do you gain (a big discount) and what do you risk (being shut down at short notice)? How can a
+    job survive that?"
   keywords:
     - iaas
     - paas
@@ -47,37 +55,58 @@ checkpoint:
     - elasticity
     - checkpoint
     - gpu
-  idealAnswer: "IaaS (Infrastructure as a Service) gives you bare virtual machines in the cloud: you look after the
-    operating system, GPU drivers (CUDA), Docker and networking. PaaS (Platform as a Service, e.g. Render) hides
-    the machine: you provide the code or Docker container, and the platform keeps it running and handles security
-    certificates. MLaaS (Machine Learning as a Service, e.g. AWS SageMaker) provides managed prediction endpoints,
-    automatic scaling (elasticity), model registries and monitoring for data drift. Spot (preemptible) machines are
-    spare cloud capacity at a 70–90% discount, which cuts cost a lot, for GPU training too. Because they can be
-    shut down at short notice, the work must either keep no important state on the machine or save a checkpoint of
-    the model often to durable storage (S3/GCS), so the job can resume automatically on a new machine."
+  idealAnswer: "IaaS (Infrastructure as a Service) gives you bare virtual machines in the cloud: you look after
+    the operating system, GPU drivers (CUDA), Docker and networking. PaaS (Platform as a Service, e.g. Render)
+    hides the machine: you provide the code or Docker container, and the platform keeps it running and handles
+    security certificates. MLaaS (Machine Learning as a Service, e.g. AWS SageMaker) provides managed
+    prediction endpoints, automatic scaling (elasticity), model registries and monitoring for data drift. Spot
+    (preemptible) machines are spare cloud capacity at a 70–90% discount, which cuts cost a lot, for GPU
+    training too. Because they can be shut down at short notice, the work must either keep no important state
+    on the machine or save a checkpoint of the model often to durable storage (S3/GCS), so the job can resume
+    automatically on a new machine."
 terms:
   - term: Cloud computing
     definition: Renting computers, storage and networks over the internet, paying for what you use.
   - term: NIST's five cloud characteristics
-    definition: "On-demand self-service (set it up yourself), broad network access (reach it over the internet),
-      resource pooling (shared hardware), rapid elasticity (grow or shrink quickly) and measured service (pay by use)."
+    definition: On-demand self-service (set it up yourself), broad network access (reach it over the internet),
+      resource pooling (shared hardware), rapid elasticity (grow or shrink quickly) and measured service (pay
+      by use).
   - term: Virtual machine (VM)
     definition: A computer simulated in software on a provider's real hardware; you rent it by the hour.
   - term: IaaS
     definition: "Infrastructure as a Service: rent bare virtual machines, storage and networks; you manage the software."
   - term: PaaS
-    definition: "Platform as a Service: hand over your app or container and the platform runs it; you don't manage the
-      operating system."
+    definition: "Platform as a Service: hand over your app or container and the platform runs it; you don't manage
+      the operating system."
   - term: MLaaS
     definition: "Machine Learning as a Service: complete cloud platforms for training, storing and serving models."
   - term: CPU vs GPU
-    definition: A CPU is a general-purpose processor; a GPU does huge numbers of simple calculations at once, ideal
-      for big neural networks.
+    definition: A CPU is a general-purpose processor; a GPU does huge numbers of simple calculations at once,
+      ideal for big neural networks.
   - term: Spot / preemptible VM
-    definition: A heavily discounted virtual machine that the provider can take back at short notice when it needs the
-      capacity.
+    definition: A heavily discounted virtual machine that the provider can take back at short notice when it needs
+      the capacity.
   - term: Checkpoint
     definition: A saved copy of training progress, so a job can carry on from there instead of starting again.
+  - term: vCPU-hour
+    definition: "The price unit for compute: one virtual CPU used for one hour."
+  - term: GB-hour
+    definition: "The price unit for memory: one gigabyte of RAM used for one hour."
+  - term: Egress
+    definition: Data leaving the cloud, which providers usually charge for.
+  - term: Utilisation
+    definition: The share of the CPU and memory you pay for that the app actually uses.
+  - term: Serverless container
+    definition: A container service such as Fargate or Cloud Run where you hand over the image and the provider
+      runs it and scales capacity with demand.
+  - term: Container registry
+    definition: A server that stores container images so any machine can pull and run them.
+  - term: Docker Swarm
+    definition: A simpler Docker-native orchestrator that is easier to learn than Kubernetes but has a smaller ecosystem.
+  - term: Managed Kubernetes
+    definition: Kubernetes where the cloud provider runs the control plane and operations, such as EKS, AKS and GKE.
+  - term: Autoscaling
+    definition: Adding containers when load rises and removing them when it falls, within a minimum and maximum.
 quiz:
   - question: Which cloud service model requires you to configure the Linux kernel, install Nvidia GPU drivers,
       and manage Docker security updates yourself?
@@ -105,7 +134,8 @@ quiz:
       - Guaranteed zero downtime
       - Resource pooling
     answer: 2
-    explanation: The five are on-demand self-service, broad network access, resource pooling, rapid elasticity and measured service.
+    explanation: The five are on-demand self-service, broad network access, resource pooling, rapid elasticity and
+      measured service.
   - question: Render running your Docker container is an example of…
     options:
       - IaaS
@@ -121,7 +151,8 @@ quiz:
       - They have no GPUs
       - They can't run Docker
     answer: 1
-    explanation: They can be taken back at short notice. That's fine for training that saves checkpoints, not for a live hospital service.
+    explanation: They can be taken back at short notice. That's fine for training that saves checkpoints, not for
+      a live hospital service.
   - question: The best hardware for serving an XGBoost stroke model is usually…
     options:
       - An A100 GPU
@@ -146,6 +177,49 @@ quiz:
       - Reboot
     answer: 1
     explanation: An idle GPU still costs money every hour, so scale it down to zero when there's no traffic.
+  - question: A container uses 2 vCPU and 4 GB for 100 hours at $0.04 per vCPU-h and $0.005 per GB-h. What is the cost?
+    options:
+      - $8.00
+      - $10.00
+      - $12.00
+      - $28.00
+    answer: 1
+    explanation: (2 x 0.04 + 4 x 0.005) x 100 = (0.08 + 0.02) x 100 = 0.10 x 100 = 10 dollars.
+  - question: Which cost is egress?
+    options:
+      - Data leaving the cloud
+      - Storing images in a registry
+      - Memory used for an hour
+      - Time spent patching
+    answer: 0
+    explanation: Egress means data leaving the cloud. Registry storage is GB-month, and memory is GB-hour.
+  - question: A small API has unpredictable traffic and a small team. Which start does the deck recommend?
+    options:
+      - Self-run Kubernetes with custom networking
+      - A managed or serverless container
+      - One VM per microservice
+      - Docker Desktop on a laptop
+    answer: 1
+    explanation: When you choose for speed, a managed or serverless container handles much of the platform work.
+  - question: Which is the best reason to use a registry in the same Region as your compute?
+    options:
+      - It makes images smaller
+      - It removes the need for tags
+      - It avoids transfer fees and cuts latency
+      - It stops containers from being killed
+    answer: 2
+    explanation: Pulling within one Region avoids data-transfer charges and delay. For example, ECR transfer to
+      compute in the same Region is free.
+  - question: On DigitalOcean App Platform with CPU autoscaling set to min 2, max 5 and a 70% threshold, average
+      CPU is 40% and 4 containers run. What happens?
+    options:
+      - The platform removes containers, but never below 2
+      - The platform adds a fifth container
+      - Nothing, autoscaling only adds containers
+      - The platform moves to a bigger instance size
+    answer: 0
+    explanation: Below the threshold the platform removes containers, always staying between the minimum 2 and the
+      maximum 5. Vertical scaling is manual.
 fact:
   title: Latency Realities in East Africa
   body: A client in Kampala making API calls to an EU-West (Ireland) data center incurs a minimum physical
@@ -226,6 +300,94 @@ notes:
       **Cost arithmetic:** Spot price per hour = normal price × (1 − discount); job cost = price per hour × hours.
 
       **Tiny example:** a normal price of 2.40 per hour with a 75% discount gives 2.40 × 0.25 = **0.60 per hour**. A 10-hour job then costs **6.00** instead of 24.00.
+  - heading: "What you actually pay for: cost metrics and the Fargate formula"
+    body: |
+      **In plain words:** in the cloud you pay for what a container uses, like a taxi meter. The meter has a few dials: CPU time, memory time, storage, and data leaving the cloud.
+
+      Everyday comparison: your phone bill has minutes, data and a monthly fee. A container bill has the same kind of parts.
+
+      | You pay for | Unit |
+      |---|---|
+      | Compute | vCPU-hour (one virtual CPU for one hour) |
+      | Memory | GB-hour (one gigabyte of RAM for one hour) |
+      | Registry storage | GB-month |
+      | Data transfer | GB of **egress** (data leaving the cloud) |
+      | Licensing | For example Docker Desktop, paid for firms with 250+ staff or 10 million dollars of revenue |
+      | People and operations | Time to build, secure, monitor and patch |
+
+      For pay-per-use containers the formula is:
+
+      $$\text{cost} = (\text{vCPU} \times \text{price per vCPU-h} + \text{GB} \times \text{price per GB-h}) \times \text{hours}$$
+
+      A month is taken as 720 hours. The deck's AWS Fargate rates (US East, checked Oct 2026, change often) are: x86 at $0.0404784 per vCPU-h and $0.004446 per GB-h; ARM at $0.03237984 per vCPU-h and $0.00356004 per GB-h. A small container of 0.25 vCPU and 0.5 GB costs about $8.89 a month on x86 and $7.11 on ARM. ARM is about 20% cheaper for the same size. Load balancer, data transfer and registry storage are not included. Fargate bills Linux per second, with a 1-minute minimum.
+
+      **Metrics to track:**
+
+      - cost per service or container per month
+      - CPU and memory utilisation, meaning what you pay for against what you use
+      - cost per 1,000 requests
+      - image size times number of pulls (storage plus egress)
+      - idle time, meaning containers running with no traffic
+
+      For an ML API the key one is utilisation: a model server that holds 4 GB but uses 1 GB wastes three quarters of its memory bill.
+
+      **Exam angle:** write the formula, name the five cost dials, and say why utilisation is the most useful metric.
+  - heading: "Cutting the container bill: six levers and registry costs"
+    body: |
+      **In plain words:** most savings come from not paying for things you do not use. Six habits do most of the work.
+
+      Think of a household electricity bill: switch off unused lights, buy efficient bulbs, and do not pay for a bigger connection than you need.
+
+      1. **Right-size:** set CPU and memory to what the app really uses. Check `docker stats` or the cloud's metrics.
+      2. **Pack densely:** run many small containers on fewer hosts, not one VM per app.
+      3. **Choose cheaper compute:** ARM instances (about 20% cheaper in the deck's example) and Spot capacity (spare cloud capacity at a discount that can be taken back; Fargate Spot is up to 70% off) for work that can be restarted.
+      4. **Scale with demand:** autoscale down at night, and stop idle dev and test environments.
+      5. **Shrink images:** less storage and less egress. Delete old tags with lifecycle policies.
+      6. **Stay in one Region:** pull from a registry in the same Region as the compute to avoid transfer fees and latency.
+
+      **Registries** (servers that store images) also differ in cost. The deck's figures, checked Oct 2026 and likely to change:
+
+      | Registry | Cost notes |
+      |---|---|
+      | Docker Hub | Free Personal tier, with pull limits per 6 h: 100 anonymous (per IP), 200 Personal |
+      | GHCR (GitHub) | Storage and bandwidth currently free |
+      | Amazon ECR | $0.10 per GB-month private storage, free transfer to compute in the same Region |
+      | Azure ACR | Basic, Standard and Premium daily tiers (10, 100 and 500 GB included) |
+      | Google Artifact Registry | Pay for storage and egress |
+      | Harbor | Free open-source software, self-hosted, you pay for the servers |
+
+      A sound rule: use the registry that lives next to where you deploy. For example, 0.5 GB of images in ECR at $0.10 per GB-month costs $0.05 a month, so storage is small and compute is usually the big bill.
+
+      **Exam angle:** pick three levers and say which cost dial each one reduces.
+  - heading: "Choosing where to run containers: the platform ladder"
+    body: |
+      **In plain words:** once you have an image, you must pick where it runs. The choice is a trade: more control means more work for you.
+
+      Think of getting to town. Your own car (a single VM) gives most control and most work. A taxi (serverless) means you only say where to go.
+
+      From most control to least to manage:
+
+      1. **Single host:** a VM running Docker or Compose. For small apps, student projects and internal tools.
+      2. **Orchestrators:** Kubernetes, run by you or managed by AWS (EKS), Azure (AKS) or Google (GKE). For many services at large scale. **Docker Swarm** is a simpler Docker-native orchestrator: a smaller step for Docker teams, but less ecosystem than Kubernetes.
+      3. **Serverless containers:** you hand over a container and capacity follows demand. AWS Fargate (with ECS), Google Cloud Run, Azure Container Apps and Azure Container Instances.
+      4. **PaaS** (Platform as a Service): Render, Fly.io, Heroku, Railway, DigitalOcean App Platform. Push an image, get a URL.
+
+      The deck groups managed platforms into three families: managed containers, managed Kubernetes, and serverless.
+
+      **How to choose** (fit, not prestige):
+
+      1. Start with workload complexity.
+      2. Estimate traffic and scaling needs.
+      3. Check team capacity.
+      4. Compare cost, control and portability.
+
+      **Two scenarios.** A small API with unpredictable traffic: choose for speed, start with a managed or serverless container. Many microservices with strict control needs (advanced networking, access and security policies, scheduling and updates): choose for control, and evaluate managed Kubernetes.
+
+      **AI workloads add needs:** large model files (keep images lean and load models from a volume or object storage), explicit GPU requests, slow start-up (use startup and readiness probes and keep a minimum number of replicas), and safe, versioned rollouts.
+
+      On DigitalOcean App Platform, setting `instance_count: 3` runs three copies. CPU autoscaling (above 70% average CPU add containers, between min 2 and max 5) needs dedicated instances from about $29 a month. Prices checked Oct 2026, change often.
+
+      **Exam angle:** match each scenario to a platform family and justify it with traffic, complexity and team skill.
 examples:
   - title: Spot retraining bill
     problem: Nightly retraining runs 3 hours on a GPU that costs $2.80/h on-demand, with a 72% Spot discount. What
@@ -246,6 +408,42 @@ examples:
       - The small machine close to users beats the big machine far away.
     answer: The small instance in Kampala (32 ms).
     takeaway: For latency, distance often matters more than horsepower.
+  - title: Monthly Fargate cost of a small container
+    problem: Using the deck's AWS Fargate rates (US East, checked Oct 2026, change often), work out the monthly
+      cost of a small container with 0.25 vCPU and 0.5 GB of memory on x86 and on ARM. Use 720 hours. Then
+      compute the ARM saving.
+    steps:
+      - "Formula: cost = (vCPU x price per vCPU-h + GB x price per GB-h) x hours."
+      - "x86 CPU part per hour: 0.25 x 0.0404784 = 0.0101196 dollars."
+      - "x86 memory part per hour: 0.5 x 0.004446 = 0.002223 dollars."
+      - "x86 hourly total: 0.0101196 + 0.002223 = 0.0123426 dollars. Over 720 h that is 0.0123426 x 720 =
+        8.8867 dollars, about $8.89."
+      - "ARM CPU part per hour: 0.25 x 0.03237984 = 0.00809496 dollars."
+      - "ARM memory part per hour: 0.5 x 0.00356004 = 0.00178002 dollars."
+      - "ARM hourly total: 0.00809496 + 0.00178002 = 0.00987498 dollars. Over 720 h that is 7.10999 dollars,
+        about $7.11."
+      - "Saving: 8.8867 - 7.1100 = 1.7767 dollars a month. As a share: 1.7767 / 8.8867 = 0.20, so 20%."
+    answer: About $8.89 a month on x86 and $7.11 on ARM. ARM saves about $1.78 a month, which is 20%. This
+      excludes the load balancer, data transfer and registry storage.
+    takeaway: The deck's small container is 0.25 vCPU and 0.5 GB. Three stroke-risk API replicas would cost about
+      3 x 7.11 = 21.33 dollars on ARM against 26.66 dollars on x86, a saving of about $63.96 a year.
+  - title: Setting a cost cap on App Platform autoscaling
+    problem: A hospital API runs on DigitalOcean App Platform with CPU autoscaling set to min_instance_count 2 and
+      max_instance_count 5, scaling when average CPU passes 70%. Autoscaling needs dedicated instances, which
+      the deck says start from about $29 a month (checked Oct 2026, change often). Assume each container is
+      one such instance at $29. Find the lowest and highest monthly bill from instances alone. Then decide
+      what happens when average CPU reads 85% with 3 containers.
+    steps:
+      - "Lowest bill: the platform never goes below 2 containers, so 2 x 29 = 58 dollars a month."
+      - "Highest bill: the platform never goes above 5 containers, so 5 x 29 = 145 dollars a month."
+      - At 85% average CPU with 3 containers, the reading is above the 70% threshold, so the platform adds
+        containers.
+      - It stays at or below the maximum of 5, so it can add up to 2 more.
+      - The range is 145 - 58 = 87 dollars a month between a quiet and a busy month.
+    answer: Between $58 and $145 a month for instances. At 85% CPU with 3 containers the platform adds containers,
+      up to 5.
+    takeaway: "max_instance_count is also a cost cap: every extra container is billed. Set it from a budget, not a
+      guess."
 questions:
   - question: List NIST's five essential characteristics of cloud computing and explain rapid elasticity with an
       ML example.
@@ -318,6 +516,56 @@ questions:
       storage every few minutes; on a 2-minute reclaim notice it saves state, and the scheduler restarts the
       job on a new instance from the last checkpoint. The new model is validated, versioned in the registry
       and rolled out via canary, so an interruption delays retraining but never affects the live API."
+  - question: Describe the main cost dials for running containers in the cloud and give the formula for a
+      pay-per-use container.
+    kind: short
+    marks: 5
+    keywords:
+      - vcpu-hour
+      - gb-hour
+      - gb-month
+      - egress
+      - licensing
+      - utilisation
+      - 720 hours
+      - idle time
+      - formula
+    idealAnswer: Compute is billed per vCPU-hour and memory per GB-hour. Registry storage is billed per GB-month,
+      and data transfer is billed as egress, which is data leaving the cloud. There may also be licensing,
+      such as Docker Desktop for large firms, and the cost of people who build, secure, monitor and patch. For
+      pay-per-use containers, cost = (vCPU x price per vCPU-hour + GB x price per GB-hour) x hours, with about
+      720 hours in a month. For example, 0.25 vCPU and 0.5 GB on Fargate x86 costs about $8.89 a month. Useful
+      metrics to track are cost per service, utilisation (what you pay for against what you use), cost per
+      1,000 requests, image size times number of pulls, and idle time. Prices change often, so record the date
+      checked.
+  - question: A hospital wants to host its stroke-risk API. Compare the two scenarios, a small API with
+      unpredictable traffic and many microservices with strict control needs, and recommend a platform for
+      each.
+    kind: long
+    marks: 10
+    keywords:
+      - managed container
+      - serverless
+      - kubernetes
+      - workload complexity
+      - traffic
+      - team capacity
+      - cost
+      - control
+      - portability
+      - autoscaling
+      - probes
+    idealAnswer: "Choose by fit, not provider prestige, using four steps: workload complexity, traffic and scaling
+      needs, team capacity, and the balance of cost, control and portability. Scenario 1 is a small API with
+      unpredictable traffic. Here we choose for speed. A managed container or serverless container such as
+      Fargate or Cloud Run handles much of the platform work, and capacity follows demand while the team
+      focuses on code. Scenario 2 is many microservices with strict control needs: advanced networking,
+      policies for access and security, and control over scheduling, isolation and updates. Here we choose for
+      control and evaluate managed Kubernetes such as EKS, AKS or GKE, where the provider runs the control
+      plane. Docker Swarm is a simpler option for Docker teams but has a smaller ecosystem. For an AI model,
+      add slow start-up (use startup and readiness probes and keep a minimum number of replicas), explicit GPU
+      requests, large model files kept outside the image, and gradual rollouts with rollback. A good default
+      is simple enough to run today and flexible enough to grow."
 coding:
   - id: cheapest-safe-instance
     title: Pick the cheapest safe instance

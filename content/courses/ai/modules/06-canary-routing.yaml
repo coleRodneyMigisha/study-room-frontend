@@ -9,30 +9,38 @@ recap: |
   and automatically switches back if it breaks the agreed limits (the error budget). That way, a bad model only
   affects a few users (a small blast radius).
 traps:
-  - "Thinking Blue/Green limits the damage of a bad release. It moves 100% of users at once."
-  - "Starting a canary without automatic rollback limits. Someone has to notice and react, which takes minutes."
-  - "Watching only HTTP errors. A model can answer perfectly normally and still give clinically wrong predictions."
+  - Thinking Blue/Green limits the damage of a bad release. It moves 100% of users at once.
+  - Starting a canary without automatic rollback limits. Someone has to notice and react, which takes minutes.
+  - Watching only HTTP errors. A model can answer perfectly normally and still give clinically wrong
+    predictions.
+  - "Using :latest as the image tag: you cannot tell which version runs or roll back to it, so pin a version."
+  - "Saying continuous delivery and continuous deployment are the same: delivery needs a human to approve
+    going live, deployment does not."
+  - "Treating kubectl port-forward as a way to serve real users: it is a testing tunnel; use a LoadBalancer
+    Service or Ingress."
+  - "Mixing up requests and limits: requests are used for scheduling, limits are the ceiling, and going over
+    the memory limit kills the container."
 lesson:
   checkpointStep: 3
   steps:
-    - "In a hospital, you can't switch the AI prediction service off for 15 minutes every time a new model is ready.
-      Updates must happen with zero downtime."
-    - "A load balancer and reverse proxy (such as Nginx, Traefik or AWS ALB) is the single public front door. It
-      shares incoming requests between several healthy copies (replicas) of the service."
-    - "In a Blue/Green deployment there are two identical live environments. Blue runs v1; we put v2 on Green, check
-      it's healthy, then switch all the traffic from Blue to Green in an instant."
-    - "Checkpoint: how does a canary deployment reduce risk compared with Blue/Green, and which measurements should
-      trigger an automatic instant rollback?"
-    - "In canary routing, a small share (e.g. 5%) of real traffic goes to v2 while 95% stays on v1. We watch the error
-      rate, the p99 latency (how slow the slowest 1% of requests are) and any strange predictions."
-    - "If the canary breaks an error-budget limit (e.g. more than 1.5% server errors, or p99 latency above 300 ms), the
-      router immediately sends the canary's traffic back to v1, so patients aren't affected."
+    - In a hospital, you can't switch the AI prediction service off for 15 minutes every time a new model is
+      ready. Updates must happen with zero downtime.
+    - A load balancer and reverse proxy (such as Nginx, Traefik or AWS ALB) is the single public front door.
+      It shares incoming requests between several healthy copies (replicas) of the service.
+    - In a Blue/Green deployment there are two identical live environments. Blue runs v1; we put v2 on Green,
+      check it's healthy, then switch all the traffic from Blue to Green in an instant.
+    - "Checkpoint: how does a canary deployment reduce risk compared with Blue/Green, and which measurements
+      should trigger an automatic instant rollback?"
+    - In canary routing, a small share (e.g. 5%) of real traffic goes to v2 while 95% stays on v1. We watch
+      the error rate, the p99 latency (how slow the slowest 1% of requests are) and any strange predictions.
+    - If the canary breaks an error-budget limit (e.g. more than 1.5% server errors, or p99 latency above 300
+      ms), the router immediately sends the canary's traffic back to v1, so patients aren't affected.
 checkpoint:
   question: Compare Blue/Green and Canary deployment strategies for machine learning models. How do you
     configure health checks and error budgets to automate rollbacks?
-  hint: "How much traffic does each strategy send to the new version at first? How many users does a bug reach (the
-    blast radius)? Then: how does a service tell the load balancer it's ready, and what limits should trigger an
-    automatic switch back?"
+  hint: "How much traffic does each strategy send to the new version at first? How many users does a bug reach
+    (the blast radius)? Then: how does a service tell the load balancer it's ready, and what limits should
+    trigger an automatic switch back?"
   keywords:
     - canary
     - blue green
@@ -43,37 +51,67 @@ checkpoint:
     - readiness probe
     - blast radius
     - latency
-  idealAnswer: "Blue/Green deployment keeps two identical full environments. Once Green (with v2) has been checked, the
-    router flips 100% of the traffic to it in one go. It's quick, but if there's a subtle bug or a problem with
-    unusual inputs, every user is affected immediately. A canary deployment instead sends a small first share (e.g.
-    5–10%) of live traffic to the new model (v2) while the rest stays on the stable v1, which greatly shrinks the
-    blast radius (how many users a bug can reach). Health checks use a readiness probe (is the model loaded in
-    memory and ready for requests?) and a liveness probe (is the web server still responding?). Automatic rollback
-    watches an error budget: if the canary's server-error (HTTP 5xx) rate goes above 1%, or its p99 latency goes
-    above 250 ms over a 2-minute window, the router moves all traffic back to v1 automatically."
+  idealAnswer: "Blue/Green deployment keeps two identical full environments. Once Green (with v2) has been
+    checked, the router flips 100% of the traffic to it in one go. It's quick, but if there's a subtle bug or
+    a problem with unusual inputs, every user is affected immediately. A canary deployment instead sends a
+    small first share (e.g. 5–10%) of live traffic to the new model (v2) while the rest stays on the stable
+    v1, which greatly shrinks the blast radius (how many users a bug can reach). Health checks use a readiness
+    probe (is the model loaded in memory and ready for requests?) and a liveness probe (is the web server
+    still responding?). Automatic rollback watches an error budget: if the canary's server-error (HTTP 5xx)
+    rate goes above 1%, or its p99 latency goes above 250 ms over a 2-minute window, the router moves all
+    traffic back to v1 automatically."
 terms:
   - term: Zero-downtime deployment
     definition: Releasing a new version without the service ever going offline.
   - term: Load balancer / reverse proxy
-    definition: The front door that receives every request and passes it to one of several healthy copies of the
-      service.
+    definition: The front door that receives every request and passes it to one of several healthy copies of the service.
   - term: Replica
     definition: One running copy of the service. Several replicas share the load and cover for each other.
   - term: Blue/Green deployment
     definition: Two identical environments; all traffic is switched from the old one to the new one at once.
   - term: Canary deployment
-    definition: Sending a small share of real traffic to the new version first, and increasing it only if it behaves
-      well.
+    definition: Sending a small share of real traffic to the new version first, and increasing it only if it
+      behaves well.
   - term: Blast radius
     definition: How many users are affected if a release goes wrong.
   - term: Readiness vs liveness probe
-    definition: Readiness asks "is it ready for traffic (model loaded)?"; liveness asks "is it still alive, or should
-      it be restarted?".
+    definition: Readiness asks "is it ready for traffic (model loaded)?"; liveness asks "is it still alive, or
+      should it be restarted?".
   - term: Error budget
-    definition: The agreed limits (e.g. at most 1.5% errors, p99 under 300 ms). Breaking them triggers an automatic
-      rollback.
+    definition: The agreed limits (e.g. at most 1.5% errors, p99 under 300 ms). Breaking them triggers an
+      automatic rollback.
   - term: Shadow deployment
     definition: The new version gets a copy of real traffic, but its answers are thrown away. Zero risk to users.
+  - term: Control loop
+    definition: The repeating cycle of declare, observe, reconcile and act that an orchestrator uses to make the
+      real system match the desired one.
+  - term: Scheduler
+    definition: The control-plane part that chooses a node for each new pod by filtering, scoring and placing.
+  - term: Pod
+    definition: The smallest thing Kubernetes runs, usually one application container.
+  - term: Ingress
+    definition: A set of HTTP routing rules that send outside traffic to the right Service by host name or path.
+  - term: Resource requests and limits
+    definition: Requests are the minimum CPU and memory reserved for scheduling; limits are the maximum a
+      container may use.
+  - term: Startup probe
+    definition: A check that gives a slow-starting container, such as one loading a model, time to finish before
+      other probes begin.
+  - term: Horizontal Pod Autoscaler
+    definition: A Kubernetes controller that changes the number of pods to keep a measured value, such as CPU,
+      near a target.
+  - term: Cluster autoscaler
+    definition: A cloud feature that adds machines to the cluster when pods cannot be scheduled and removes idle ones.
+  - term: Rolling update
+    definition: Replacing old pods with new ones a few at a time, waiting for readiness, so the service never goes
+      fully down.
+  - term: Continuous deployment
+    definition: Every change that passes the automated tests goes live by itself, with no human approval.
+  - term: Shift left
+    definition: Moving security and quality checks earlier in the pipeline, when problems are cheaper to fix.
+  - term: DORA metrics
+    definition: "Four measures of delivery health: deployment frequency, lead time, change failure rate and time
+      to restore."
 quiz:
   - question: An ingress router directs 10% of traffic to a new model v2. Within 5 minutes, v2 has an error rate
       of 8% while v1 has 0.05%. What should happen?
@@ -143,6 +181,75 @@ quiz:
       - Scaling to zero
     answer: 1
     explanation: It tells the load balancer when a copy is ready (model loaded), so requests only go to ready copies.
+  - question: In the orchestration control loop, what does the Reconcile step do?
+    options:
+      - Starts a new container
+      - Finds the difference between desired and actual state
+      - Checks what is running
+      - States what you want
+    answer: 1
+    explanation: Declare states the goal, Observe checks reality, Reconcile finds the gap, and Act changes the
+      system to close it.
+  - question: Which Kubernetes component keeps the cluster state in a key-value store?
+    options:
+      - kubelet
+      - scheduler
+      - kube-proxy
+      - etcd
+    answer: 3
+    explanation: etcd stores the cluster state. The scheduler picks nodes, the kubelet runs pods on a node, and
+      kube-proxy maintains network rules.
+  - question: Which Service type is the default and is reachable only inside the cluster?
+    options:
+      - ClusterIP
+      - NodePort
+      - LoadBalancer
+      - Ingress
+    answer: 0
+    explanation: ClusterIP is the default. NodePort opens a port on each node and LoadBalancer gets a public cloud
+      address. Ingress is HTTP routing, not a Service type.
+  - question: A model takes 40 seconds to load and keeps being restarted before it is ready. Which fix fits best?
+    options:
+      - Use the :latest image tag
+      - Lower the CPU limit
+      - Add a startup probe
+      - Use port-forward
+    answer: 2
+    explanation: A startup probe gives a slow starter time to finish loading before liveness checks can kill it.
+  - question: With 4 pods at 90% CPU and a 60% target, what does the standard HPA rule ask for?
+    options:
+      - 5 pods
+      - 6 pods
+      - 8 pods
+      - 4 pods
+    answer: 1
+    explanation: ceil(4 x 90 / 60) = ceil(6) = 6 pods.
+  - question: In the workflow, which line makes the deploy job run only when the tests pass?
+    options:
+      - "runs-on: ubuntu-latest"
+      - "on: pull_request"
+      - "needs: test"
+      - "uses: actions/checkout@v4"
+    answer: 2
+    explanation: "needs: test makes deploy wait for the test job and skip if it fails. The if line then limits it
+      to main."
+  - question: Which pair describes the deployment frequency and change failure rate in DORA?
+    options:
+      - How often you release; the share of releases that cause problems
+      - Time from commit to live; how fast you fix a failure
+      - How many tests exist; how fast they run
+      - How many servers you have; how much they cost
+    answer: 0
+    explanation: Deployment frequency is how often you release, and change failure rate is the share of releases
+      that cause problems. The second option describes lead time and time to restore.
+  - question: Why does the test pyramid have many unit tests but few end-to-end tests?
+    options:
+      - Unit tests are slower and give more detail
+      - End-to-end tests are slow and costly, unit tests are fast and cheap
+      - End-to-end tests cannot find any bugs
+      - Unit tests need a live production system
+    answer: 1
+    explanation: Fast, cheap tests give quick feedback so the pipeline stays short. Slow UI tests are kept few.
 fact:
   title: Shadow Deployments (Dark Traffic)
   body: "In ultra-high stakes domains like medical diagnosis or autonomous driving, companies use Shadow
@@ -219,6 +326,205 @@ notes:
       - **A/B testing:** split the traffic to measure which version leads to better *results* (not just fewer errors). It usually runs longer and uses statistical tests.
 
       For hospital models, a sensible path is: **shadow → canary with automatic rollback → full rollout**, keeping the old version running and ready until the new one has a track record.
+  - heading: Orchestration is a control loop, and the scheduler picks the home
+    body: |
+      **In plain words:** Running one container by hand is easy. Running fifty, keeping them alive and sending traffic to the healthy ones is too much for a person, so a program called an orchestrator does it for you.
+
+      An orchestrator works like a thermostat. You set the temperature you want (the **desired state**), it keeps checking the room (the **actual state**), and it turns the heater on or off to close the gap. The deck calls this a control loop with four steps that repeat forever:
+
+      1. **Declare:** you state what you want, for example "3 copies of the stroke-risk API".
+      2. **Observe:** the platform checks what is really running.
+      3. **Reconcile:** it finds the difference. Say only 2 copies are alive.
+      4. **Act:** it starts one more copy, with no human involved.
+
+      This one loop gives you self-healing (a crashed container is replaced), scaling (change the number and it follows) and safe updates.
+
+      **Scheduling** is the part of the loop that decides which machine runs a new container. It has three moves:
+
+      - **Filter:** drop machines without enough CPU and memory.
+      - **Score:** rank the machines that fit and pick the best.
+      - **Place:** start the container there.
+
+      The scheduler also respects labels, node selectors and taints (rules about where a workload may run), tries to spread replicas over different machines, and handles special hardware such as GPUs. Kubernetes schedules Pods; Docker Swarm schedules Tasks.
+
+      **Example:** you ask for 3 copies and one machine dies. The loop sees 2 of 3, the scheduler filters out the dead machine, scores the rest, and places a replacement.
+
+      **Exam angle:** name the four loop steps, name the three scheduling steps, and say that the platform compares intention with reality all the time.
+  - heading: "Inside Kubernetes: control plane, worker nodes and core objects"
+    body: |
+      **In plain words:** A Kubernetes cluster is a group of machines with one brain and many hands. The brain decides, the hands run your containers.
+
+      Think of a restaurant. The manager takes orders and assigns tables (control plane). The waiters carry out the work at each table (worker nodes).
+
+      **Control plane (the brain)**
+
+      - **API server:** the single entry point for every management command.
+      - **etcd:** a key-value store that holds the cluster state.
+      - **Scheduler:** chooses a node for each new pod.
+      - **Controller manager:** keeps actual state equal to desired state.
+
+      **Worker node (the hands)**
+
+      - **Kubelet:** the node's agent; makes sure pods run as instructed.
+      - **Kube-proxy:** keeps the network rules so Services reach the right pods.
+      - **Container runtime:** such as containerd; it actually runs the containers.
+
+      The layers nest: a cluster contains nodes, nodes run pods, and pods carry your application.
+
+      **Core objects**
+
+      | Object | What it is |
+      |---|---|
+      | Pod | Smallest deployable unit, usually one container |
+      | ReplicaSet | Keeps N identical pods running |
+      | Deployment | Manages ReplicaSets; gives rolling updates and rollback |
+      | Service | Stable address and load balancing for a set of pods |
+      | ConfigMap / Secret | Settings / sensitive values, kept out of the image |
+      | Namespace | A virtual cluster inside the cluster |
+
+      **Rule:** you almost never create bare pods. You create a Deployment, which creates a ReplicaSet, which creates pods. Pods are disposable, so never rely on one pod's address.
+
+      **Exam angle:** "The control plane decides; the worker nodes do the work." Be ready to match each component to its job.
+  - heading: Writing a Deployment, exposing it, and sizing it
+    body: |
+      **In plain words:** A Deployment file is a written order: "keep 3 copies of this container running". Kubernetes then makes it true and keeps it true.
+
+      Here is a correct manifest for the stroke-risk API:
+
+      ```yaml
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: model-api
+      spec:
+        replicas: 3
+        selector:
+          matchLabels:
+            app: model-api
+        template:
+          metadata:
+            labels:
+              app: model-api
+          spec:
+            containers:
+              - name: api
+                image: model-api:1.0
+                resources:
+                  requests:
+                    cpu: "500m"
+                    memory: "1Gi"
+                  limits:
+                    cpu: "1"
+                    memory: "2Gi"
+      ```
+
+      - `replicas` is the desired state.
+      - `selector` and the template `labels` must match; that is how the Deployment finds its own pods.
+      - `image` is pinned to `1.0`. Never use `:latest`, because you cannot tell which version is running or roll back to it.
+      - **Requests** are the minimum the scheduler reserves; **limits** are the maximum. Going over the memory limit gets the container killed.
+
+      **Exposing it.** Pods come and go, so put a Service in front:
+
+      - **ClusterIP:** the default, reachable only inside the cluster.
+      - **NodePort:** opens a port on every node.
+      - **LoadBalancer:** asks the cloud for a load balancer with a public address.
+      - **Ingress:** HTTP rules that route by host name or path to Services.
+
+      A real request travels Internet, Ingress, Service, Pods.
+
+      **Exam angle:** state why the image is pinned, what selector and labels do, and the difference between requests (scheduling) and limits (ceiling).
+  - heading: Scaling out, rolling updates and what is different for AI models
+    body: |
+      **In plain words:** Kubernetes can add copies when you are busy, swap in a new version without stopping, and undo a bad version. AI models make this harder because they are big and slow to start.
+
+      **Horizontal Pod Autoscaler (HPA).** It watches CPU and changes the replica count between a floor and a ceiling:
+
+      `kubectl autoscale deployment model-api --cpu-percent=70 --min=2 --max=10`
+
+      The floor keeps the service available; the ceiling caps the cost. It needs a metrics source, usually metrics-server. The standard Kubernetes rule is: desired replicas = ceil(current replicas x current CPU / target CPU).
+
+      **Cluster autoscaler.** The HPA adds pods, but pods need room. In the cloud, the cluster autoscaler adds machines when pods cannot be scheduled. In the GKE Autopilot demo, `kubectl get nodes` first showed no resources, and a node appeared only after pods were requested.
+
+      **Rolling update.** Start new pods, wait until their readiness probe passes, then remove old pods gradually, never all at once.
+
+      ```
+      kubectl set image deployment/model-api api=model-api:1.1
+      kubectl rollout status deployment/model-api
+      kubectl rollout undo deployment/model-api
+      ```
+
+      **What is different for AI.**
+
+      - **Large model files:** keep images lean; load models from a volume or object storage, and version them.
+      - **GPUs:** request them explicitly so the scheduler picks a GPU node.
+      - **Slow start:** a model taking 40 seconds to load needs a **startup probe** so liveness does not kill it while it loads (readiness and liveness are covered elsewhere). Keep a minimum number of replicas.
+      - **Safe rollouts:** version models like code, roll out gradually, keep rollback ready.
+
+      **Demo lesson:** `kubectl port-forward` is for testing only. Real traffic needs a LoadBalancer Service or Ingress.
+  - heading: "CI, continuous delivery and continuous deployment: the pipeline"
+    body: |
+      **In plain words:** CI/CD is an automatic road from a developer's laptop to the live app. Three similar names describe how far down the road the automation goes.
+
+      - **Continuous integration (CI):** developers merge into one shared place many times a day, and each merge is built and tested by a computer. Goal: find mistakes early.
+      - **Continuous delivery:** code that passes is packaged and ready, but a person presses the button to go live.
+      - **Continuous deployment:** code that passes goes live by itself. Only the tests decide.
+
+      | | Continuous delivery | Continuous deployment |
+      |---|---|---|
+      | Going live | A person approves | Automatic |
+      | Risk | Lower; good for banks | Needs very good tests |
+      | Speed | Hours or days | Minutes |
+      | Also needs | A release-ready pipeline | Feature flags, monitoring, auto-rollback |
+
+      **Pipeline stages:** Plan, Code, Build, Test, Release, Deploy, Monitor. Code, Build and Test are the CI part. The output is an **artifact** (a tested package such as a Docker image). Release, Deploy and Monitor are the CD part, and what monitoring learns feeds back into Plan.
+
+      **Build once.** Build the artifact one time and move that same artifact through staging (a practice copy of the live system) and production. If you rebuilt at each step, the thing you tested would not be the thing you shipped.
+
+      **A deploy job gated by tests** (GitHub Actions):
+
+      ```yaml
+      deploy:
+        needs: test
+        if: github.ref == 'refs/heads/main'
+        steps:
+          - run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+      ```
+
+      `needs: test` means deploy runs only if tests pass. The `if` limits it to the main branch, so pull requests never deploy. The hook URL lives in a secret, never in the code. With Render's auto-deploy switched off, a failed test means no deployment.
+
+      **Exam angle:** the difference is whether a human approves the last step.
+  - heading: "Quality gates: test pyramid, DevSecOps, DORA metrics and branching"
+    body: |
+      **In plain words:** A pipeline is only as safe as its tests and checks. These are the gates, and the numbers that tell you whether the pipeline is healthy.
+
+      **Test pyramid.** Many fast, cheap unit tests at the bottom; some integration and API tests in the middle; few slow end-to-end (UI) tests on top. If a test fails the pipeline stops, so bad code does not reach users. Keep the whole pipeline under 10 minutes.
+
+      **DevSecOps and shift left.** Move security checks early, when problems are cheap to fix:
+
+      1. Secret scan (no passwords in code)
+      2. Code scan (SAST)
+      3. Library scan (known-vulnerable dependencies)
+      4. Image scan (the container image)
+      5. Live test (DAST, against a running app)
+
+      **DORA four metrics.**
+
+      - **Deployment frequency:** how often you release.
+      - **Lead time:** time from commit to live.
+      - **Change failure rate:** share of releases that cause problems.
+      - **Time to restore:** how fast you fix a failure.
+
+      **Branching.**
+
+      - **GitHub Flow:** main is always deployable; short branch, pull request, merge. Good for small teams and web apps.
+      - **Trunk-based:** everyone merges to main daily; unfinished work hides behind feature flags. Best fit for CI/CD.
+      - **GitFlow:** long-lived develop, release and hotfix branches. Organised but slow.
+
+      The longer a branch lives, the harder it is to merge.
+
+      **Deployment strategies not covered elsewhere:** rolling (replace a few servers at a time; no downtime, slow to undo), recreate (stop old, start new; simple but has downtime) and feature flags (ship code switched off, turn it on for some users).
+
+      **Exam angle:** list the DORA four, and say why trunk-based suits CI/CD.
 examples:
   - title: Errors during a canary
     problem: A gateway sends 5% of 240 QPS to v2. Over 15 minutes v2 has a 2.5% error rate. How many failed
@@ -240,6 +546,42 @@ examples:
         before increasing.
     answer: Pause at the current percentage and gather more evidence.
     takeaway: Compare against the baseline, not only against a fixed threshold.
+  - title: How many pods does the autoscaler ask for?
+    problem: The model-api Deployment runs 2 pods. The HPA target is 70% CPU, but the pods are now at 85% CPU. How
+      many replicas does the standard HPA rule want, and what happens if the setting is --max=10?
+    steps:
+      - The standard Kubernetes HPA rule is desired = ceil(current replicas x current CPU / target CPU).
+      - "Put in the numbers: 2 x 85 / 70 = 170 / 70 = 2.43 (rounded)."
+      - "Round up to the next whole pod: ceil(2.43) = 3."
+      - "Check the limits: 3 is above the floor of 2 and below the ceiling of 10, so the HPA scales from 2 to
+        3."
+      - "Check the result: 3 pods share the same load, so each would sit near 2 x 85 / 3 = 56.7% (rounded),
+        under the 70% target."
+    answer: The HPA asks for 3 replicas. The ceiling of 10 is not reached.
+    takeaway: The HPA always rounds up, and --min and --max clamp the answer. If new pods then do not fit on the
+      machines, the cluster autoscaler adds a node.
+  - title: Change failure rate from a month of releases
+    problem: A team releases a new version of the stroke-risk API 40 times in a month. 3 of those releases caused
+      an incident. What is the change failure rate, and which other DORA metric is the monthly count?
+    steps:
+      - Change failure rate means the share of releases that cause problems.
+      - "Divide failed releases by all releases: 3 / 40 = 0.075."
+      - "Turn it into a percentage: 0.075 x 100 = 7.5%."
+      - The count of 40 releases in a month is the deployment frequency (about 40 per month).
+    answer: Change failure rate is 7.5%. The 40 per month is the deployment frequency.
+    takeaway: Deployment frequency and lead time measure speed; change failure rate and time to restore measure
+      stability. A good team improves both together.
+  - title: How many pods fit on one node?
+    problem: A node has 4 CPUs and 6 GiB of memory free (ignore system overhead). Each model-api pod requests 500m
+      CPU and 1Gi memory, with limits of 1 CPU and 2Gi. How many pods can the scheduler place on this node?
+    steps:
+      - The scheduler filters using requests, not limits.
+      - "CPU: 4 CPUs is 4000m, and 4000 / 500 = 8 pods."
+      - "Memory: 6 GiB / 1 GiB = 6 pods."
+      - "A pod needs both, so take the smaller number: 6 pods."
+    answer: 6 pods fit. Memory is the bottleneck, so the 7th pod goes to another node, or stays Pending until the
+      cluster autoscaler adds one.
+    takeaway: Requests decide where a pod fits; limits only cap what it may use. Set both for every container.
 questions:
   - question: Compare Blue/Green and Canary deployments in terms of risk and rollback.
     kind: short
@@ -312,6 +654,80 @@ questions:
       consistent with shadow results. If any gate fails, the router automatically sets v2's weight to 0% and
       alerts. Stages 2–4 — 25%, 50%, 100% with the same gates and longer windows. Keep v1 deployed and warm
       until v2 has run cleanly at 100% for an agreed period, so rollback remains instant."
+  - question: Explain how Kubernetes uses a control loop to keep an application running, and name the control
+      plane components involved.
+    kind: short
+    marks: 5
+    keywords:
+      - control loop
+      - desired state
+      - actual state
+      - declare
+      - observe
+      - reconcile
+      - act
+      - api server
+      - etcd
+      - scheduler
+      - controller manager
+    idealAnswer: "Kubernetes works as a control loop. You declare the desired state, for example 3 replicas of a
+      Deployment. The platform observes the actual state, reconciles by finding the difference, and acts to
+      remove it, for example starting a new pod when one has crashed. The loop repeats continuously, which
+      gives self-healing, scaling and updates. The control plane holds the brain: the API server is the single
+      entry point for commands, etcd stores the cluster state, the scheduler chooses a node for each new pod
+      by filtering, scoring and placing, and the controller manager keeps the actual state equal to the
+      desired state. The worker nodes then do the work through the kubelet, kube-proxy and the container
+      runtime."
+  - question: A team serves a large stroke-risk model on Kubernetes. Describe four ways AI workloads differ from
+      ordinary web services and how Kubernetes features address each.
+    kind: long
+    marks: 10
+    keywords:
+      - large model files
+      - volume
+      - object storage
+      - gpu
+      - scheduler
+      - startup probe
+      - readiness
+      - minimum replicas
+      - versioned
+      - rolling update
+      - rollback
+      - hpa
+    idealAnswer: "First, model files are large, so keep images lean, load the model from a volume or object
+      storage, and version it. Second, models may need GPUs; request them explicitly in the pod resources so
+      the scheduler places the pod on a GPU node. Third, start-up is slow because the model must load. Use a
+      startup probe so liveness does not kill the container while it loads, use a readiness probe so no
+      traffic arrives until it is ready, and keep a minimum number of replicas so capacity exists while new
+      pods warm up. The HPA can add pods with a floor and ceiling, and the cluster autoscaler adds nodes when
+      pods do not fit. Fourth, rollouts must be safe: version models like code, use a rolling update that
+      waits for readiness, watch it with kubectl rollout status, and keep rollback ready with kubectl rollout
+      undo. Pin image versions and never use latest."
+  - question: Compare continuous delivery with continuous deployment, and describe how a GitHub Actions deploy job
+      can be gated so that failed tests never reach production.
+    kind: short
+    marks: 5
+    keywords:
+      - continuous delivery
+      - continuous deployment
+      - human approval
+      - automatic
+      - needs
+      - test
+      - main branch
+      - deploy hook
+      - secret
+      - artifact
+      - monitoring
+    idealAnswer: "In continuous delivery a passing build is packaged and ready, but a person approves going live.
+      It is lower risk and suits banks and government. In continuous deployment a passing build goes live
+      automatically, so only the tests decide. It is faster, but it needs very good tests, feature flags,
+      monitoring and automatic rollback. To gate a deploy in GitHub Actions, add a deploy job with needs: test
+      so it runs only if the test job passed, and an if condition that limits it to the main branch so pull
+      requests never deploy. The job calls the Render deploy hook, whose URL is stored as a repository secret
+      rather than in the code. With auto-deploy off, a failed test therefore means no deployment. The same
+      artifact should be reused, and monitoring feeds back into planning."
 coding:
   - id: canary-gate
     title: An automated canary gate

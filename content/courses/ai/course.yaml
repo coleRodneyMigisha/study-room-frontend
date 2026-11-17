@@ -9,7 +9,9 @@ persona: You are an expert professor of AI Systems, MLOps and Cloud Computing te
   Deployment and Scaling) at Uganda Christian University. You hold students to rigorous standards across the
   deployment lifecycle — data pipelines, Pickle/Joblib persistence, FastAPI/Pydantic, cloud service models and
   Spot pricing, multi-stage non-root Docker, Canary/Blue-Green routing, ONNX and INT8 quantisation, PSI drift
-  monitoring, and the Uganda Regional Referral Hospital stroke-risk capstone with SHAP explanations.
+  monitoring, ETL/ELT data pipelines, API security and gRPC vs REST, container internals and registries, Kubernetes
+  orchestration, CI/CD pipelines and DORA metrics, and the Uganda Regional Referral Hospital stroke-risk capstone with SHAP
+  explanations.
 formulas:
   - name: Little's Law (API Concurrency)
     expr: L = λ × W  (concurrency = arrival rate × latency)
@@ -245,3 +247,84 @@ exam:
         that predictions align with medical pathophysiology and focus treatment on actionable risk factors."
       tip: "State that SHAP decomposes predictions additively: Base Rate + Sum of Feature Effects = Final
         Probability."
+    - prompt: Explain how atomicity and idempotency make an ETL load safe to re-run after a failure, and say which
+        load strategies (append, overwrite, upsert) are idempotent.
+      module: data-preparation
+      keywords:
+        - atomicity
+        - transaction
+        - commit
+        - rollback
+        - idempotent
+        - append
+        - overwrite
+        - upsert
+        - duplicate
+      idealAnswer: "Atomicity means a load is all or nothing: the pipeline loads inside a transaction, runs COMMIT if
+        every step works and ROLLBACK on any error, so users never see half-loaded data. Idempotency means
+        running the same job twice gives the same result. Upsert (update the row if its ID exists, insert it if
+        not) and overwrite (truncate, then write a full copy) are idempotent. A plain append is not: re-running a
+        failed append job adds duplicate rows and double-counts revenue. Together, atomic and idempotent loads let
+        an engineer simply re-run a failed job."
+      tip: Use the mobile-money comparison for atomicity, then show what a re-run does under append versus upsert.
+    - prompt: Name the three front-door defences for a model-serving API and two flaws that studies found in
+        LLM-generated API code. Why is one kind of security testing not enough?
+      module: fastapi-serving
+      keywords:
+        - validate
+        - parameterized queries
+        - rate limit
+        - "429"
+        - body size
+        - mass assignment
+        - race condition
+        - sast
+        - dast
+      idealAnswer: "First, validate input with Pydantic rules and use parameterized queries so text cannot become SQL
+        injection. Second, rate limit each key and answer HTTP 429 with a Retry-After header. Third, cap the request
+        body size before parsing JSON, so a huge upload cannot exhaust memory. A 2026 study of LLM-generated APIs
+        found mass assignment (an inherited role field let users sign up as admin) and race conditions (no row
+        locking, so duplicate payments). Code that compiles can still hide logic flaws, and scanners miss them, so
+        combine SAST (reading the code), DAST or fuzzing (attacking the running API) and manual penetration tests."
+      tip: Give the three defences in the order a request meets them, then name the flaws.
+    - prompt: Explain how Kubernetes keeps a model API running and serves an update without downtime. Include the
+        control loop, the Horizontal Pod Autoscaler and a rolling update.
+      module: canary-routing
+      keywords:
+        - desired state
+        - control loop
+        - reconcile
+        - deployment
+        - replicas
+        - hpa
+        - readiness
+        - rolling update
+        - rollout undo
+      idealAnswer: "You declare the desired state in a Deployment, for example 3 replicas of model-api:1.0. Kubernetes
+        runs a control loop: it observes the actual state, reconciles the difference and acts, so a crashed pod is
+        replaced automatically. The Horizontal Pod Autoscaler changes the replica count between a minimum and a
+        maximum to keep CPU near a target (desired = ceil(current × current CPU / target CPU)). An update is a
+        rolling update: new pods start, they receive traffic only after their readiness probe passes, and old pods
+        are removed gradually. kubectl rollout undo returns to the previous version. A slow-loading model also needs
+        a startup probe."
+      tip: Walk through one crash and one update, naming the component that acts at each step.
+    - prompt: Distinguish continuous integration, continuous delivery and continuous deployment, and name the four
+        DORA metrics used to judge a delivery pipeline.
+      module: canary-routing
+      keywords:
+        - continuous integration
+        - continuous delivery
+        - continuous deployment
+        - tests
+        - human approval
+        - deployment frequency
+        - lead time
+        - change failure rate
+        - time to restore
+      idealAnswer: "Continuous integration means developers merge into one shared repository many times a day, and
+        every merge is built and tested automatically to catch mistakes early. Continuous delivery packages every
+        passing build so it is ready to release, but a person approves going live. Continuous deployment releases
+        every passing build automatically, so it needs very good tests, monitoring and automatic rollback. The four
+        DORA metrics are deployment frequency (how often you release), lead time (commit to live), change failure
+        rate (share of releases that cause problems) and time to restore (how fast a failure is fixed)."
+      tip: "The one-line difference: delivery has a human approval step before production; deployment does not."

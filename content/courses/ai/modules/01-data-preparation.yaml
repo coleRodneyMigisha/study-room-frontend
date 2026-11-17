@@ -9,34 +9,41 @@ recap: |
   while missing every single stroke patient. Judge medical models by recall (how many sick patients you catch),
   precision, and PR-AUC instead.
 traps:
-  - "Calling fit_transform on the whole dataset before train_test_split. The test patients' numbers leak into
-    training."
-  - "Applying SMOTE (making extra synthetic patients) to the test set. Tests must use only real patients."
-  - "Celebrating 95% accuracy when only 5% of cases are positive. Always saying \"no\" gets that score."
+  - Calling fit_transform on the whole dataset before train_test_split. The test patients' numbers leak into
+    training.
+  - Applying SMOTE (making extra synthetic patients) to the test set. Tests must use only real patients.
+  - Celebrating 95% accuracy when only 5% of cases are positive. Always saying "no" gets that score.
+  - "Saying a plain append load is safe to re-run: it adds duplicate rows each time and double-counts revenue,
+    so it is not idempotent."
+  - "Mixing up the order: ETL transforms before loading, while ELT loads raw data first and transforms inside
+    the warehouse."
+  - Extracting from the live production database instead of a read replica, which can slow checkout for real
+    customers.
+  - Writing separate cleaning code for training and for production, which causes training-serving skew.
 lesson:
   checkpointStep: 3
   steps:
-    - "A model is only as reliable as the data prepared for it. In the Uganda Regional Referral Hospital stroke
+    - A model is only as reliable as the data prepared for it. In the Uganda Regional Referral Hospital stroke
       dataset we face missing BMI values, text categories that need converting to numbers, and very few stroke
-      cases compared with healthy patients (class imbalance)."
-    - "The worst mistake in deploying ML is data leakage: for example, working out a scaler's average and spread
-      (StandardScaler), or the values to fill gaps with, from the whole dataset before splitting it into training
-      and test sets."
-    - "If you fit a scaler on all rows, information about the test patients leaks into training. The test score
-      looks better than it should, and the model disappoints the moment real new patients arrive."
-    - "Checkpoint: why does plain accuracy fail on an imbalanced hospital dataset, and why must SMOTE and scaling be
-      fitted on the training split only?"
-    - "In stroke screening, only about 4.9% of patients have a stroke. A useless model that always says \"no stroke\"
-      gets 95.1% accuracy, while missing 100% of the stroke patients."
-    - "To keep it honest, bundle the preparation steps into an sklearn Pipeline or ColumnTransformer, fit it only on
-      X_train (the training data), and apply SMOTE (creating extra synthetic stroke examples) only to the training
-      data."
+      cases compared with healthy patients (class imbalance).
+    - "The worst mistake in deploying ML is data leakage: for example, working out a scaler's average and
+      spread (StandardScaler), or the values to fill gaps with, from the whole dataset before splitting it
+      into training and test sets."
+    - If you fit a scaler on all rows, information about the test patients leaks into training. The test score
+      looks better than it should, and the model disappoints the moment real new patients arrive.
+    - "Checkpoint: why does plain accuracy fail on an imbalanced hospital dataset, and why must SMOTE and
+      scaling be fitted on the training split only?"
+    - In stroke screening, only about 4.9% of patients have a stroke. A useless model that always says "no
+      stroke" gets 95.1% accuracy, while missing 100% of the stroke patients.
+    - To keep it honest, bundle the preparation steps into an sklearn Pipeline or ColumnTransformer, fit it
+      only on X_train (the training data), and apply SMOTE (creating extra synthetic stroke examples) only to
+      the training data.
 checkpoint:
   question: Why is accuracy a dangerous metric for clinical triage with 5% positive cases, and why must data
     scalers and SMOTE oversampling never touch the test set?
-  hint: "What score does a lazy model get by saying \"no stroke\" to everyone? Compare that with its recall (or F2
-    score). Then: if the scaler learns its average from all patients, including test patients, is the test still a
-    fair exam?"
+  hint: 'What score does a lazy model get by saying "no stroke" to everyone? Compare that with its recall (or F2
+    score). Then: if the scaler learns its average from all patients, including test patients, is the test
+    still a fair exam?'
   keywords:
     - accuracy
     - imbalance
@@ -49,13 +56,13 @@ checkpoint:
     - fit_transform
     - smote
     - generalization
-  idealAnswer: "With only 5% of patients having a stroke (class imbalance), a lazy model that says 'no stroke' for
-    everyone gets 95.1% accuracy but is useless, because its recall is 0%: it catches none of the stroke patients.
-    In medical screening a false negative (a missed stroke) can be fatal, so we focus on recall and PR-AUC rather
-    than accuracy. Scalers and SMOTE must only be fitted on the training split. Using fit_transform on the full
-    dataset before you split leaks the test patients' average and spread into training (data leakage), and
-    applying SMOTE to the test data adds made-up patients to the exam. Either way the test score no longer shows
-    how well the model works on real new patients (generalization)."
+  idealAnswer: "With only 5% of patients having a stroke (class imbalance), a lazy model that says 'no stroke'
+    for everyone gets 95.1% accuracy but is useless, because its recall is 0%: it catches none of the stroke
+    patients. In medical screening a false negative (a missed stroke) can be fatal, so we focus on recall and
+    PR-AUC rather than accuracy. Scalers and SMOTE must only be fitted on the training split. Using
+    fit_transform on the full dataset before you split leaks the test patients' average and spread into
+    training (data leakage), and applying SMOTE to the test data adds made-up patients to the exam. Either way
+    the test score no longer shows how well the model works on real new patients (generalization)."
 terms:
   - term: Data leakage
     definition: Information from outside the training data (e.g. the test set's averages) accidentally used while
@@ -72,15 +79,42 @@ terms:
   - term: One-hot encoding
     definition: Turning a text category (e.g. smoking_status) into several 0/1 columns, one per category.
   - term: SMOTE
-    definition: "Synthetic Minority Over-sampling Technique: creates made-up examples of the rare class by blending
-      real ones that are similar."
+    definition: "Synthetic Minority Over-sampling Technique: creates made-up examples of the rare class by
+      blending real ones that are similar."
   - term: Pipeline / ColumnTransformer
-    definition: sklearn tools that bundle the preparation steps and the model together, applying the right steps to
-      each group of columns, so they're always fitted on training data only.
+    definition: sklearn tools that bundle the preparation steps and the model together, applying the right steps
+      to each group of columns, so they're always fitted on training data only.
   - term: Recall (sensitivity)
     definition: TP ÷ (TP + FN). The share of real stroke patients the model catches.
   - term: Precision
     definition: TP ÷ (TP + FP). Of the patients the model flags, the share who really had a stroke.
+  - term: Training-serving skew
+    definition: A mismatch between how data is prepared for training and how it is prepared in production, which
+      makes live predictions worse than expected.
+  - term: Change data capture (CDC)
+    definition: A method that reads a database's internal activity log to catch every insert, update and delete as
+      it happens.
+  - term: High-watermark
+    definition: A bookmark, such as the timestamp or ID of the last extracted row, that lets the next run continue
+      from where the last one stopped.
+  - term: Exponential backoff
+    definition: A retry rule where the wait doubles after each failure (2, 4, 8 seconds), used to respect API rate
+      limits.
+  - term: Upsert (merge)
+    definition: A load that updates a row when its ID already exists and inserts a new row when it does not.
+  - term: Atomicity
+    definition: The all-or-nothing rule that a load either saves every row or saves none, using COMMIT and ROLLBACK.
+  - term: Idempotent pipeline
+    definition: A pipeline that gives the same result no matter how many times you run it on the same input.
+  - term: ELT
+    definition: "Extract, Load, Transform: raw data is loaded into the cloud warehouse first and cleaned there
+      with SQL tools such as dbt."
+  - term: Data lakehouse
+    definition: A hybrid store that adds warehouse features, such as fast SQL and safety checks, on top of cheap
+      data lake files.
+  - term: DAG (directed acyclic graph)
+    definition: A workflow map in which tasks run in one direction without loops, so a step starts only after the
+      steps before it succeed.
 quiz:
   - question: In a hospital cohort of 2,000 patients, 100 experience a stroke. A baseline model predicts 'No
       Stroke' for all 2,000. What is its accuracy and recall?
@@ -99,8 +133,8 @@ quiz:
       - Stripping whitespace from strings
       - Writing raw data to read-only storage
     answer: 0
-    explanation: Fitting StandardScaler on everything works out the average and spread from training AND test patients,
-      so information about the test set leaks into training.
+    explanation: Fitting StandardScaler on everything works out the average and spread from training AND test
+      patients, so information about the test set leaks into training.
   - question: What is wrong with calling StandardScaler().fit_transform(X) before train_test_split?
     options:
       - Nothing
@@ -140,7 +174,8 @@ quiz:
       - Learning curve
       - Loss curve
     answer: 1
-    explanation: The precision–recall curve focuses on the rare positive cases, so lots of easy "no stroke" patients can't make it look good.
+    explanation: The precision–recall curve focuses on the rare positive cases, so lots of easy "no stroke"
+      patients can't make it look good.
   - question: XGBoost's scale_pos_weight for ~5% positives is roughly…
     options:
       - "0.05"
@@ -149,6 +184,59 @@ quiz:
       - "100"
     answer: 2
     explanation: "It tells XGBoost how much more to count each positive: negatives ÷ positives ≈ 95 ÷ 5 = 19."
+  - question: Why does a fraud-detection API with a 50 ms limit rely on ETL?
+    options:
+      - ETL replaces the model with a faster one
+      - ETL pre-computes historical aggregates in the background so live requests avoid slow SQL queries
+      - ETL deletes old data to save disk space
+      - ETL makes the website database run the reports
+    answer: 1
+    explanation: ETL works ahead of time, so a live request only reads ready-made numbers instead of running heavy
+      queries.
+  - question: An API returns error 429 three times in a row. Which retry plan uses exponential backoff?
+    options:
+      - Retry immediately each time
+      - Wait 5 seconds every time
+      - Wait 2, then 4, then 8 seconds
+      - Stop the pipeline and delete the data
+    answer: 2
+    explanation: "Exponential backoff doubles the wait after each failure: 2, 4, 8 seconds."
+  - question: What does a high-watermark record?
+    options:
+      - The largest table in the warehouse
+      - The highest price in the data
+      - The time a query took to run
+      - The timestamp or ID of the last row extracted, so the next run resumes from there
+    answer: 3
+    explanation: It is a bookmark. After an outage the pipeline picks up from it without losing or repeating rows.
+  - question: A load crashes after saving 50,000 of 100,000 rows. Which feature makes sure users see none of the
+      partial rows?
+    options:
+      - Atomicity, using a transaction with ROLLBACK
+      - Cursor pagination
+      - Star schema
+      - Columnar storage
+    answer: 0
+    explanation: Atomicity means all or nothing. ROLLBACK undoes the partial load.
+  - question: Order 500 changes from Pending to Shipped in the source. Which load strategy fits best?
+    options:
+      - Append
+      - Overwrite with truncate
+      - Upsert (merge)
+      - Blue-green swap of the whole warehouse
+    answer: 2
+    explanation: Upsert updates the existing row for order 500 and inserts any new orders. Append would create a
+      duplicate.
+  - question: Which tool tests data against written rules such as expect_column_values_to_not_be_null and stops
+      the pipeline when one fails?
+    options:
+      - Apache Kafka
+      - Great Expectations
+      - Fivetran
+      - Apache Flink
+    answer: 1
+    explanation: "Great Expectations is rule-based data testing. Monte Carlo is different: it learns normal
+      patterns automatically."
 fact:
   title: "The Silent Killer of Production ML: Train-Serve Skew"
   body: Google's landmark paper on ML technical debt notes that differences between training data pipelines and
@@ -239,10 +327,125 @@ notes:
       - **SMOTE** creates extra, made-up stroke examples by blending similar real stroke patients, so the model sees enough of them. Inside an `imblearn` pipeline it runs **only while fitting**, so test data is never oversampled. Alternatives: `class_weight="balanced"`, or XGBoost's `scale_pos_weight` ≈ negatives ÷ positives ≈ 95 ÷ 5 = **19**.
 
       The whole pipeline is what you save and deploy. That's what guarantees the preparation is identical in the real hospital.
+  - heading: What ETL is and why AI deployment needs it
+    body: |
+      **In plain words:** ETL is an automatic routine that Extracts (copies) raw data from many systems, Transforms (cleans) it, and Loads (saves) it into one central place built for analysis.
+
+      Think of a kitchen. Extract is shopping for ingredients, Transform is washing and chopping them, and Load is putting the finished meal on the table. Nobody serves muddy vegetables.
+
+      Raw data is messy. One system writes dates as DD/MM/YYYY and another as MM-DD-YYYY. Different departments keep data in separate tools (called data silos). Running heavy reports on the live database also slows the app for real users. ETL fixes all three problems.
+
+      **Why it matters for AI deployment.** The deck says up to 85% of AI projects fail to reach production, not because the model is bad, but because the data pipeline cannot feed it clean, timely data. Five reasons:
+
+      1. **Models only take numbers.** Text, images and SQL strings must become scaled numbers (tensors) or embeddings before a model can use them.
+      2. **Latency budgets.** A fraud or recommendation API may have under 50 ms to answer. ETL pre-computes history in the background, so a live request never runs a slow SQL query.
+      3. **Training-serving skew.** If data scientists clean data in Python for training and backend engineers rewrite the logic in Java or Go for production, the two versions drift apart and predictions go wrong. One shared pipeline removes this.
+      4. **GPU use.** GPUs read data faster than one disk can supply it, so distributed ETL streams the data to them.
+      5. **Privacy and quality.** ETL masks personal data (PII), drops corrupt rows, and blocks broken upstream changes before they poison the model.
+
+      For the stroke-risk API, the same code that scaled and encoded patient fields in training must run again when a clinic sends a new patient.
+
+      **ETL vs ELT.** In ETL you clean data on a middle server before it enters the warehouse. In ELT you load the raw data first and clean it inside the cloud warehouse with SQL tools such as dbt. Cloud storage is cheap and warehouses are fast, so ELT won. ETL is still used when sensitive data must be erased before it touches the cloud.
+
+      **Exam angle:** list the five AI reasons, and state the order of steps in ETL and ELT.
+  - heading: "Extraction: pulling data without hurting the source"
+    body: |
+      **In plain words:** extraction is the first step. The pipeline connects to other systems, reads their raw data, and saves a copy in a staging area (a holding place) without disturbing the original.
+
+      **Push or pull.** In pull extraction the pipeline asks on a schedule: "Give me all orders created since 2:00 PM." In push extraction the source sends each event the moment it happens, like a checkout app sending a receipt.
+
+      **Full or incremental.** Full extraction copies every row every run. It is simple and fine for a list of 50 store locations, but too slow for millions of rows. Incremental extraction copies only rows that are new or changed, often using an updated_at timestamp.
+
+      **CDC (change data capture)** is a smart form of incremental extraction. It reads the database's internal activity log and catches every insert, update and delete. It is fast and puts almost no strain on the source.
+
+      **High-watermark.** This is a bookmark: the timestamp or ID of the last row you extracted. If the network fails, the next job restarts from the bookmark and loses nothing.
+
+      **Golden rules from the deck:**
+
+      - Read from a **read replica** (a mirror copy of the live database), so real users never see slow pages.
+      - Keep an untouched raw copy in staging, so a later cleaning bug can be fixed without downloading again.
+      - Run heavy pulls off-peak, such as 2:00 AM.
+      - Alert early if a source renames or deletes a column.
+
+      **APIs.** Web APIs limit you to, say, 100 calls per minute. If you go over, the server answers with error 429. The fix is **exponential backoff**: wait 2 seconds, retry, wait 4, retry, wait 8, and so on. The wait doubles each time. APIs also split big results into pages of, say, 100 records. **Cursor pagination** gives you a bookmark token for the next page, so no rows are skipped even if new rows arrive meanwhile.
+
+      Tools such as Fivetran (paid, fully managed) and Airbyte (open source) provide ready-made connectors, track incremental changes, and handle new columns automatically.
+
+      **Exam angle:** know why replica, watermark and backoff exist.
+  - heading: Transformation tasks and dbt
+    body: |
+      **In plain words:** transformation turns messy records into clean, uniform tables that people and models can trust.
+
+      Raw data problems: the same country typed as "Uganda", "UG" and "uganda "; a payment receipt recorded twice after a slow connection; cryptic columns such as usr_sts_cd = 4; blank prices that break maths.
+
+      **Five common tasks:**
+
+      | Task | Raw | Clean |
+      |---|---|---|
+      | Cleansing | " john@GMAIL.com ", discount NULL | "john@gmail.com", discount 0.00 |
+      | Deduplication | Order 105 appears 3 times | One row for order 105 (the newest) |
+      | Type casting | price "45000" (text) | price 45000 (integer) |
+      | PII masking | NIN CM98012345UG | ********45UG, or a hashed code |
+      | Enrichment | separate orders, app and support tables | one joined view per customer |
+
+      Enrichment also covers currency conversion (multiply each sale by that day's rate), pre-computed metrics such as Net Profit = Revenue - (Cost + Tax), and tier labels such as "VIP" for a user who spends over 1,000 dollars a year.
+
+      This ties directly to ML. Dropping duplicates and filling blanks happen before training. Masking PII matters for patient data in the stroke-risk case.
+
+      **dbt (data build tool)** does the transformation inside the warehouse, not outside it. You write a plain SELECT query in a .sql file and dbt wraps it in CREATE TABLE or INSERT. Models call each other with the ref function (staging, then intermediate, then final marts), and dbt works out the run order. A line of YAML can test that a key is unique and not_null after every build. Changes live in Git, so they can be reviewed and rolled back, and dbt draws a lineage map.
+
+      **Schemas (brief).** Fact tables hold numbers or events (sales). Dimension tables hold context (customer, product, date). A **star schema** has one fact table linked straight to dimensions: fastest for dashboards. A **snowflake schema** splits the dimensions into sub-tables: saves space but needs more joins.
+
+      **Exam angle:** name the tasks with a one-line example each.
+  - heading: "Loading: append, overwrite, upsert, atomicity and idempotency"
+    body: |
+      **In plain words:** loading writes the clean data into its final table. The danger is writing half the data, or writing the same data twice.
+
+      **Three ways to write:**
+
+      - **Append** adds rows at the bottom and never checks old ones. Use it for click logs or ATM history, where past events never change.
+      - **Overwrite** empties the table (truncate) and writes a fresh full copy. Use it for small lookup tables, such as 30 branch offices.
+      - **Upsert (merge)** checks each incoming ID. If the ID exists it updates the row, if not it inserts a new one. Use it for orders, where order 500 goes from "Pending" to "Shipped".
+
+      **Atomicity** means all or nothing. Suppose the power fails after 50,000 of 100,000 rows are loaded. Atomicity says the load is one indivisible unit: either all rows are saved or none. Compare a mobile money transfer: if money leaves your account, it must arrive in the other one, or the whole transfer is cancelled.
+
+      Engineers do this with a transaction. Load inside BEGIN TRANSACTION. If every step works, run COMMIT to make it permanent. If anything fails, run ROLLBACK to undo the partial load.
+
+      ```sql
+      BEGIN TRANSACTION;
+      -- load 100,000 rows
+      COMMIT;      -- success: rows become visible
+      -- ROLLBACK; -- error: nothing is kept
+      ```
+
+      A **blue-green table swap** is another safe way. Load into a hidden temporary table, check it, then swap names with the live table in about one millisecond. Users never see a half-built table.
+
+      **Idempotency** means running the same pipeline twice gives the same result. A non-idempotent pipeline (for example, a plain append) adds duplicate rows every time you re-run a failed job, so revenue is double-counted. Upsert and overwrite are idempotent.
+
+      Other loading goals: bulk writing (thousands of rows per batch, not one by one), history tracking (overwrite an old phone number or add a new row with start and end dates), and finishing on time, such as before 8:00 AM.
+
+      **Exam angle:** pick the right strategy for a scenario, and explain commit and rollback.
+  - heading: Where data lives, how fast it moves, and how it is watched
+    body: |
+      **In plain words:** after cleaning, you must choose where to store data, how often to process it, who runs the steps in order, and who checks the numbers.
+
+      **Warehouse, lake, lakehouse.**
+
+      - A **data warehouse** (Snowflake, BigQuery, Redshift) holds neat tables for fast SQL and charts. It separates storage from compute, so you pay for CPU only while a query runs, and it stores by column, so SUM(revenue) reads one column, not all 50.
+      - A **data lake** (Amazon S3, Google Cloud Storage, Azure Blob) is a cheap folder for any raw file: images, PDFs, JSON logs, CSVs.
+      - A **lakehouse** (Databricks, Apache Iceberg) puts warehouse features, such as fast SQL and safety checks, on top of cheap lake files.
+
+      **Batch or streaming.** Batch processing collects data and runs it together on a schedule, for example every night. It is cheaper and simpler to debug. Use it for daily reports, payroll and historical backfills, where a few hours of delay is fine. Streaming processes each event as it happens. Apache Kafka is the message highway that carries millions of events per second. Apache Flink does live calculations on that data while it is still moving. Streaming suits fraud detection, live personalisation and ML pipelines. CDC can also feed a stream, by reading the database log. Lambda and Kappa architectures mix both speeds.
+
+      **Orchestration.** If one tool extracts and another cleans, something must make sure cleaning waits for extraction. An orchestrator (Airflow, Prefect, Dagster) schedules tasks, tracks dependencies and retries failures. The workflow is a **DAG (directed acyclic graph)**: tasks flow one way with no loops, so step 2 never starts until step 1 succeeds.
+
+      **Observability.** A pipeline can run without errors yet produce wrong data, such as all prices showing 0.00. Great Expectations tests rules you write, for example expect_column_values_to_not_be_null, and stops the pipeline when one fails. Monte Carlo uses machine learning to spot odd patterns, such as 12 new rows when 50,000 is normal.
+
+      **Exam angle:** match each tool to its job.
 examples:
   - title: The trivial model's scorecard
-    problem: There are 3,000 patients, and 5% of them had a stroke. Work out the accuracy, recall and precision of a model
-      that always says "no stroke".
+    problem: There are 3,000 patients, and 5% of them had a stroke. Work out the accuracy, recall and precision of
+      a model that always says "no stroke".
     steps:
       - Positives = 3,000 × 0.05 = **150**; negatives = **2,850**.
       - TP = 0, FN = 150, TN = 2,850, FP = 0.
@@ -251,8 +454,8 @@ examples:
     answer: 95% accuracy, 0% recall.
     takeaway: On imbalanced data, report recall/precision (or F2, PR-AUC) — never accuracy alone.
   - title: Computing F2
-    problem: A model has precision 0.32 (32% of flagged patients really had a stroke) and recall 0.86 (it catches 86% of
-      stroke patients). Work out F1 and F2, and explain why F2 suits stroke screening.
+    problem: A model has precision 0.32 (32% of flagged patients really had a stroke) and recall 0.86 (it catches
+      86% of stroke patients). Work out F1 and F2, and explain why F2 suits stroke screening.
     steps:
       - F1 = 2PR / (P + R) = 2 × 0.32 × 0.86 / 1.18 = **0.466**.
       - F2 = 5PR / (4P + R) = 5 × 0.32 × 0.86 / (1.28 + 0.86) = 1.376 / 2.14 = **0.643**.
@@ -260,6 +463,34 @@ examples:
         clinical cost of a missed stroke.
     answer: F1 ≈ 0.47, F2 ≈ 0.64.
     takeaway: Choose the metric that encodes which mistake is worse.
+  - title: Exponential backoff after rate-limit errors
+    problem: An ETL job calls a payments API. The API allows 100 calls per minute and replies with error 429 when
+      you go over. The job uses exponential backoff, waiting 2 seconds, then 4, then 8. Suppose the first
+      three tries all fail with 429. How long has the job waited in total before the 4th try?
+    steps:
+      - Try 1 fails with 429. Wait 2 seconds.
+      - Try 2 fails. The wait doubles to 4 seconds.
+      - Try 3 fails. The wait doubles again to 8 seconds.
+      - Now make try 4. Total wait before it is 2 + 4 + 8 = 14 seconds.
+      - If try 4 also failed, the next wait would be 16 seconds, because the pattern keeps doubling.
+    answer: 14 seconds of waiting before the 4th try.
+    takeaway: Backoff gives a busy server room to recover. Waiting longer each time is gentler than retrying
+      instantly, and it helps the job survive rate limits.
+  - title: Append vs upsert when a job is re-run
+    problem: The orders table holds 3 rows, with total amount 100000. The incoming batch has order 500 (now
+      Shipped, amount 45000) and a new order 503 (Pending, amount 20000). Order 500 was already in the table
+      as Pending with amount 45000. Compare what append and upsert do, then re-run the failed job once more.
+    steps:
+      - "Existing table: order 500 Pending 45000, order 501 Pending 30000, order 502 Shipped 25000. Total =
+        45000 + 30000 + 25000 = 100000."
+      - Incoming batch total = 45000 + 20000 = 65000 (2 rows).
+      - "Append, first run: 3 + 2 = 5 rows. Order 500 now appears twice. Total = 100000 + 65000 = 165000."
+      - "Append, re-run: 7 rows, total = 165000 + 65000 = 230000. Revenue is double-counted."
+      - "Upsert, first run: order 500 exists, so update it to Shipped. Order 503 is new, so insert it. Result:
+        4 rows, total = 45000 + 30000 + 25000 + 20000 = 120000."
+      - "Upsert, re-run: both IDs now exist, so the same updates happen again. Still 4 rows and total 120000."
+    answer: Append ends at 7 rows and 230000 after the re-run. Upsert stays at 4 rows and 120000.
+    takeaway: Upsert is idempotent, so a re-run is safe. Plain append is not, and it silently inflates revenue.
 questions:
   - question: Explain why accuracy is misleading on the stroke dataset and which metrics you would use instead.
     kind: short
@@ -330,6 +561,78 @@ questions:
       with recall, precision, F2 and PR-AUC plus the confusion matrix. Save the entire fitted pipeline with
       joblib so the API applies exactly the same imputation, scaling and encoding — no leakage, no
       training-serving skew."
+  - question: Explain why ETL is important when deploying an AI model. Give any four reasons.
+    kind: short
+    marks: 5
+    keywords:
+      - numbers
+      - tensors
+      - latency
+      - training-serving skew
+      - pre-compute
+      - pii
+      - masking
+      - quality
+      - schema
+      - gpu
+    idealAnswer: "ETL matters because a deployed model depends on a steady supply of clean, timely data. First,
+      models only understand numbers, so ETL converts text, images and categories into scaled tensors or
+      embeddings. Second, live APIs have latency budgets, for example under 50 ms, so ETL pre-computes
+      historical aggregates in the background and requests never run slow SQL. Third, a shared pipeline
+      removes training-serving skew, where training code in Python differs from production code in another
+      language and gives different features. Fourth, ETL applies governance and quality filters: it masks PII
+      such as patient identifiers, drops corrupt rows, and blocks broken schema changes before they harm the
+      model. It can also feed GPUs fast enough to keep them busy."
+  - question: A pipeline loads daily orders into a warehouse table. Describe the three load strategies and explain
+      how atomicity and idempotency make the load safe to re-run.
+    kind: short
+    marks: 5
+    keywords:
+      - append
+      - overwrite
+      - truncate
+      - upsert
+      - atomicity
+      - commit
+      - rollback
+      - idempotent
+      - duplicate
+      - transaction
+    idealAnswer: "Append adds new rows to the bottom without checking old ones, good for logs. Overwrite truncates
+      the table and writes a fresh full copy, good for small lookup tables. Upsert checks each ID: it updates
+      the row if the ID exists and inserts it if not, which suits orders whose status changes. Atomicity means
+      the load is all or nothing. The pipeline loads inside a transaction, runs COMMIT if every step works,
+      and runs ROLLBACK on any error, so users never see half-loaded data. Idempotency means re-running the
+      job gives the same result. Upsert and overwrite are idempotent, but a plain append adds duplicate rows
+      each time and double-counts revenue. Together, a failed job can safely be re-run."
+  - question: Compare ETL and ELT, and explain how a data warehouse, a data lake and a lakehouse differ. Say where
+      orchestration and observability fit in a modern pipeline.
+    kind: long
+    marks: 10
+    keywords:
+      - etl
+      - elt
+      - transform
+      - warehouse
+      - data lake
+      - lakehouse
+      - raw
+      - dbt
+      - orchestration
+      - dag
+      - airflow
+      - observability
+    idealAnswer: In ETL, data is extracted, cleaned on a separate server, then loaded into the warehouse. It is
+      slow to change, because a missing column means re-extracting, but it is still used when sensitive data
+      must be removed before reaching the cloud. In ELT, raw data is loaded into the cloud warehouse first and
+      transformed there with SQL tools such as dbt. Since the raw data is already stored, analysts can add new
+      transformations in minutes, which is why ELT became the norm. A data warehouse, such as Snowflake or
+      BigQuery, stores neat tables for fast SQL. A data lake, such as S3, is a cheap store for any raw file
+      with no fixed structure. A lakehouse, such as Databricks or Iceberg, adds warehouse features on top of
+      lake files. Orchestration tools such as Airflow, Prefect and Dagster run the steps as a DAG, so each
+      step waits for the one before it, and they retry failures. Observability tools such as Great
+      Expectations and Monte Carlo catch silent errors, like prices turning to 0.00, by testing rules or
+      spotting unusual row counts.
 coding:
   - id: clinical-metrics
     title: Metrics that don't lie

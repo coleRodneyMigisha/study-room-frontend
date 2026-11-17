@@ -9,34 +9,43 @@ recap: |
   number-crunching like making predictions. Little's Law, L = λ·W, links how many requests arrive per second,
   how long each takes, and how many are being handled at once.
 traps:
-  - "Doing heavy prediction work directly inside an async function. It blocks the event loop, so every other request
-    waits."
-  - "Checking inputs inside the model code instead of at the API's front door (with Pydantic)."
-  - "Forgetting to turn milliseconds into seconds in Little's Law (45 ms = 0.045 s)."
+  - Doing heavy prediction work directly inside an async function. It blocks the event loop, so every other
+    request waits.
+  - Checking inputs inside the model code instead of at the API's front door (with Pydantic).
+  - Forgetting to turn milliseconds into seconds in Little's Law (45 ms = 0.045 s).
+  - Quoting the FastAPI vs Django numbers (67.8 vs 10.1 req/s) without saying they come from one study on an
+    I/O-bound workload.
+  - "Saying code that compiles or passes a scanner is secure: business-logic flaws like mass assignment and
+    race conditions slip past both."
+  - Parsing the request body before checking the key or size, which lets one huge upload crash the server with
+    an out-of-memory error.
+  - Mixing up authentication (who are you) with authorization (what may you do), or putting gRPC on the public
+    side instead of REST.
 lesson:
   checkpointStep: 3
   steps:
-    - "A model saved on disk can't help a single patient by itself. We put it inside a REST API, a web service, so
-      websites, the hospital's electronic health record (EHR) system and mobile apps can ask it for predictions over
-      HTTP."
-    - "FastAPI is the standard tool for serving Python ML models. Built on Starlette and Pydantic, it handles many
-      requests at once (asynchronously), converts data to and from JSON automatically, and writes its own
-      documentation page."
-    - "With Pydantic schemas, every patient detail in a request is strictly checked at the API's front door: age must
-      be between 0 and 120, avg_glucose_level must be positive, and text fields must be one of the allowed choices."
-    - "Checkpoint: why should prediction services run on asynchronous web frameworks, and how does Pydantic stop the
-      model code from crashing?"
-    - "Pydantic catches wrong types, missing fields and impossible values before your model code is touched, and
-      replies with a clear HTTP 422 (Unprocessable Entity) error instead of the server crashing."
-    - "To handle as many requests as possible, separate work that waits (logging to a database, writing audit
-      records) from heavy number-crunching (the prediction itself), and use several Uvicorn worker processes or a
-      thread pool for the heavy part."
+    - A model saved on disk can't help a single patient by itself. We put it inside a REST API, a web service,
+      so websites, the hospital's electronic health record (EHR) system and mobile apps can ask it for
+      predictions over HTTP.
+    - FastAPI is the standard tool for serving Python ML models. Built on Starlette and Pydantic, it handles
+      many requests at once (asynchronously), converts data to and from JSON automatically, and writes its own
+      documentation page.
+    - "With Pydantic schemas, every patient detail in a request is strictly checked at the API's front door:
+      age must be between 0 and 120, avg_glucose_level must be positive, and text fields must be one of the
+      allowed choices."
+    - "Checkpoint: why should prediction services run on asynchronous web frameworks, and how does Pydantic
+      stop the model code from crashing?"
+    - Pydantic catches wrong types, missing fields and impossible values before your model code is touched,
+      and replies with a clear HTTP 422 (Unprocessable Entity) error instead of the server crashing.
+    - To handle as many requests as possible, separate work that waits (logging to a database, writing audit
+      records) from heavy number-crunching (the prediction itself), and use several Uvicorn worker processes
+      or a thread pool for the heavy part.
 checkpoint:
   question: How does Pydantic schema validation enforce data contracts at the API boundary, and why is this
     critical for maintaining 99.9% uptime in production healthcare ML?
-  hint: "What should happen if an app sends the text \"twenty\" instead of a number for BMI, or a negative glucose
-    level? Checking at the door gives a clear 422 error; what happens if the bad value reaches the model instead
-    (a 500 Internal Server Error)?"
+  hint: What should happen if an app sends the text "twenty" instead of a number for BMI, or a negative glucose
+    level? Checking at the door gives a clear 422 error; what happens if the bad value reaches the model
+    instead (a 500 Internal Server Error)?
   keywords:
     - pydantic
     - schema
@@ -48,36 +57,63 @@ checkpoint:
     - uptime
     - crash
     - sanitization
-  idealAnswer: "Pydantic enforces a data contract (the agreed rules for each field) at the boundary of the service,
-    before a request ever reaches the model. The schema enforces types (type enforcement: turning number-text like
-    \"67\" into a number where that's valid), rejects unknown or malformed fields, and checks the allowed values (e.g.
-    Field(..., ge=0, le=120) for age, or a fixed list of smoking statuses). If invalid data arrives, FastAPI replies
-    straight away with a structured HTTP 422 response naming the exact field and problem. In a hospital service,
-    this validation (input sanitization) stops unhandled Python errors (like a ValueError inside scikit-learn) that
-    would crash the request, prevents missing values silently turning into wrong predictions, and keeps the service
-    reliable, protecting its 99.9% uptime."
+  idealAnswer: "Pydantic enforces a data contract (the agreed rules for each field) at the boundary of the
+    service, before a request ever reaches the model. The schema enforces types (type enforcement: turning
+    number-text like \"67\" into a number where that's valid), rejects unknown or malformed fields, and checks
+    the allowed values (e.g. Field(..., ge=0, le=120) for age, or a fixed list of smoking statuses). If
+    invalid data arrives, FastAPI replies straight away with a structured HTTP 422 response naming the exact
+    field and problem. In a hospital service, this validation (input sanitization) stops unhandled Python
+    errors (like a ValueError inside scikit-learn) that would crash the request, prevents missing values
+    silently turning into wrong predictions, and keeps the service reliable, protecting its 99.9% uptime."
 terms:
   - term: API / REST API
-    definition: A web service with addresses (like /predict) that other programs send requests to and get answers
-      from.
+    definition: A web service with addresses (like /predict) that other programs send requests to and get answers from.
   - term: FastAPI
     definition: A modern, fast Python framework for building APIs, built on Starlette and Pydantic.
   - term: Pydantic BaseModel
-    definition: A class where you write the expected fields and their types and limits; Pydantic checks every request
-      against it.
+    definition: A class where you write the expected fields and their types and limits; Pydantic checks every
+      request against it.
   - term: HTTP 422
-    definition: "\"Unprocessable Entity\": the request was valid JSON, but its contents broke the rules."
+    definition: '"Unprocessable Entity": the request was valid JSON, but its contents broke the rules.'
   - term: Uvicorn
     definition: The program (an ASGI web server) that actually runs a FastAPI app and handles the network connections.
   - term: async (asynchronous)
     definition: Code that can pause while waiting (for a database or network) and let other requests run meanwhile.
   - term: CPU-bound vs I/O-bound
-    definition: CPU-bound work keeps the processor busy (making predictions); I/O-bound work mostly waits (for disks,
-      databases, networks).
+    definition: CPU-bound work keeps the processor busy (making predictions); I/O-bound work mostly waits (for
+      disks, databases, networks).
   - term: Throughput (QPS)
     definition: Queries per second, i.e. how many requests the service completes each second.
   - term: Latency (and p99)
     definition: How long one request takes. p99 is the time the slowest 1% of requests exceed.
+  - term: ASGI
+    definition: A Python server standard that lets one process juggle many waiting requests with an event loop;
+      FastAPI uses it.
+  - term: WSGI
+    definition: The older Python server standard where each request holds a thread that sits idle during I/O;
+      Django traditionally uses it.
+  - term: Cursor pagination
+    definition: Returning a long list one page at a time, with a next_cursor value the client sends back to get
+      the next page.
+  - term: gRPC
+    definition: An RPC-style API that calls named operations on another machine using Protocol Buffers over
+      HTTP/2, typical for internal service calls.
+  - term: Bearer token
+    definition: A secret string sent with each request in the Authorization header to prove who the caller is.
+  - term: RBAC (role-based access control)
+    definition: Granting permissions by role, such as nurse or admin, instead of person by person.
+  - term: Mass assignment
+    definition: A flaw where a client can set fields it should not, such as a role field that lets a user sign up
+      as admin.
+  - term: SAST vs DAST
+    definition: SAST reads the code without running it, while DAST attacks the running API; each catches flaws the
+      other misses.
+  - term: OpenAPI
+    definition: A machine-readable contract describing every endpoint, used to generate docs, client SDKs, mocks
+      and fuzz tests.
+  - term: HTTP 429 and Retry-After
+    definition: The status code a rate limiter returns when a caller sends too many requests, with a header saying
+      how long to wait.
 quiz:
   - question: "A hospital client sends {'age': -5, 'bmi': 'obese'} to a FastAPI endpoint requiring float bmi and
       age > 0. What happens?"
@@ -87,8 +123,8 @@ quiz:
       - The model converts -5 to 0 and predicts anyway
       - The request hangs indefinitely
     answer: 1
-    explanation: Pydantic checks the request the moment it arrives, rejects the bad fields (a negative age, text for
-      BMI) and replies with a clear 422 error. The model code never runs.
+    explanation: Pydantic checks the request the moment it arrives, rejects the bad fields (a negative age, text
+      for BMI) and replies with a clear 422 error. The model code never runs.
   - question: What is Little's Law relating Concurrency (L), Throughput (λ), and Latency (W)?
     options:
       - L = λ × W
@@ -96,8 +132,8 @@ quiz:
       - L = λ + W
       - W = L × λ²
     answer: 0
-    explanation: "The average number of requests being handled at once (L) equals how many arrive per second (λ) times
-      how long each takes (W): L = λ × W."
+    explanation: "The average number of requests being handled at once (L) equals how many arrive per second (λ)
+      times how long each takes (W): L = λ × W."
   - question: An invalid field in a FastAPI request body returns…
     options:
       - 200
@@ -105,7 +141,8 @@ quiz:
       - 422
       - 500
     answer: 2
-    explanation: "When Pydantic rejects a field, FastAPI replies with 422 Unprocessable Entity: valid JSON, invalid contents."
+    explanation: "When Pydantic rejects a field, FastAPI replies with 422 Unprocessable Entity: valid JSON,
+      invalid contents."
   - question: Why can a CPU-heavy predict() inside async def hurt throughput?
     options:
       - It is not allowed
@@ -113,7 +150,8 @@ quiz:
       - It uses more memory
       - It disables validation
     answer: 1
-    explanation: While it calculates, it blocks the event loop, so no other request is served. Use plain def (a thread pool) or more workers for heavy work.
+    explanation: While it calculates, it blocks the event loop, so no other request is served. Use plain def (a
+      thread pool) or more workers for heavy work.
   - question: λ = 200 req/s, W = 15 ms. L = ?
     options:
       - "3"
@@ -146,6 +184,60 @@ quiz:
       - In the client
     answer: 1
     explanation: Once per worker, at startup. Each worker process needs its own copy in memory.
+  - question: Which role of an API is a trained model sitting behind a web address that returns a prediction?
+    options:
+      - Orchestrator
+      - Model endpoint
+      - Tool for AI agents
+      - Composite API
+    answer: 1
+    explanation: A model endpoint takes data or an image and returns a prediction. An orchestrator drives other
+      tools, and agents call APIs as tools.
+  - question: In the cited I/O-bound study, FastAPI reached 67.8 req/s and Django 10.1 req/s. About what is the
+      throughput ratio?
+    options:
+      - About 3.7 times
+      - About 4.4 times
+      - About 7.4 times
+      - About 6.7 times
+    answer: 3
+    explanation: 67.8 / 10.1 = 6.71. The 7.4 figure is the latency ratio (48,841 / 6,634 = 7.36).
+  - question: Which is the correct order of serving a model?
+    options:
+      - Receive, load, predict, prepare, respond
+      - Load, receive, prepare, predict, respond
+      - Load, prepare, receive, respond, predict
+      - Prepare, load, receive, predict, respond
+    answer: 1
+    explanation: Weights load once at start-up. Each request is then received, prepared, predicted and answered.
+  - question: With 7 books (ids 1 to 7), limit=3 and after=3, what does list_books return?
+    options:
+      - Books 4, 5, 6 and next_cursor 6
+      - Books 4, 5, 6, 7 and next_cursor None
+      - Books 3, 4, 5 and next_cursor 5
+      - Book 7 and next_cursor None
+    answer: 0
+    explanation: Ids greater than 3 are 4 to 7. The first 3 are 4, 5, 6, which fills the limit, so next_cursor is
+      the last id, 6.
+  - question: Which is a correct front-door defence for a model API?
+    options:
+      - Parse the whole JSON first, then check the key
+      - Trust scanners to find logic flaws
+      - Answer HTTP 429 with a Retry-After header when a key sends too many requests
+      - Use gRPC for all public clients
+    answer: 2
+    explanation: Rate limiting returns 429 with Retry-After. Parsing before checking causes the OOM flaw, and REST
+      is preferred for external clients.
+  - question: An LLM-generated API let users sign up as admin because of an inherited role field. What is this
+      flaw called?
+    options:
+      - Race condition
+      - Execution ordering
+      - Human-in-the-loop paradox
+      - Mass assignment
+    answer: 3
+    explanation: Mass assignment means a client can set a field it should not. The others are locking, ordering
+      and shallow-review flaws.
 fact:
   title: FastAPI + Pydantic v2 Performance
   body: Pydantic v2 was completely rewritten in Rust, delivering 5× to 50× faster JSON parsing and validation.
@@ -230,6 +322,109 @@ notes:
       **Capacity:** with c workers, each taking S seconds per request, the service can finish c ÷ S requests per second. 4 workers × (1 ÷ 0.020 s) = **200 requests per second**. **Utilisation** ρ ("rho") = arrivals ÷ capacity: how busy the service is.
 
       **Waiting grows fast as you get busy.** A simple queueing rule of thumb: **W ≈ S ÷ (1 − ρ)**. At 50% busy, each request takes about 2× as long as normal; at 90% busy, about 10× as long; at 100% or more, the queue grows forever. That's why services are sized to run at about 60–70% busy, and why the **p99** latency (the time the slowest 1% of requests exceed) is watched, not just the average.
+  - heading: Three roles of an API in an AI system
+    body: |
+      **In plain words:** an AI system uses APIs in three different ways: to run other tools for you, to let others use your model, and to let AI agents use outside services.
+
+      An API (a set of rules that lets one program talk to another) shows up in AI projects in three roles.
+
+      1. **Orchestrator.** A script drives another program through its API. In the deck, a Python script drove a design tool (Keysight ADS) to generate and collect training data. Think of a conductor telling each musician when to play.
+      2. **Model endpoint.** A trained model sits behind a web address. A client sends data or an image and gets a prediction back. The client never sees the model's inside. Our stroke-risk API is this role: a clinic app sends patient details and receives a risk score.
+      3. **Tool for AI agents.** Large language model (LLM) agents call APIs to reach outside services. Gorilla, a retriever-aware model, maps a question to an API specification and then calls the right endpoint. This only works because the API is described in a machine-readable way.
+
+      Tiny example: a nurse's app posts a retinal photo to `/upload_file`. A person is the client. When an LLM agent sends the same request, the endpoint cannot tell the difference, and it should not need to.
+
+      **Rule:** clients are not always people. Design the endpoint so a program can read its description, call it, and understand the reply.
+
+      **Exam angle:** name all three roles and give one example of each. The role this module focuses on is the model endpoint.
+  - heading: "ASGI vs WSGI: why blocking servers queue up"
+    body: |
+      **In plain words:** a blocking server makes a worker stand still while it waits. A non-blocking server uses that waiting time to help someone else.
+
+      WSGI (the older Python web-server standard, used by Django) gives each request a thread (one line of work). When the thread waits for I/O (a database, an upload, a remote model call), it sits idle. Requests pile up in a queue, and users eventually see **504 Gateway Timeout** errors.
+
+      ASGI (the newer standard, used by FastAPI) runs an **event loop**. When one request waits, the loop switches to another. Think of a waiter who takes your order, then serves other tables while the kitchen cooks, instead of standing at the kitchen door.
+
+      The deck cites one study (ICECCO 2026) that compared FastAPI microservices with a monolithic Django setup on an **I/O-bound** workload:
+
+      | | FastAPI | Django |
+      |---|---|---|
+      | Requests per second | 67.8 | 10.1 |
+      | Average latency | 6,634 ms | 48,841 ms |
+
+      That is over 6 times the throughput and about 7.3 times lower latency. Memory stayed stable under heavy traffic. The authors credit type hints and Pydantic for lower serialization overhead.
+
+      **Careful:** this is one study, on an I/O-bound workload. It does not say FastAPI makes a heavy model compute faster. A CPU-bound step still blocks the loop (see the existing note on CPU-bound inference).
+
+      **Exam angle:** state the numbers and say they come from an I/O-bound test.
+  - heading: Serving a model in five steps
+    body: |
+      **In plain words:** serving a model means loading it once, then repeating the same four actions for each request.
+
+      The deck's two real systems follow the same five steps:
+
+      1. **Load:** pre-trained weights load into memory at start-up, once, not per request.
+      2. **Receive:** an endpoint such as `POST /upload_file` takes a file or JSON.
+      3. **Prepare:** preprocess the data in memory.
+      4. **Predict:** run the in-memory model (inference).
+      5. **Respond:** return class, confidence and an explanation as JSON.
+
+      Think of a kitchen. The chef sets up the oven before opening (load). Then each order is taken, prepped, cooked and plated.
+
+      Step 3 turns raw input into the exact format the model expects. For images: CLAHE contrast adjustment, then resize to 224 x 224 pixels. For CSV tables: load into a pandas DataFrame, clean column names, one-hot encode, then Min-Max scale.
+
+      **System 1, diabetic retinopathy.** A user uploads a retinal fundus image through a multilingual chatbot. A pre-trained DenseNet121 model behind a FastAPI backend returns a real-time result in 3 classes: No DR, Mild/Moderate DR, Severe DR.
+
+      **System 2, zero-day detection.** CSV network logs are uploaded to `POST /upload_file`, preprocessed with pandas, and checked by three models (Isolation Forest, Random Forest, LSTM). The reported accuracy is 98%. The OpenAI API adds plain-language threat descriptions.
+
+      **Rule:** load once at start-up. A model that loads on every request makes every request slow.
+
+      **Exam angle:** list the five steps in order and give the preparation step for one input type.
+  - heading: Cursor pagination, REST vs gRPC and API-first design
+    body: |
+      **In plain words:** return long lists a page at a time, pick the right protocol for each side of your system, and write the contract before the code.
+
+      **Cursor pagination.** A cursor is a bookmark. The server returns one page plus a `next_cursor`. The client sends it back to get the next page. This is the deck's Books API:
+
+      ```python
+      @app.get("/v1/books")
+      def list_books(limit: int = 3, after: int = 0):
+          ids = sorted(k for k in DB if k > after)[:limit]
+          nxt = ids[-1] if len(ids) == limit else None
+          return {"data": [DB[i] for i in ids], "next_cursor": nxt}
+      ```
+
+      A `next_cursor` of `None` means the last page.
+
+      **REST vs gRPC.** REST exposes resources at web addresses and is preferred for external-facing interfaces. gRPC is an RPC-style API (Remote Procedure Call: run a function that lives on another machine). It sends data as Protocol Buffers, a compact binary format, over HTTP/2. It is typical for internal service-to-service calls. Short rule: **REST outside, gRPC inside**. The deck marks this as general engineering guidance, not a peer-reviewed result.
+
+      **API-first with OpenAPI.** Write the OpenAPI contract (a machine-readable description of every endpoint) before the code. From it you can generate documentation, client SDKs, mocks and fuzz-testing scripts. FastAPI also publishes one for you.
+
+      **What to measure.** Latency (time for one request), throughput (requests per second), the 95th percentile (the time within which 95% of requests finish), CPU, memory and SLA compliance (how often the agreed service level is met). The deck's example is a 459 ms average response time.
+
+      **Exam angle:** know the one-line rule for REST vs gRPC and what a cursor is.
+  - heading: "Securing a model API: identity, front-door defences and testing"
+    body: |
+      **In plain words:** first check who is calling, then stop bad requests at the door, then test the API from several angles.
+
+      **Authentication vs authorization.** Authentication asks who is calling. Authorization asks what they may do. Tools: API keys (identify the calling application), bearer tokens (prove identity on each request, sent as `Authorization: Bearer <token>`), OAuth 2.0 (a standard token flow) and RBAC (role-based access control: permissions come from a role, such as nurse or admin).
+
+      **Three front-door defences.**
+      - **Validate input:** Pydantic rules (min_length, ge, le), and parameterized queries so user text cannot become SQL injection.
+      - **Limit the rate:** a per-key limiter answers **HTTP 429** with a `Retry-After` header.
+      - **Limit the size:** cap the request body before parsing the JSON, so huge uploads cannot exhaust memory.
+
+      **Four flaws found in LLM-generated APIs** (IEEE Access 2026 study):
+      - *Mass assignment:* an inherited `role` field let users sign up as admin.
+      - *Execution ordering:* huge JSON was parsed before the key check, causing an OOM (out of memory) crash.
+      - *Race conditions:* no row locking, so duplicate payments or webhooks.
+      - *Human-in-the-loop paradox:* polished code invites shallow review.
+
+      Code that compiles is not secure, and scanners miss business-logic flaws when the syntax looks valid.
+
+      **Testing triangulation.** Use three methods because each catches what the others miss: **SAST** reads code without running it (Bandit, Semgrep); **DAST / fuzzing** attacks the running API (Schemathesis, RESTler); **manual** penetration tests follow OWASP WSTG.
+
+      **Exam angle:** name the three defences and the four flaws, and say why one test type is not enough.
 examples:
   - title: Little's Law
     problem: The stroke API handles 80 requests/s with an average latency of 45 ms. How many requests are in
@@ -249,6 +444,40 @@ examples:
       - "Check: 9 × 50 = 450 req/s, ρ = 300/450 = 67%; latency ≈ 20 / 0.33 ≈ 60 ms."
     answer: 9 workers.
     takeaway: Size for a target utilisation, not for 100% — queues explode near capacity.
+  - title: Walking cursor pagination through 7 books
+    problem: A DB has books with ids 1 to 7. The deck's list_books uses limit=3 and after=0 by default. Trace each
+      call until the client reaches the last page.
+    steps:
+      - Call 1 is GET /v1/books with after=0. The ids greater than 0 are 1 to 7. Sorted and cut to the first
+        3, we get ids 1, 2, 3.
+      - len(ids) is 3, which equals limit, so nxt = ids[-1] = 3. The reply has data for books 1, 2, 3 and
+        next_cursor 3.
+      - Call 2 is GET /v1/books?after=3. Ids greater than 3 are 4, 5, 6, 7. The first 3 are 4, 5, 6. len is 3,
+        so next_cursor is 6.
+      - Call 3 is GET /v1/books?after=6. Only id 7 is greater than 6, so ids is [7]. len is 1, which is not 3,
+        so next_cursor is None.
+      - The client sees None and stops. It fetched 3 + 3 + 1 = 7 books in 3 calls.
+      - "Edge case: with exactly 6 books, call 2 returns 4, 5, 6 with next_cursor 6. Call 3 then returns an
+        empty list with next_cursor None. One extra call, but still correct."
+    answer: "3 pages: ids 1,2,3 (next_cursor 3), ids 4,5,6 (next_cursor 6), id 7 (next_cursor None)."
+    takeaway: The client never counts pages. It just sends back whatever next_cursor it was given, and stops when
+      it is None.
+  - title: Speedup ratios from the FastAPI vs Django study
+    problem: The cited study (I/O-bound workload) measured FastAPI at 67.8 requests per second and 6,634 ms
+      average latency, and Django at 10.1 requests per second and 48,841 ms. Compute both ratios and convert
+      the latencies to seconds.
+    steps:
+      - "Throughput ratio: 67.8 / 10.1 = 6.71. FastAPI handled about 6.7 times the requests per second, which
+        matches the deck's 'over 6x'."
+      - "Latency ratio: 48,841 / 6,634 = 7.36. Django's average latency was about 7.4 times higher, close to
+        the deck's '~7.3x lower'."
+      - "In seconds: 6,634 ms is 6.634 s and 48,841 ms is 48.841 s."
+      - "Time saved per request on average: 48,841 - 6,634 = 42,207 ms, about 42.2 s."
+      - "Scope check: this was an I/O-bound workload, one study. It is not a claim about heavy model
+        computation."
+    answer: About 6.71 times the throughput and 7.36 times lower average latency, on that I/O-bound test.
+    takeaway: Quote the numbers with their condition. Gains from async come from not blocking while waiting, so
+      they apply to waiting-heavy workloads.
 questions:
   - question: How does Pydantic protect the model code in a FastAPI service? Give two concrete validation rules
       for the stroke API.
@@ -320,6 +549,78 @@ questions:
       (or replicas behind a load balancer). Errors: return clear 4xx for client issues, catch model errors as
       500 with a request id, never leak stack traces. Monitor request rate, p50/p99 latency, error rates,
       utilisation, input distributions (for drift) and model version, with structured logs per request."
+  - question: Explain why a blocking (WSGI) server struggles under I/O-heavy model serving and how an ASGI server
+      like FastAPI helps. Include the study result the deck cites.
+    kind: short
+    marks: 5
+    keywords:
+      - wsgi
+      - asgi
+      - blocking
+      - thread
+      - event loop
+      - i/o-bound
+      - 504
+      - 67.8
+      - 10.1
+      - latency
+    idealAnswer: A WSGI server such as Django gives each request a thread. When the request waits on I/O, such as
+      an upload, a database query or a remote model call, the thread sits idle, queues fill and users see 504
+      Gateway Timeout errors. An ASGI server such as FastAPI runs an event loop that serves other requests
+      while one waits, so one process can handle many concurrent connections. The cited ICECCO 2026 study
+      compared FastAPI microservices with a monolithic Django setup on an I/O-bound workload. FastAPI reached
+      67.8 requests per second against 10.1 (about 6.7 times) and average latency of 6,634 ms against 48,841
+      ms (about 7.4 times lower). This result is for I/O-bound work and does not show faster CPU computation.
+  - question: Describe the five steps of serving a model behind an API, using one of the two real systems in the deck.
+    kind: short
+    marks: 5
+    keywords:
+      - load
+      - receive
+      - prepare
+      - predict
+      - respond
+      - densenet121
+      - fundus
+      - 224
+      - clahe
+      - json
+    idealAnswer: "Step 1, load: pre-trained weights are loaded into memory once at start-up. Step 2, receive: an
+      endpoint such as POST /upload_file takes a file or JSON. Step 3, prepare: preprocess the data in memory.
+      Step 4, predict: run the in-memory model. Step 5, respond: return class, confidence and explanation as
+      JSON. In the diabetic retinopathy system, a user uploads a retinal fundus image through a multilingual
+      chatbot. The image gets CLAHE contrast adjustment and is resized to 224 x 224 pixels. A pre-trained
+      DenseNet121 model behind FastAPI classifies it into No DR, Mild/Moderate DR or Severe DR, and the result
+      returns in real time. The client never sees the model internals."
+  - question: Discuss how to secure an API that serves a model. Cover authentication, the three front-door
+      defences, the flaws found in LLM-generated APIs and how to test.
+    kind: long
+    marks: 10
+    keywords:
+      - authentication
+      - authorization
+      - bearer token
+      - rbac
+      - parameterized queries
+      - 429
+      - retry-after
+      - body size
+      - mass assignment
+      - race condition
+      - sast
+      - dast
+    idealAnswer: "Authentication asks who is calling and authorization asks what they may do. API keys identify
+      the calling application, bearer tokens prove identity on each request, OAuth 2.0 gives a standard token
+      flow, and RBAC grants permissions by role. At the front door there are three defences. First, validate
+      input with Pydantic rules and use parameterized queries to block SQL injection. Second, rate limit per
+      key and answer HTTP 429 with a Retry-After header. Third, cap the request body size before parsing JSON
+      so huge uploads cannot exhaust memory. A 2026 IEEE Access study found four flaws in LLM-generated APIs:
+      mass assignment (an inherited role field allowed admin sign-up), execution ordering (huge JSON parsed
+      before the key check, causing an OOM crash), race conditions (no row locking, so duplicate payments or
+      webhooks) and the human-in-the-loop paradox (polished code invites shallow review). Code that compiles
+      is not necessarily secure, and scanners miss business-logic flaws. So triangulate: SAST reads code
+      (Bandit, Semgrep), DAST or fuzzing attacks the running API (Schemathesis, RESTler), and manual
+      penetration tests follow OWASP WSTG."
 coding:
   - id: patient-schema
     title: The Patient request schema

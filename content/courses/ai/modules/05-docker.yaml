@@ -8,30 +8,39 @@ recap: |
   cuts the size by about 80% and leaves no compilers for an attacker to use. Run the app as a normal (non-root)
   user, and use .dockerignore to keep secrets and data out of the image.
 traps:
-  - "Shipping gcc and other build tools in the final image. They make it huge and give attackers tools."
-  - "Running the container as root (the all-powerful admin user)."
-  - "Copying your code before installing the requirements. Then every code change re-installs every library."
+  - Shipping gcc and other build tools in the final image. They make it huge and give attackers tools.
+  - Running the container as root (the all-powerful admin user).
+  - Copying your code before installing the requirements. Then every code change re-installs every library.
+  - "Do not call a container a small virtual machine: it is a normal process on the host that shares the host
+    kernel, and that is why its isolation is weaker than a VM."
+  - "Do not confuse RUN and CMD: RUN executes once at build time and is stored in a layer, while CMD runs
+    every time a container starts."
+  - "Do not use shell-form CMD and expect a clean stop: SIGTERM goes to the shell, and Docker kills the app
+    with SIGKILL after 10 seconds."
+  - "Do not trust a tag such as latest to mean the same image tomorrow: pin a digest, and remember replicas
+    must be stateless."
 lesson:
   checkpointStep: 3
   steps:
-    - "A web API that works on your laptop often fails on a cloud server because of a different Python version,
-      missing system libraries, or different operating-system packages. Docker solves this."
-    - "A Docker image is a sealed, runnable package containing your code, the Python runtime, system tools and
-      libraries, built up in layers that never change once built."
-    - "A careless Dockerfile starts from a 1 GB Ubuntu image and installs compilers (gcc, g++) that stay in the final
-      container. That makes it slow to deploy and gives attackers more to work with (a bigger attack surface)."
-    - "Checkpoint: why are multi-stage Docker builds so useful for Python ML APIs, and why should containers never run
-      as root in production?"
-    - "A multi-stage build uses a heavy first stage, with compilers, to build the Python packages, then copies only
-      the finished packages into a clean, minimal python:3.11-slim image, cutting the size by about 80%."
-    - "Running as a normal user (USER appuser), not root, means that if an attacker exploits a bug or a malicious
-      pickle file, they can't change system files or reach the host computer's drives as easily."
+    - A web API that works on your laptop often fails on a cloud server because of a different Python version,
+      missing system libraries, or different operating-system packages. Docker solves this.
+    - A Docker image is a sealed, runnable package containing your code, the Python runtime, system tools and
+      libraries, built up in layers that never change once built.
+    - A careless Dockerfile starts from a 1 GB Ubuntu image and installs compilers (gcc, g++) that stay in the
+      final container. That makes it slow to deploy and gives attackers more to work with (a bigger attack
+      surface).
+    - "Checkpoint: why are multi-stage Docker builds so useful for Python ML APIs, and why should containers
+      never run as root in production?"
+    - A multi-stage build uses a heavy first stage, with compilers, to build the Python packages, then copies
+      only the finished packages into a clean, minimal python:3.11-slim image, cutting the size by about 80%.
+    - Running as a normal user (USER appuser), not root, means that if an attacker exploits a bug or a
+      malicious pickle file, they can't change system files or reach the host computer's drives as easily.
 checkpoint:
   question: Explain the architecture of a multi-stage Docker build for a Python ML serving image, and detail two
     security best practices for production container deployment.
-  hint: "Describe the two stages: a 'builder' stage with compilers, and a final small 'runner' stage. What gets copied
-    across, and what's left behind? For security, think about which user the app runs as, and what .dockerignore
-    keeps out."
+  hint: "Describe the two stages: a 'builder' stage with compilers, and a final small 'runner' stage. What gets
+    copied across, and what's left behind? For security, think about which user the app runs as, and what
+    .dockerignore keeps out."
   keywords:
     - multi-stage
     - docker
@@ -43,15 +52,16 @@ checkpoint:
     - attack surface
     - layer
     - caching
-  idealAnswer: "A multi-stage Docker build separates building from running. The first, builder stage (FROM python:3.11
-    AS builder) installs compilers and build tools (gcc, g++, libpq-dev) to compile the heavy Python libraries into
-    ready-to-install packages (wheels). The final stage (FROM python:3.11-slim) copies in only those wheels and the
-    app code, leaving the compilers, header files and build leftovers behind. That shrinks the image from about
-    1.2 GB to about 160 MB, so containers start and scale faster, and there's a smaller attack surface. Copying
-    requirements before the code also keeps each layer's caching effective. Two key security practices: (1) run as
-    a dedicated non-root user (RUN useradd -m appuser, then USER appuser), so an attacker who exploits a bug can't
-    easily gain control of the host; and (2) use a strict .dockerignore file to keep virtual environments, test
-    data, git history and secrets out of the image."
+  idealAnswer: "A multi-stage Docker build separates building from running. The first, builder stage (FROM
+    python:3.11 AS builder) installs compilers and build tools (gcc, g++, libpq-dev) to compile the heavy
+    Python libraries into ready-to-install packages (wheels). The final stage (FROM python:3.11-slim) copies
+    in only those wheels and the app code, leaving the compilers, header files and build leftovers behind.
+    That shrinks the image from about 1.2 GB to about 160 MB, so containers start and scale faster, and
+    there's a smaller attack surface. Copying requirements before the code also keeps each layer's caching
+    effective. Two key security practices: (1) run as a dedicated non-root user (RUN useradd -m appuser, then
+    USER appuser), so an attacker who exploits a bug can't easily gain control of the host; and (2) use a
+    strict .dockerignore file to keep virtual environments, test data, git history and secrets out of the
+    image."
 terms:
   - term: Docker image vs container
     definition: An image is the sealed package; a container is a running copy of it.
@@ -60,18 +70,48 @@ terms:
   - term: Image layer
     definition: The read-only result of one Dockerfile step. Docker reuses (caches) unchanged layers to rebuild fast.
   - term: Base image
-    definition: The starting image you build on, e.g. python:3.11-slim, which provides a minimal operating system and
-      Python.
+    definition: The starting image you build on, e.g. python:3.11-slim, which provides a minimal operating system
+      and Python.
   - term: Multi-stage build
     definition: A Dockerfile with several FROM stages, copying only the needed results from one stage into the next.
   - term: Attack surface
-    definition: Everything an attacker could try to use. Fewer tools and packages in the image means a smaller attack
-      surface.
+    definition: Everything an attacker could try to use. Fewer tools and packages in the image means a smaller
+      attack surface.
   - term: Root vs non-root user
-    definition: Root is the all-powerful admin account. Running your app as an ordinary user limits the damage if it's
-      hacked.
+    definition: Root is the all-powerful admin account. Running your app as an ordinary user limits the damage if
+      it's hacked.
   - term: .dockerignore
     definition: A file listing what to leave out of the image (e.g. .git, .env secrets, datasets, notebooks).
+  - term: Namespace
+    definition: A Linux kernel feature that gives a process its own private view of something, such as its process
+      tree, network, filesystem, hostname or user IDs.
+  - term: cgroups (control groups)
+    definition: A Linux kernel feature that limits and measures how much CPU, memory and I/O a process or
+      container can use.
+  - term: Copy-on-write
+    definition: A storage trick where a file in a read-only image layer is copied into the container's writable
+      layer only when it is changed.
+  - term: OCI (Open Container Initiative)
+    definition: A Linux Foundation project that sets vendor-neutral image, runtime and distribution standards so
+      container tools work with each other.
+  - term: runc
+    definition: The OCI runtime at the end of the docker run chain that asks the kernel to create the namespaces
+      and cgroups and starts the container process.
+  - term: SIGTERM and SIGKILL
+    definition: SIGTERM politely asks a process to stop and can be caught for a graceful shutdown, while SIGKILL
+      forces it to stop immediately.
+  - term: PID 1
+    definition: The first process inside a container, whose exit stops the whole container and which should
+      receive and handle stop signals.
+  - term: Exec form vs shell form
+    definition: Exec form (CMD ["python","app.py"]) runs your program directly as PID 1, while shell form (CMD
+      python app.py) runs it inside /bin/sh, which may block signals.
+  - term: Digest
+    definition: A sha256 hash of an image's content that names exactly one image forever, unlike a tag, which can
+      be moved.
+  - term: OOM killer
+    definition: The kernel mechanism that stops a process when it goes over its memory limit or the machine runs
+      out of memory.
 quiz:
   - question: Why place 'COPY requirements.txt .' and 'RUN pip install' before 'COPY . .' in a Dockerfile?
     options:
@@ -107,15 +147,17 @@ quiz:
       - It makes the image smaller
       - For security
     answer: 1
-    explanation: A change rebuilds that layer and everything after it. Libraries change rarely, so installing them first means code edits only rebuild the last step.
+    explanation: A change rebuilds that layer and everything after it. Libraries change rarely, so installing them
+      first means code edits only rebuild the last step.
   - question: Why can python:3.11-alpine make ML image builds slower?
     options:
       - It's bigger
-      - "It uses musl, so many scientific wheels compile from source"
+      - It uses musl, so many scientific wheels compile from source
       - It has no pip
       - It can't run Python 3.11
     answer: 1
-    explanation: Ready-made packages are built for the glibc library, but Alpine uses musl, so they often have to be compiled from scratch.
+    explanation: Ready-made packages are built for the glibc library, but Alpine uses musl, so they often have to
+      be compiled from scratch.
   - question: What does USER appuser protect against?
     options:
       - Slow startup
@@ -123,11 +165,12 @@ quiz:
       - Large images
       - Network latency
     answer: 1
-    explanation: If the app is hacked, the attacker only gets an ordinary user's limited powers, not root's (the "least privilege" rule).
+    explanation: If the app is hacked, the attacker only gets an ordinary user's limited powers, not root's (the
+      "least privilege" rule).
   - question: What belongs in .dockerignore?
     options:
       - requirements.txt
-      - ".git, .env and local datasets"
+      - .git, .env and local datasets
       - The Dockerfile
       - The app code
     answer: 1
@@ -139,7 +182,61 @@ quiz:
       - Injected as an environment variable at runtime
       - In the image label
     answer: 2
-    explanation: In an environment variable set when the container starts. Images get copied and shared, so secrets must never be built into them.
+    explanation: In an environment variable set when the container starts. Images get copied and shared, so
+      secrets must never be built into them.
+  - question: Which pair of kernel features decides what a container can SEE and what it can USE?
+    options:
+      - cgroups for what it sees, namespaces for what it uses
+      - Namespaces for what it sees, cgroups for what it uses
+      - Overlay for what it sees, hypervisor for what it uses
+      - Namespaces for what it sees, hypervisor for what it uses
+    answer: 1
+    explanation: Namespaces give a private view (process tree, network, filesystem, hostname). cgroups limit CPU,
+      memory and I/O.
+  - question: Which is the correct order for what happens when you type docker run?
+    options:
+      - CLI, containerd, dockerd, runc, kernel
+      - CLI, dockerd, runc, containerd, kernel
+      - CLI, runc, dockerd, containerd, kernel
+      - CLI, dockerd, containerd, runc, kernel
+    answer: 3
+    explanation: The CLI calls dockerd, which delegates to containerd, which uses runc to ask the kernel for
+      namespaces and cgroups.
+  - question: docker stop is run on a container whose app ignores SIGTERM. What happens?
+    options:
+      - Docker waits 10 seconds by default, then sends SIGKILL
+      - Docker sends SIGKILL at once
+      - Docker waits for ever until the app exits
+      - Docker deletes the image
+    answer: 0
+    explanation: docker stop sends SIGTERM, waits the grace period (10 s by default), then forces the stop with SIGKILL.
+  - question: In the image name ghcr.io/ucu-group2/visits-app:1.0, what is ucu-group2?
+    options:
+      - The registry
+      - The tag
+      - The repository
+      - The namespace
+    answer: 3
+    explanation: The pattern is registry/namespace/repository:tag, so ghcr.io is the registry, ucu-group2 the
+      namespace, visits-app the repository and 1.0 the tag.
+  - question: You run docker compose up --scale web=3 and the replicas fail. The Compose file has ports 5000:5000
+      for web. What is the most likely cause?
+    options:
+      - Three replicas all try to use host port 5000
+      - Compose cannot start more than one container
+      - The tag is missing
+      - The named volume is too small
+    answer: 0
+    explanation: A fixed host port can belong to only one container. Remove the host port or put a load balancer
+      or reverse proxy in front.
+  - question: A container is started with --memory=256m and the app tries to use 400 MB. What happens?
+    options:
+      - The container is paused until memory is free
+      - Docker silently raises the limit
+      - The kernel's OOM killer stops it
+      - The app moves to a bigger host
+    answer: 2
+    explanation: --memory is a hard cap. Going over it makes the kernel's OOM killer stop the container.
 fact:
   title: Why Alpine Linux Can Slow Python Builds
   body: Alpine Linux uses musl libc instead of glibc. Because most scientific Python packages (NumPy, SciPy,
@@ -238,6 +335,160 @@ notes:
       - keep secrets out of the image; pass them in as environment variables when the container starts;
       - add a `HEALTHCHECK` so the platform can tell when the app stops responding;
       - keep the image minimal.
+  - heading: Containers vs virtual machines, and how containers work
+    body: |
+      **In plain words:** a container is an ordinary program that the operating system has fenced in, so it thinks it has the whole computer to itself. A virtual machine (VM, a pretend computer with its own full operating system) is much heavier.
+
+      Think of a block of flats against separate houses. A VM is a house: its own walls, roof and plumbing. A container is a flat: it has its own door and rooms, but the building's foundations and pipes (the kernel, the core of the operating system) are shared.
+
+      | | Virtual machine | Container |
+      |---|---|---|
+      | Virtualises | Hardware | Operating system |
+      | OS | Full guest OS each | None, shares the host kernel |
+      | Typical size | Gigabytes | Megabytes |
+      | Start-up | Minutes | Seconds or less |
+      | Isolation | Strong (hypervisor) | Process-level |
+      | Density | Fewer per host | Many more per host |
+
+      They work together: in the cloud, containers usually run inside VMs.
+
+      Three Linux kernel features make a container:
+
+      - **Namespaces** control what a process can **see**: its own process tree (PID), network (NET), filesystem view (MNT), hostname (UTS), inter-process messaging (IPC) and user IDs (USER).
+      - **cgroups** (control groups) control what a process can **use**: CPU time, memory, disk and network I/O. They also measure use per container.
+      - **Overlay (union) filesystem** controls how files are **stored**. An image is a stack of read-only layers. A running container adds one thin writable layer on top. This is **copy-on-write**: a file is copied up into the writable layer only when it changes. Ten images that share a base store that base once.
+
+      Docker did not invent these features. It made them easy to use.
+
+      **Exam angle:** "A container is not a mini VM." Say it is a normal process with limited view (namespaces) and limited use (cgroups). Because the kernel is shared, isolation is weaker than a VM.
+  - heading: What happens when you type docker run, and the OCI standards
+    body: |
+      **In plain words:** typing `docker run` sets off a relay race. Each runner hands the job to a more specialised one until the Linux kernel makes the isolated process.
+
+      Think of ordering food. You tell the waiter (the CLI), the waiter tells the kitchen manager (the daemon), the manager gives the order to a cook (containerd), and the cook uses the stove (runc and the kernel).
+
+      The chain:
+
+      1. **docker CLI** (command-line interface): the command you type. It is only a client.
+      2. **dockerd**: the Docker daemon (a background service). The CLI calls its REST API. It can even be on another machine.
+      3. **containerd**: manages images and containers.
+      4. **runc**: the OCI runtime. It creates the process.
+      5. **Linux kernel**: sets up the namespaces and cgroups.
+
+      Because the CLI is just a client, `docker version` prints two sections, Client and Server.
+
+      **OCI** (Open Container Initiative) is a Linux Foundation project from 2015. It writes vendor-neutral standards so that an image built with one tool runs in another. It has three specs:
+
+      - **Image spec**: how an image and its layers are packaged.
+      - **Runtime spec**: how to run a container from an unpacked image.
+      - **Distribution spec**: how registries push and pull images.
+
+      So an image built with Docker can be run by Podman (a daemonless alternative) or by Kubernetes. Other tools in the family are Buildah, CRI-O and nerdctl.
+
+      For the stroke-risk model this means the image you test on your laptop is the same one a cloud platform runs, whichever engine it uses.
+
+      **Exam angle:** list the five links of the chain in order, and name the three OCI specs with one phrase each.
+  - heading: Container lifecycle, stopping, and PID 1
+    body: |
+      **In plain words:** a container lives exactly as long as its first process. How you stop it decides whether it closes politely or gets cut off.
+
+      The states are Created, Running, Paused, Stopped (Exited) and Removed. `docker run` is `docker create` plus `docker start`. Use `docker pause` and `docker unpause` to freeze and resume, `docker stop` to stop, and `docker rm` to delete.
+
+      **What `docker stop` really does:**
+
+      1. It sends **SIGTERM** (a signal meaning "please finish and exit") to the main process.
+      2. It waits a **grace period**, 10 seconds by default.
+      3. If the process is still alive, it sends **SIGKILL** (forced kill, cannot be caught).
+
+      A well-written app catches SIGTERM, finishes in-flight requests and closes connections. This is a **graceful shutdown**.
+
+      **Restart policies** tell Docker what to do after a crash: `no` (default), `on-failure`, `always`, `unless-stopped`. Example: `docker run --restart unless-stopped ...`.
+
+      **PID 1** (process ID 1) is the first process in the container. When it exits, the container stops.
+
+      - **Exec form** `CMD ["python","app.py"]` makes your app PID 1, so it receives signals directly.
+      - **Shell form** `CMD python app.py` wraps it in `/bin/sh`. The shell becomes PID 1 and may not forward SIGTERM, so Docker waits the full 10 seconds and then kills the app.
+      - Use `docker run --init` (adds a tiny init program called tini) if your app starts child processes, so finished children (zombie processes, dead but not cleaned up) get reaped.
+      - Send logs to **stdout and stderr**. Docker collects them for `docker logs`.
+
+      **Exam angle:** "Why does my container take 10 seconds to stop?" Answer: shell-form CMD, SIGTERM never reaches the app, SIGKILL after the grace period.
+  - heading: Dockerfile instructions and Docker Compose
+    body: |
+      **In plain words:** a Dockerfile is a recipe read top to bottom. Compose is a second recipe that says how several containers fit together.
+
+      Here is the stroke-risk API recipe:
+
+      ```dockerfile
+      FROM python:3.12-slim
+      WORKDIR /app
+      COPY requirements.txt .
+      RUN pip install --no-cache-dir -r requirements.txt
+      COPY . .
+      ENV PYTHONUNBUFFERED=1
+      EXPOSE 5000
+      USER 10001
+      HEALTHCHECK CMD curl -f http://localhost:5000/health
+      CMD ["python", "app.py"]
+      ```
+
+      - `FROM`: the base image to start from.
+      - `WORKDIR`: the working folder inside the image.
+      - `COPY`: copy files from your machine.
+      - `RUN`: run a command **at build time**.
+      - `ENV`: set an environment variable.
+      - `EXPOSE`: document the port the app uses. It does not publish it.
+      - `USER`: run as a non-root user.
+      - `HEALTHCHECK`: how Docker tests that the app is alive.
+      - `CMD` and `ENTRYPOINT`: the command that runs **when the container starts**.
+
+      **RUN vs CMD** is a favourite exam question. RUN happens once, while building the image, and its result is baked into a layer. CMD happens every time a container starts. (The slim image has no curl, so a real healthcheck may call Python instead.)
+
+      **Compose** describes a multi-container app in one YAML file:
+
+      ```yaml
+      services:
+        web:
+          build: .
+          environment:
+            REDIS_HOST: redis
+        redis:
+          image: redis:7-alpine
+          volumes: ["redis-data:/data"]
+      volumes:
+        redis-data:
+      ```
+
+      - Compose makes a private network, so `web` finds Redis by the **service name** `redis`.
+      - A **named volume** (`redis-data`) keeps the data when containers are replaced.
+      - `docker compose up -d` starts everything, and `docker compose down` stops it.
+
+      **Exam angle:** one main process per container, and keep data in volumes, never inside the container.
+  - heading: Image names, resource limits and scaling out
+    body: |
+      **In plain words:** an image name says where an image lives. Limits stop one container from eating the whole server. Scaling means running more copies.
+
+      **Name anatomy.** In `ghcr.io/ucu-group2/visits-app:1.0`:
+
+      - registry = `ghcr.io` (the server that stores images)
+      - namespace = `ucu-group2` (the owner)
+      - repository = `visits-app` (all versions of one image)
+      - tag = `1.0` (a label)
+
+      A **tag** is a movable label: `latest` can point to a new image tomorrow. A **digest** (`sha256:...`) is a content hash, so it always means exactly the same bytes. Pin a digest for reliable deployments, such as a hospital model.
+
+      **Limits.** By default a container has no limits, so one busy container can starve the others.
+
+      ```
+      docker run -d --cpus=0.5 --memory=256m visits-app:optimised
+      ```
+
+      `--cpus` caps CPU. `--memory` is a hard cap. `--memory-reservation` is a soft limit. If the container passes its memory limit, the kernel's **OOM killer** (out-of-memory killer) stops it. A model that needs more RAM than the limit will be killed again and again. `docker stats` shows usage against the limit.
+
+      **Scaling.** Scale **out** (horizontal) means more containers from the same image, usually behind a load balancer. Scale **up** (vertical) means more CPU and memory for one container, which stops at the size of one host. Scaling out works only if replicas are **stateless**: counters and sessions live in Redis or a database, so any replica can answer.
+
+      **A trap:** `docker compose up --scale web=3` with a fixed `5000:5000` port mapping fails, because three replicas fight for host port 5000. Remove the host port, or put a load balancer or reverse proxy in front.
+
+      **Exam angle:** name the four parts of an image name, and explain tag vs digest.
 examples:
   - title: How much did the multi-stage build save?
     problem: A single-stage ubuntu-based image is 1,315 MB (850 MB base, 420 MB build tools, 45 MB app). Rebuilt
@@ -257,6 +508,46 @@ examples:
       - "Now a code change only rebuilds the final COPY layer: seconds instead of minutes."
     answer: Layer order — copy and install dependencies before copying code.
     takeaway: Put what changes least at the top of the Dockerfile.
+  - title: Parse an image name into its four parts
+    problem: Your team pushes the stroke-risk API to a private DigitalOcean registry with the name
+      registry.digitalocean.com/group2-registry/visits-app:1.0. Split it into registry, namespace, repository
+      and tag. Then say what name Docker would pull if someone wrote only visits-app, and why a digest is
+      safer than the tag.
+    steps:
+      - "Find the tag first. It is the part after the last colon: 1.0."
+      - "Everything before the colon is the path: registry.digitalocean.com/group2-registry/visits-app. Split
+        it at the slashes into 3 pieces."
+      - "Piece 1 is the registry (the server): registry.digitalocean.com. Piece 2 is the namespace (the owner
+        or project): group2-registry. Piece 3 is the repository (all versions of one image): visits-app."
+      - "Count the parts: registry, namespace, repository, tag. That is 4 parts, matching the pattern
+        registry/namespace/repository:tag."
+      - If someone writes only visits-app, the tag is missing, so Docker uses the default tag latest. The
+        registry and namespace are also missing, so Docker uses its defaults, which is a weak habit for
+        production.
+      - The tag 1.0 is a label that someone can move to a different image later. A digest such as sha256:...
+        is a hash of the content, so it always names the same bytes.
+    answer: registry = registry.digitalocean.com, namespace = group2-registry, repository = visits-app, tag = 1.0.
+      Pin a digest when you need the exact same image every time.
+    takeaway: Read an image name right to left for the tag and left to right for the registry. Tags move, digests
+      do not.
+  - title: Stopping an app that uses shell-form CMD
+    problem: A container runs the stroke-risk API with the shell form CMD python app.py. The app needs 2 seconds
+      to finish its in-flight requests after SIGTERM. You run docker stop. Show what happens second by second.
+      Then compare with the exec form for stopping 20 containers one after another.
+    steps:
+      - Shell form wraps the app in /bin/sh, so the shell is PID 1 and the app is its child.
+      - At 0 s, docker stop sends SIGTERM to PID 1. This is the shell. The shell does not forward the signal,
+        so the app never hears it.
+      - From 0 s to 10 s, the app keeps running. Docker waits the default grace period of 10 seconds.
+      - At 10 s, Docker sends SIGKILL. The process is cut off at once. In-flight requests are dropped with no
+        clean-up.
+      - Total stop time is 10 s, with an ungraceful end.
+      - With exec form CMD ["python","app.py"], the app is PID 1 and gets SIGTERM at 0 s. It finishes in 2 s
+        and exits cleanly, so the stop takes 2 s.
+      - "For 20 containers stopped in turn: 20 x 10 = 200 s with shell form, and 20 x 2 = 40 s with exec form."
+    answer: "Shell form: 10 s and a forced kill. Exec form: 2 s and a graceful exit. For 20 containers that is 200
+      s against 40 s, a saving of 160 s."
+    takeaway: Always use exec form CMD so SIGTERM reaches your app. The slow stop is the sign that it did not.
 questions:
   - question: Explain how Docker layer caching works and how Dockerfile order affects build time.
     kind: short
@@ -324,6 +615,73 @@ questions:
       runtime, never baked in; .dockerignore excludes .git, .env and data. EXPOSE 8000, add HEALTHCHECK
       calling /health, and CMD uvicorn app.main:app --host 0.0.0.0 --port 8000. Result: a ~150–200 MB
       reproducible image with no build tools, fast rebuilds and a minimal attack surface."
+  - question: Explain how a container works under the hood, and compare it with a virtual machine.
+    kind: long
+    marks: 10
+    keywords:
+      - namespaces
+      - cgroups
+      - overlay
+      - copy-on-write
+      - shared kernel
+      - hypervisor
+      - guest os
+      - process-level isolation
+      - seconds
+      - density
+    idealAnswer: "A container is not a small VM. It is an ordinary process on the host, started from an image,
+      that shares the host kernel. Three Linux kernel features build it. Namespaces control what the process
+      can see: its own process tree, network, filesystem view, hostname and user IDs. cgroups control what it
+      can use: CPU, memory and I/O, and they measure usage. An overlay (union) filesystem stores the image as
+      read-only layers with a thin writable layer on top, using copy-on-write so a file is copied only when it
+      changes, and layers are shared between images. A virtual machine virtualises hardware through a
+      hypervisor and carries a full guest OS, so it is gigabytes in size and takes minutes to start, but it
+      has strong isolation. A container virtualises the operating system, is megabytes in size, starts in
+      seconds or less, and allows much higher density per host, but its isolation is only process-level
+      because the kernel is shared. In the cloud, containers usually run inside VMs, so the two are
+      complementary."
+  - question: State what docker stop does and explain why the shell form of CMD can cause problems. Say how to fix it.
+    kind: short
+    marks: 5
+    keywords:
+      - sigterm
+      - grace period
+      - 10 seconds
+      - sigkill
+      - pid 1
+      - /bin/sh
+      - exec form
+      - graceful shutdown
+      - init
+    idealAnswer: docker stop sends SIGTERM to the main process (PID 1) and waits a grace period, 10 seconds by
+      default. If the process is still running, Docker sends SIGKILL to force it to stop. A good app catches
+      SIGTERM and does a graceful shutdown, finishing in-flight requests. With the shell form, CMD python
+      app.py, the command is wrapped in /bin/sh, so the shell is PID 1 and may not forward SIGTERM. The app
+      never hears the request, Docker waits the full 10 seconds, then kills it with SIGKILL, dropping
+      requests. The fix is the exec form, CMD ["python","app.py"], which makes the app PID 1 so it receives
+      the signal directly. If the app starts child processes, add docker run --init so zombies are cleaned up.
+  - question: Explain why replicas must be stateless when you scale out a web service, and describe the port
+      problem with docker compose --scale.
+    kind: short
+    marks: 5
+    keywords:
+      - scale out
+      - stateless
+      - redis
+      - load balancer
+      - replicas
+      - same image
+      - host port
+      - reverse proxy
+      - disposable
+    idealAnswer: "Scaling out means starting more containers from the same image and spreading requests across
+      them with a load balancer. Any replica may answer any request, and replicas are disposable and may be
+      replaced at any time. So they must be stateless: counters, sessions and other state must live outside
+      the container, for example in Redis or a database, not in the web container. Otherwise two replicas
+      would give different answers and state would be lost when one is removed. The port problem: with docker
+      compose up --scale web=3 and a fixed mapping such as 5000:5000, all three replicas try to use host port
+      5000, and only one can. The fix is to remove the fixed host port, or to put a reverse proxy or load
+      balancer in front so it forwards to the replicas."
 coding:
   - id: production-dockerfile
     title: A production Dockerfile
