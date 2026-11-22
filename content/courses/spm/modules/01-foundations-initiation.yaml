@@ -1,0 +1,617 @@
+id: foundations-initiation
+title: Foundations, Life Cycle & Initiation
+subtitle: What a project is, why projects succeed or fail, and how one is started and authorised
+recap: |
+  A project is a temporary effort to produce something unique: a product, a service or a result. Because it is
+  new, it carries uncertainty, and the whole point of project management is prediction and prevention, not
+  recognition and reaction. Scope, time and cost are tied together with quality in the middle (the triple
+  constraint), so changing one forces another to move. A project runs through a life cycle (initiation, planning,
+  execution, monitoring and control, closure). Initiation starts with a real problem, evidence, boundaries and an
+  honest decision (proceed, revise, investigate further or stop), and a sponsor-signed charter gives the project
+  its existence and the project manager their authority.
+traps:
+  - "Saying a project is just 'a big piece of work'. The exam definition is a temporary endeavour to produce a unique product, service or result."
+  - "Confusing a project with operations. Operations are ongoing and repetitive (paying salaries every month); a project is temporary and unique (building the new payroll system)."
+  - "When a sponsor wants the deadline tightened on a fixed budget, saying 'that is hard' and stopping. Name the trade-off: reduce scope or accept a quality risk, and present the options through change control."
+  - "Mixing up risk and issue. A risk is a potential problem; an issue is already happening and already affecting cost, time or quality."
+  - "Mixing up assumption, constraint and dependency. Assumption: believed true, unconfirmed. Constraint: a fixed limit. Dependency: relies on something outside the team's control."
+  - "Mixing up the charter and the project plan. The charter authorises the project and sets high-level boundaries (initiation); the plan details how (planning)."
+  - "Forgetting who signs the charter: the sponsor. The signature authorises the project, commits resources and gives the project manager authority."
+  - "Treating a deployed product as a finished project. Deployment is not closure."
+lesson:
+  checkpointStep: 5
+  steps:
+    - "A project is a temporary endeavour undertaken to produce a unique product, service or result. It has a definite start and end, it is new (so it carries uncertainty), its details are filled in step by step (progressive elaboration), and it has specific objectives. Operations, by contrast, are ongoing and repetitive."
+    - "Project management means applying skills, knowledge, tools and techniques to meet stakeholders' needs and expectations. The slide's key line: the purpose of project management is prediction and prevention, NOT recognition and reaction. A problem found in planning costs a conversation; found after delivery, it can cost the project."
+    - "The triple constraint links scope, time and cost, with quality in the middle. More scope means more time and more cost. Tight time means more cost and/or less scope. Tight budget means more time and/or less scope. Change one and at least one other must move."
+    - "Projects succeed when they are on time, on budget, meet requirements at the expected quality, satisfy stakeholders (the customer accepts the result) and deliver the expected value. They fail through unclear scope, scope creep, unrealistic schedules, too few resources, poor communication, a disengaged sponsor, weak risk management and poor team coordination."
+    - "The life cycle has five phase groups: Initiation (should we proceed?), Planning (scope, WBS, schedule, budget, risk and communication plans), Execution (build, test, coordinate), Monitoring and control (are we still on course?) and Closure (acceptance, handover, lessons learned). A deployed product is not automatically a closed project."
+    - "Checkpoint: state the triple constraint and say what happens when a sponsor tightens the deadline but keeps the budget fixed."
+    - "Initiation starts with the problem, not the app. Use the structure: users experience a problem because of a cause, resulting in an effect, and back it with 3 to 5 pieces of evidence. Then write a SMART objective, 3 to 5 measurable success criteria and a high-level scope (in scope, out of scope, main deliverables)."
+    - "Identify at least five stakeholders with their interest, influence and engagement approach. A power/interest grid gives four strategies: manage closely, keep satisfied, keep informed, monitor. Then run a feasibility snapshot: technical, economic, operational, schedule, legal and ethical."
+    - "Record the uncertainty honestly. An assumption is believed true but unconfirmed. A constraint is a fixed limit. A dependency is something outside your control that your work relies on. A risk is an uncertain event that could affect objectives. An issue is a problem that has already happened."
+    - "Initiation ends with a decision: proceed, revise, investigate further, or stop. If the answer is proceed, the sponsor signs the project charter. It formally authorises the project and gives the project manager authority to use organisational resources."
+    - "The charter holds: title and description, purpose and business case, SMART objectives and success criteria, scope, key stakeholders, roles, timeline and milestones, resources and budget, risks, assumptions and constraints, approval requirements, a communication plan and the sponsor's authorisation."
+checkpoint:
+  question: State the triple constraint, and explain what happens when a sponsor tightens the deadline of a software project but keeps the budget fixed.
+  hint: "Name the three corners and what sits in the middle. Then ask: if time shrinks and cost cannot grow, which other corner has to move? Finish with how the project manager handles it."
+  keywords:
+    - scope
+    - time
+    - cost
+    - quality
+    - triple constraint
+    - trade-off
+    - change control
+    - sponsor
+  idealAnswer: "The triple constraint says scope, time and cost are interdependent, with quality in the middle: changing one forces at least one other to move. If the sponsor tightens the deadline but keeps the budget fixed, I cannot add people or overtime (that would raise cost), so I must either reduce scope (for example defer the reporting module) or accept a quality risk. I would present both options and their impact to the sponsor through formal change control, and have the decision signed before implementing."
+terms:
+  - term: Project
+    definition: A temporary endeavour undertaken to produce a unique product, service or result.
+  - term: Operations
+    definition: Ongoing, repetitive work that keeps the organisation running, such as running payroll every month.
+  - term: Progressive elaboration
+    definition: Details of the project are developed step by step as the project progresses, so plans get refined.
+  - term: Project management
+    definition: Applying skills, knowledge, tools and techniques to meet the needs and expectations of stakeholders for a project.
+  - term: Prediction and prevention
+    definition: The slide's purpose of project management, as opposed to recognition and reaction (finding problems after they happen).
+  - term: Triple constraint
+    definition: Scope, time and cost are linked, with quality in the middle; changing one forces another to move.
+  - term: Scope creep
+    definition: Features added to the project without formal change control.
+  - term: Issue
+    definition: A restraint or problem already affecting cost, time or quality; logged, tracked and escalated.
+  - term: Risk
+    definition: An uncertain event that could affect objectives; a potential negative impact.
+  - term: Change control
+    definition: The formal way changes to scope, schedule, technical specification or training are approved, with the sponsor's signature before implementation.
+  - term: Project governance
+    definition: A framework that defines roles and responsibilities, the decision-making process, monitoring and evaluation standards and risk guidance.
+  - term: SWOT
+    definition: "Strengths, weaknesses, opportunities and threats: a strategic planning tool."
+  - term: Weighted scoring model
+    definition: A selection method where each criterion has a weight, each project is scored per criterion, and weighted score = sum of weight times score.
+  - term: SMART objective
+    definition: Specific, Measurable, Achievable, Relevant, Time-bound.
+  - term: Assumption
+    definition: Something believed true for planning but not yet confirmed.
+  - term: Constraint
+    definition: A fixed limitation, such as a launch date or budget ceiling.
+  - term: Dependency
+    definition: Something outside the team's control that the work relies on.
+  - term: Feasibility snapshot
+    definition: A quick check of technical, economic, operational, schedule, legal and ethical feasibility.
+  - term: Project charter
+    definition: A document signed by the sponsor that formally authorises the project and gives the project manager authority to use organisational resources.
+  - term: Power/interest grid
+    definition: A stakeholder map with four strategies, manage closely, keep satisfied, keep informed and monitor.
+quiz:
+  - question: Which definition matches the slides?
+    options:
+      - A permanent organisation that delivers products every year
+      - Any large piece of software development
+      - A temporary endeavour undertaken to produce a unique product, service or result
+      - A repeating process with fixed steps
+    answer: 2
+    explanation: A project is a temporary endeavour to produce a unique product, service or result.
+  - question: Which pair of characteristics distinguishes a project from operations?
+    options:
+      - Temporary and unique
+      - Funded and staffed
+      - Permanent and repetitive
+      - Large and expensive
+    answer: 0
+    explanation: Projects are temporary (a defined start and end) and unique. Operations are ongoing and repetitive.
+  - question: "The slide says the purpose of project management is..."
+    options:
+      - Cost cutting and delivery
+      - Recognition and reaction
+      - Documentation and reporting
+      - Prediction and prevention
+    answer: 3
+    explanation: Prediction and prevention, NOT recognition and reaction.
+  - question: A sponsor wants the system two weeks early with the same budget. Which response uses the triple constraint correctly?
+    options:
+      - Say it is not possible
+      - Offer to reduce scope or accept a quality risk, and decide through change control
+      - Hire extra staff without telling anyone
+      - Skip testing to save time
+    answer: 1
+    explanation: Time is compressed and cost is fixed, so scope or quality has to give. Present the options with impact through change control.
+  - question: "Increased scope leads to..."
+    options:
+      - Less time and less cost
+      - More time and more cost
+      - No other change
+      - Less cost only
+    answer: 1
+    explanation: More scope means more time and more cost.
+  - question: Which was the example of poor risk management in the slides?
+    options:
+      - Apollo 11
+      - Burj Khalifa
+      - Denver Airport baggage system
+      - Challenger space shuttle
+    answer: 3
+    explanation: Challenger is the poor risk management example. Denver Airport is the planning failure example.
+  - question: Which is NOT one of the intro lecture's six phases?
+    options:
+      - Monitoring
+      - Deployment
+      - Definition
+      - Closing
+    answer: 0
+    explanation: The six are Initiation, Definition, Planning, Implementation, Deployment and Closing. Monitoring and control belongs to the five-group version.
+  - question: What is the key question of monitoring and control?
+    options:
+      - Who signs the charter?
+      - Should we proceed?
+      - Are we still on course, and what must change?
+      - Have lessons been learned?
+    answer: 2
+    explanation: "Monitoring and control asks: are we still on course, and what must change?"
+  - question: In a weighted scoring model, a project scores 5 on a criterion weighted 30%. What does that criterion contribute to the weighted score?
+    options:
+      - 0.3
+      - 5.3
+      - 1.5
+      - 15
+    answer: 2
+    explanation: 0.30 x 5 = 1.5. The total weighted score is the sum of weight times score across all criteria.
+  - question: "ROI = (benefit - cost) / cost. A project costs USD 120,000 and brings benefits of USD 150,000. What is the ROI?"
+    options:
+      - 25%
+      - 20%
+      - 125%
+      - 30%
+    answer: 0
+    explanation: (150,000 - 120,000) / 120,000 = 30,000 / 120,000 = 0.25 = 25%.
+  - question: "Which statement is an assumption?"
+    options:
+      - Must launch before the semester begins
+      - The SMS provider's sandbox access
+      - The integration deadline has passed
+      - Advisors will attend user testing next week
+    answer: 3
+    explanation: An assumption is believed true but not confirmed. The first is a constraint, the second a dependency, the last an issue.
+  - question: The integration deadline has passed and the SMS provider has not finished. This is a(n)...
+    options:
+      - Risk
+      - Issue
+      - Assumption
+      - Dependency
+    answer: 1
+    explanation: It has already happened, so it is an issue. A risk is only a potential event.
+  - question: Which of these is NOT one of the four possible initiation decisions?
+    options:
+      - Proceed
+      - Delegate
+      - Revise
+      - Stop
+    answer: 1
+    explanation: The four are proceed, revise, investigate further, or stop.
+  - question: Who signs the project charter?
+    options:
+      - The project manager
+      - The customer's users
+      - The team
+      - The sponsor
+    answer: 3
+    explanation: The sponsor signs, which formally authorises the project and gives the PM authority.
+  - question: "A high power, low interest stakeholder should be..."
+    options:
+      - Kept satisfied
+      - Managed closely
+      - Kept informed
+      - Only monitored
+    answer: 0
+    explanation: "High power + low interest: keep satisfied. High + high: manage closely; low power + high interest: keep informed; low + low: monitor."
+fact:
+  title: Challenger and Denver
+  body: The slides pair two famous failures with a lesson each. The Challenger space shuttle disaster is the example of poor risk management. The Denver Airport baggage system is the example of planning failures that led to massive budget overruns. Apollo 11 (clear objective, on time) and the Burj Khalifa (on time, within budget, met requirements) are the success examples.
+lab:
+  title: Project Selection Scoring & ROI
+  variations:
+    - title: Weighted score for Project A
+      question: "A selection committee uses weights of <b>30%</b> strategic fit, <b>25%</b> ROI, <b>20%</b> risk, <b>15%</b> resources and <b>10%</b> compliance. Project A scores <b>4, 3, 5, 2, 5</b> (in that order, each out of 5). What is its weighted score?"
+      answer: 3.75
+      tolerance: 0.01
+      hint: Multiply each score by its weight and add them up.
+      explanation: "0.30 x 4 + 0.25 x 3 + 0.20 x 5 + 0.15 x 2 + 0.10 x 5 = 1.20 + 0.75 + 1.00 + 0.30 + 0.50 = 3.75."
+      unit: points
+    - title: Weighted score for Project C
+      question: "Same weights (<b>30, 25, 20, 15, 10</b> percent). Project C scores <b>2, 5, 3, 4, 5</b>. What is its weighted score?"
+      answer: 3.55
+      tolerance: 0.01
+      hint: Weighted score = sum of weight times score.
+      explanation: "0.30 x 2 + 0.25 x 5 + 0.20 x 3 + 0.15 x 4 + 0.10 x 5 = 0.60 + 1.25 + 0.60 + 0.60 + 0.50 = 3.55."
+      unit: points
+    - title: Margin between two projects
+      question: "Same weights. Project A scores <b>4, 3, 5, 2, 5</b> (weighted 3.75) and Project B scores <b>5, 4, 2, 3, 3</b>. By how many points does A beat B?"
+      answer: 0.1
+      tolerance: 0.005
+      hint: Work out B's weighted score first, then subtract it from A's.
+      explanation: "B = 1.50 + 1.00 + 0.40 + 0.45 + 0.30 = 3.65. A minus B = 3.75 - 3.65 = 0.10, so A ranks first."
+      unit: points
+    - title: ROI of a project
+      question: "A project costs <b>USD 120,000</b> and is expected to bring benefits of <b>USD 150,000</b>. Using ROI = (benefit - cost) / cost, what is the ROI as a percentage?"
+      answer: 25
+      tolerance: 0.1
+      hint: Subtract cost from benefit, divide by cost, multiply by 100.
+      explanation: (150,000 - 120,000) / 120,000 = 30,000 / 120,000 = 0.25, which is 25%.
+      unit: "%"
+notes:
+  - heading: "Start here: the big idea in plain words"
+    body: |
+      **What it is:** a **project** is a one-off effort with a start and an end that makes something new. Building a house is a project. Cleaning the house every week is not; that is a routine.
+
+      **Why it matters:** because every project is new, nobody knows exactly how it will go. Project management is the set of habits that deal with that uncertainty. The key line from the slides is that its purpose is **prediction and prevention, NOT recognition and reaction**. In other words, work out what could go wrong and stop it early, instead of discovering it when it is too late.
+
+      **Everyday comparison:** planning a wedding. You book the venue before sending invitations (prevention). You do not wait until guests arrive to find out there are no chairs (reaction).
+
+      **How this module fits together:**
+
+      1. What a project is, and how it differs from routine work.
+      2. The triple constraint: scope, time, cost, with quality in the middle.
+      3. Why projects succeed or fail.
+      4. The life cycle: the stages a project passes through.
+      5. Initiation: deciding honestly whether to start, ending with a charter signed by the sponsor.
+
+      **In the exam:** definitions, the triple constraint with an example, the charter contents, and assumption/constraint/dependency/risk are classics.
+  - heading: What a project is, and what project management is
+    body: |
+      **What it is:** a project is **a temporary endeavour undertaken to produce a unique product, service or result.** *(from slides)* Learn this sentence word for word.
+
+      **Everyday comparison:** a school timetable runs every term (operations). Building the new timetable software is a project.
+
+      | Characteristic | Meaning | Why it matters |
+      |---|---|---|
+      | **Temporary** | A definite beginning and end | Teams and budgets are assembled, then released; it needs closure |
+      | **Unique** | A new undertaking on unfamiliar ground | You cannot repeat last time's numbers, so there is **uncertainty and risk** |
+      | **Progressive elaboration** | Details are developed bit by bit as the project progresses | Plans must be refined; this is why change control exists |
+      | **Specific objectives** | Clear deliverables and outcomes | Success can be judged |
+
+      **Projects vs operations:** operations are ongoing and repetitive (running payroll every month). A project is temporary and unique (building the new payroll system). Projects also need **cross-functional collaboration** (people from different departments) and work under **constraints** of scope, time and cost.
+
+      **Project management** is *the application of skills, knowledge, tools and techniques to meet the needs and expectations of stakeholders for a project.* (A **stakeholder** is anyone affected by or able to affect the project.)
+
+      The slide's key line: **"The purpose of project management is prediction and prevention, NOT recognition and reaction."**
+
+      **Why that line is the heart of it:** a problem found during planning costs a conversation. Found during execution, it costs rework. Found after delivery, it can cost the project. Every tool in the course (WBS, schedules, risk registers, quality assurance, earned value, retrospectives) exists to move discovery earlier.
+
+      **In the exam:** "Define a project and explain two characteristics that distinguish it from operations": give the definition, then temporary and unique, and progressive elaboration as a bonus third point. If asked what project management is *for*, quote the prediction and prevention line.
+  - heading: The triple constraint
+    body: |
+      **What it is:** scope (what we will deliver), time (when) and cost (how much) are linked, with **quality** in the middle. Change one and at least one other must move. *(from slides)*
+
+      **Everyday comparison:** a balloon in your hands. Squeeze one end and another bulges out.
+
+      **Tiny example:** a university portal is due on a fixed date. The client adds two modules. Either cost rises (more developers) or the date moves. If neither can change, quality is at risk.
+
+      **The rules (memorise):**
+
+      - **Increased scope** leads to more time **and** more cost.
+      - **Tight time** leads to more cost (extra people, overtime) **and/or** reduced scope.
+      - **Tight budget** leads to more time **and/or** reduced scope.
+
+      Picture a triangle with Time at the top, Cost bottom-left and Scope bottom-right, and Quality in the middle. Pull one corner and the triangle reshapes; quality suffers if the others are squeezed without adjustment.
+
+      **In the exam:** when a scenario says "the sponsor wants the system two weeks early with the same budget", do not just say it is hard. Name the trade-off: *"Under the triple constraint, compressing time with a fixed budget means reducing scope (defer the reporting module) or accepting a quality risk. I would present both options with their impact to the sponsor through change control."*
+  - heading: Success and failure
+    body: |
+      **What it is:** a checklist of what a good result looks like and what usually goes wrong. *(from slides)*
+
+      **Success criteria:**
+
+      - on time
+      - on budget
+      - meets requirements at the expected quality
+      - stakeholders satisfied and the customer **accepts** it
+      - **delivers the expected value** (efficiency, revenue, solving the problem)
+
+      **Why projects fail (the slides list these repeatedly):**
+
+      - poor requirements gathering and **unclear scope**
+      - **scope creep** (features added without change control)
+      - **unrealistic planning and scheduling**
+      - lack of resources
+      - poor communication
+      - stakeholder disengagement and lack of sponsor buy-in
+      - inadequate risk management
+      - team coordination problems
+
+      **Examples from the slides:**
+
+      | Example | Lesson |
+      |---|---|
+      | Apollo 11 | Clear objective, achieved on time |
+      | Burj Khalifa | On time, within budget, met design requirements |
+      | **Challenger** space shuttle | **Poor risk management** led to disaster |
+      | **Denver Airport baggage system** | **Planning failures** led to massive budget overruns |
+
+      **How projects lose control:** scope creep, then unrealistic schedules, then poor risk management. **How to improve success:** clear realistic goals, strong leadership, stakeholder involvement, a solid plan, effective communication, and monitoring and controlling risks.
+
+      **In the exam:** "Give four reasons projects fail and how a PM prevents each." Pair each with a remedy: unclear scope with a charter and scope statement (in/out boundaries); scope creep with formal change control; unrealistic schedules with a WBS and evidence-based estimates (PERT) with buffers; poor risk management with a risk register with owners and triggers. Also poor communication with a communication plan, and lack of sponsor support with early engagement.
+  - heading: Knowledge areas and the project manager's role
+    body: |
+      **What it is:** the main areas a project manager looks after, and the job itself. *(from slides)*
+
+      | Area | What it is | Key idea |
+      |---|---|---|
+      | **Scope** | Definition and control of what **is and is not** included | "All the work required, and *only* the work required" |
+      | **Issue** | Restraints already affecting deliverables; logged, tracked, escalated | An issue is **already** affecting cost, time or quality (a risk is *potential*) |
+      | **Cost** | Completing within the approved budget: resource planning (people, equipment, materials, quantities), budget estimates, baseline, actuals | |
+      | **Quality** | Meeting needs: quality planning, assurance and control | Crosby: "conformance to requirements"; Juran: "fitness for use"; ISO 8402 |
+      | **Communications** | Timely generation, collection, distribution and storage of project information | Meeting schedules, status and issue meetings |
+      | **Risk** | Identification, mitigation strategy, update and tracking | A risk is a **potential** negative impact |
+      | **Change control** | How changes to scope will be executed | Formal control for scope, schedule, technical spec and training changes; **sponsor's signature before implementation** |
+
+      *Standard PM knowledge:* PMI's PMBOK groups these into knowledge areas (integration, scope, schedule, cost, quality, resources, communications, risk, procurement, stakeholders). Your course adds **issue** and **change control** explicitly.
+
+      **The project manager's role:**
+
+      - **Process responsibilities:** managing the overall work plan, scope, issues, risk mitigation, quality, metrics, disseminating information, implementing standard processes.
+      - **People responsibilities:** leadership, setting expectations, team building, communication, conflict resolution, support.
+      - Plus resource management (team, equipment, budget), stakeholder communication (meetings, progress reports, change requests), performance monitoring (KPIs, schedule, budget, quality, milestones) and **change management** (impact assessment, then plan adjustment, then stakeholder approval).
+  - heading: Governance, strategy and project selection
+    body: |
+      **What it is:** the rules for who decides, and how an organisation chooses which projects to run. *(from slides)*
+
+      **Project governance:** a framework that defines **roles and responsibilities** (who decides), the **decision-making process**, **monitoring and evaluation** standards, and **risk management** guidance. It gives better decisions, **transparency** (accurate information to stakeholders) and **risk reduction**.
+
+      **Strategic planning:** **vision and mission**, **SWOT** (strengths, weaknesses, opportunities, threats), strategic goals, execution plans. Benefits: clear direction, efficient resource allocation, adaptability, higher success.
+
+      **Controlling project selection:** strategic alignment; prioritisation frameworks (**scoring models**, **cost-benefit analysis**); **portfolio management** (a balanced mix of projects); decision bodies (selection committees). **Criteria:** financial viability, strategic importance, risk and feasibility, resource availability, regulatory compliance, stakeholder input. Projects feed back into strategy: outcomes inform future planning.
+
+      **Everyday comparison:** a family with one month's pay and five wishes. You score each wish against what matters (need, cost, risk) and buy the top one first.
+
+      **Weighted scoring model in 3 steps** *(standard PM knowledge)*:
+
+      1. Choose criteria and **weights summing to 100%** (strategic fit 30%, ROI 25%, risk 20%, resources 15%, compliance 10%).
+      2. Score each candidate project 1 to 5 per criterion.
+      3. **Weighted score = sum of weight x score**; rank the projects.
+
+      **Tiny example:** Project A scores 4, 3, 5, 2, 5 in the order above. Score = 0.30x4 + 0.25x3 + 0.20x5 + 0.15x2 + 0.10x5 = 1.20 + 0.75 + 1.00 + 0.30 + 0.50 = **3.75**. Project B scores 5, 4, 2, 3, 3, giving 1.50 + 1.00 + 0.40 + 0.45 + 0.30 = **3.65**. A ranks first. The same method is used later for **vendor selection**.
+
+      **Financial measures you can mention:**
+
+      - **Payback period:** how long until the project earns back its cost.
+      - **ROI** = (benefit - cost) / cost.
+      - **NPV:** discounted future cash flows minus the investment; positive means it adds value.
+
+      **In the exam:** list criteria, name scoring models and cost-benefit analysis, and show the formula weighted score = sum of weight x score.
+  - heading: The project life cycle
+    body: |
+      **What it is:** the stages a project passes through from idea to close. Your slides give two versions. *(from slides)*
+
+      **Everyday comparison:** building a house: decide to build, draw plans, build, inspect as you go, hand over the keys.
+
+      | Intro lecture (6 phases) | Key activities | Project Phases lecture (5 groups) |
+      |---|---|---|
+      | **Initiation** | Define the need, **ROI analysis**, **make-or-buy**, budget development | **Initiation**: should we proceed? |
+      | **Definition** | Goals, scope, constraints; members and roles; communication channels; risk management planning | (part of Planning) |
+      | **Planning** | Resource planning, **WBS**, schedule, quality assurance plan | **Planning**: scope statement, WBS, schedule, budget, risk plan, communication plan |
+      | **Implementation** | Execute the plan, training plan, system build, QA | **Execution**: build, test, coordinate, manage suppliers, address issues |
+      | **Deployment** | User training, production review, start using | **Monitoring & control** (runs alongside execution) |
+      | **Closing** | Contractual closeout, post-production transition, **lessons learned** | **Closure**: acceptance, handover, close contracts, archive, release resources, lessons learned |
+
+      Two lines from the slides to remember: *"Execution is more than coding: it includes the management work required to keep delivery coordinated and useful"* and **"A deployed product is not automatically a closed project."**
+
+      **Monitoring and control's key question:** *"Are we still on course, and what must change?"*
+
+      **In the exam:** know the five groups in order: Initiation, Planning, Execution, Monitoring and Control, Closure. If the question mentions the intro lecture, use the six: Initiation, Definition, Planning, Implementation, Deployment, Closing.
+  - heading: "Initiation: start with the problem, not the app"
+    body: |
+      **What it is:** the first phase, which answers "should we proceed?" *(from slides)*
+
+      **Everyday comparison:** before buying a car, you ask what trips you need to make and whether you can afford it, not just which car looks nice.
+
+      - **Weak start:** "We want to build an AI-powered student app."
+      - **Strong start:** "Students miss academic deadlines because announcements are scattered across disconnected channels."
+      - **Structure:** **[Users] experience [problem] because of [cause], resulting in [effect].**
+      - **Evidence:** 3 to 5 short user conversations, observation, institutional information, or a credible published source.
+
+      **Objective:** the change or result the project will achieve, written **SMART**: Specific, Measurable, Achievable, Relevant, Time-bound. **Success criteria:** 3 to 5 measurable ones. **High-level scope:** *in scope*, *out of scope* (deliberate boundaries) and *main deliverables*. Detailed requirements come later.
+
+      **Stakeholders:** at least five people or groups, each with their **interest**, **influence** and how you will engage them. *(Standard PM knowledge)* A **power/interest grid** gives four strategies:
+
+      | | Low interest | High interest |
+      |---|---|---|
+      | **High power** | Keep satisfied | Manage closely |
+      | **Low power** | Monitor | Keep informed |
+
+      **Feasibility snapshot:** **technical, economic, operational, schedule, legal and ethical.**
+
+      **The initiation decision:** **proceed, revise, investigate further, or stop**, and it must be honest. *"Do not begin with code. Begin with a problem, evidence, boundaries and a defensible decision."*
+
+      **In the exam (sample paper B4):** problem statement with evidence; SMART objective with success criteria (for example 40% of visits booked online); five stakeholders with interest, influence and approach; the six feasibility checks; and the decision. Marks are given for each element.
+  - heading: "Assumption, constraint, dependency, risk and issue"
+    body: |
+      **What it is:** five words for different kinds of uncertainty. Examiners love asking you to tell them apart. *(from slides)*
+
+      **Everyday comparison:** planning a picnic. Assumption: "it will not rain." Constraint: "we must be home by 6 pm." Dependency: "the bus driver arrives on time." Risk: "the bus might be late." Issue: "the bus is already an hour late."
+
+      | Term | Meaning | Example (UniConnect, a student app used across the course) |
+      |---|---|---|
+      | **Assumption** | Believed true for planning, not yet confirmed | Advisors will attend user testing next week |
+      | **Constraint** | A fixed limitation | Must launch before the semester begins |
+      | **Dependency** | Something outside the team's control that work relies on | The SMS provider's sandbox access |
+      | **Risk** | An uncertain event that could affect objectives | The SMS provider may not finish integration on time |
+      | **Issue** | A problem that has already happened | The integration deadline has passed |
+
+      **Key relationships:** a risk is *potential*; an issue is *already* affecting cost, time or quality. Assumptions should be validated: a wrong assumption becomes a risk or an issue.
+
+      **In the exam (sample paper A4):** give a software example of each. Assumption: users will be available for UAT (user acceptance testing). Constraint: must launch before semester start, or a fixed budget of UGX 36m. Risk: the SMS vendor may deliver late.
+  - heading: The project charter
+    body: |
+      **What it is:** the document that **formally authorises the project's existence and gives the project manager authority to use organisational resources.** It is signed by the **sponsor** (the person who champions and funds the project). *(from slides)*
+
+      **Everyday comparison:** a building permit. Without it, the builder has no right to start, and nobody has agreed to pay.
+
+      **Components (learn at least eight):**
+
+      1. Title and description
+      2. **Purpose / business case** (why; the problem or opportunity; expected benefits)
+      3. **SMART objectives** and success criteria
+      4. **Scope** (in/out, deliverables; prevents scope creep)
+      5. **Key stakeholders**
+      6. **Roles and responsibilities**
+      7. High-level **timeline and milestones**
+      8. **Resources and budget** estimate
+      9. High-level **risks**
+      10. **Assumptions and constraints**
+      11. **Approval requirements** (success criteria, sign-off process)
+      12. High-level **communication plan**
+      13. **Sponsor authorisation** (signature)
+
+      **Steps to create it:** identify objectives and purpose, engage key stakeholders, define scope, set high-level milestones and timeline, estimate resource needs and budget, list risks and constraints, assign roles and responsibilities, draft and review, **obtain sponsor approval**, communicate the charter to the team.
+
+      **Benefits:** clear direction; **establishes the PM's authority**; stakeholder alignment; helps manage scope (prevents creep); defines success criteria.
+
+      **Charter vs project plan:** the charter *authorises* and sets high-level boundaries (initiation). The plan details *how* (planning: WBS, schedule, budget, risk and communication plans). **Sponsor vs PM:** the sponsor champions and funds the project and signs the charter; the PM is authorised by it to run the project.
+
+      **In the exam:** "List the contents of a project charter and explain why the sponsor's signature matters." The signature formally authorises the project, commits resources and gives the PM authority. Without it there is no mandate. To show how it prevents scope creep, say it states in-scope and out-of-scope items and deliverables, so later requests are checked against an agreed boundary and new work goes through change control.
+examples:
+  - title: Triple constraint under pressure
+    problem: |
+      A university portal project has a fixed budget. Halfway through, the sponsor asks for the system two weeks earlier. The team is already at full capacity. What do you do, using the triple constraint?
+    steps:
+      - "Name the corners affected. The sponsor is **tightening time**, and the budget (**cost**) is fixed."
+      - "Apply the rule: tight time leads to more cost (extra people, overtime) and/or reduced scope. Cost cannot rise, so extra people and overtime are off the table."
+      - "That leaves **reduced scope** (for example, defer the reporting module) or accepting a **quality risk** (less testing)."
+      - "Present both options and their impact to the sponsor through **change control**, and get a decision signed before implementing."
+    answer: Reduce scope or accept a quality risk, decided by the sponsor through change control.
+    takeaway: Do not say "that is hard". Name the trade-off, list options with impacts, and route the decision through change control.
+  - title: Ranking two projects with a weighted score
+    problem: |
+      A committee uses these weights: strategic fit 30%, ROI 25%, risk 20%, resources 15%, compliance 10%. Project A scores 4, 3, 5, 2, 5 and Project B scores 5, 4, 2, 3, 3 (scores 1 to 5, same order). Which ranks higher?
+    steps:
+      - "Check the weights sum to 100%: 30 + 25 + 20 + 15 + 10 = 100. Good."
+      - "Project A: 0.30 x 4 = 1.20; 0.25 x 3 = 0.75; 0.20 x 5 = 1.00; 0.15 x 2 = 0.30; 0.10 x 5 = 0.50. Sum = 3.75."
+      - "Project B: 0.30 x 5 = 1.50; 0.25 x 4 = 1.00; 0.20 x 2 = 0.40; 0.15 x 3 = 0.45; 0.10 x 3 = 0.30. Sum = 3.65."
+      - "Rank: A (3.75) is above B (3.65), a margin of 0.10."
+    answer: Project A ranks higher, 3.75 against 3.65.
+    takeaway: "Weighted score = sum of weight x score. Weights must sum to 100% so scores stay on the 1 to 5 scale."
+  - title: ROI of a project
+    problem: |
+      A project costs USD 120,000 and is expected to bring benefits of USD 150,000. What is the ROI?
+    steps:
+      - "Formula: ROI = (benefit - cost) / cost."
+      - "Benefit minus cost = 150,000 - 120,000 = 30,000."
+      - "Divide by cost: 30,000 / 120,000 = 0.25."
+      - "As a percentage, 0.25 = 25%."
+    answer: ROI = 25%.
+    takeaway: ROI is a quick financial measure; NPV and payback period are alternatives that account for timing.
+  - title: Sorting the five uncertainty words
+    problem: |
+      A student-app project has these five statements. Label each as assumption, constraint, dependency, risk or issue. (1) The app must launch before the semester begins. (2) The SMS provider's sandbox access. (3) Advisors will attend user testing next week. (4) The SMS provider may not finish integration on time. (5) The integration deadline has passed.
+    steps:
+      - "(1) A fixed limitation is a **constraint**."
+      - "(2) Something outside the team's control that the work relies on is a **dependency**."
+      - "(3) Believed true, but not yet confirmed, is an **assumption** (validate it)."
+      - "(4) An uncertain future event that could affect objectives is a **risk**."
+      - "(5) It has already happened, so it is an **issue**."
+    answer: "(1) constraint, (2) dependency, (3) assumption, (4) risk, (5) issue."
+    takeaway: A wrong assumption can become a risk or an issue, and an unresolved risk that happens becomes an issue.
+questions:
+  - question: Define a project and explain two characteristics that distinguish it from operations.
+    kind: short
+    marks: 4
+    keywords:
+      - temporary
+      - unique
+      - progressive elaboration
+      - operations
+      - endeavour
+    idealAnswer: A project is a temporary endeavour undertaken to produce a unique product, service or result. Temporary means it has a defined start and end, while operations continue indefinitely. Unique means it creates something new, so there is uncertainty and risk, while operations repeat known processes. Progressive elaboration (details developed step by step) is a good third point.
+  - question: Using the triple constraint, explain what happens when a sponsor tightens the deadline of a software project but keeps the budget fixed.
+    kind: short
+    marks: 4
+    keywords:
+      - scope
+      - time
+      - cost
+      - quality
+      - trade-off
+      - change control
+    idealAnswer: Scope, time and cost are interdependent with quality in the middle. Tight time means more cost (extra people, overtime) and/or reduced scope. If the budget is fixed, cost cannot rise, so scope must be reduced (defer a module) or quality is put at risk. The PM presents the options and their impact to the sponsor through change control.
+  - question: '"The purpose of project management is prediction and prevention, not recognition and reaction." Discuss.'
+    kind: short
+    marks: 4
+    keywords:
+      - prediction
+      - prevention
+      - recognition
+      - reaction
+      - risk register
+      - early
+    idealAnswer: Good project management anticipates problems through planning, risk identification, estimation and monitoring early warning signs, so corrective action is cheap. Reacting after problems appear (recognition) is costlier and often too late. Examples (1 mark each) include a risk register with owners and triggers, earned value as an early warning, PERT probability analysis for realistic deadlines, QA reviews preventing defects, and a charter or WBS preventing scope gaps.
+  - question: List eight components of a project charter and state who signs it.
+    kind: short
+    marks: 4
+    keywords:
+      - title
+      - business case
+      - SMART objectives
+      - scope
+      - stakeholders
+      - milestones
+      - budget
+      - risks
+      - assumptions
+      - sponsor
+    idealAnswer: Any eight of title and description; purpose or business case; SMART objectives and success criteria; scope (in/out, deliverables); stakeholders; roles and responsibilities; milestones and timeline; resources and budget; risks; assumptions and constraints; approval requirements; communication overview. The charter is signed by the project sponsor, which authorises the project and gives the project manager authority.
+  - question: Distinguish an assumption, a constraint and a risk, giving a software-project example of each.
+    kind: short
+    marks: 4
+    keywords:
+      - assumption
+      - constraint
+      - risk
+      - unconfirmed
+      - fixed limit
+      - uncertain
+    idealAnswer: "Assumption: treated as true for planning but unconfirmed (users will be available for user acceptance testing). Constraint: a fixed limit (must launch before semester start; budget UGX 36m). Risk: an uncertain future event that could affect objectives (the SMS vendor may deliver late). A wrong assumption can become a risk or an issue, so assumptions should be validated."
+  - question: State four reasons why software projects fail, and give one remedy for each.
+    kind: short
+    marks: 4
+    keywords:
+      - unclear scope
+      - scope creep
+      - unrealistic schedule
+      - risk management
+      - change control
+      - charter
+      - communication plan
+    idealAnswer: "Any four, one mark per reason plus remedy. Unclear scope: a charter and scope statement with in and out boundaries. Scope creep: formal change control. Unrealistic schedules: a WBS and evidence-based estimates (PERT) with buffers. Poor risk management: a risk register with owners and triggers. Poor communication: a communication plan. Lack of sponsor support: early engagement."
+  - question: Explain what happens in project initiation, including the problem statement, SMART objectives, scope boundaries, stakeholders and feasibility. What decision ends the phase?
+    kind: long
+    marks: 8
+    keywords:
+      - problem statement
+      - evidence
+      - SMART
+      - success criteria
+      - scope
+      - stakeholders
+      - feasibility
+      - proceed
+      - revise
+      - investigate further
+      - stop
+      - charter
+    idealAnswer: "Problem statement (1.5): users experience a problem because of a cause, resulting in an effect, backed by 3 to 5 pieces of evidence (interviews, observation, published sources). SMART objective plus 3 to 5 measurable success criteria (1.5). Scope: in scope, out of scope and deliverables (1). Stakeholders: at least five, each with interest, influence and an engagement approach, for example a power/interest grid (1). Feasibility: technical, economic, operational, schedule, legal and ethical; record assumptions, constraints, dependencies and risks (1.5). The phase ends with a decision: proceed, revise, investigate further or stop (1.5). If proceeding, the charter is signed by the sponsor."
+  - question: Explain how the project charter prevents scope creep, and what the sponsor's signature does.
+    kind: short
+    marks: 4
+    keywords:
+      - scope
+      - in scope
+      - out of scope
+      - deliverables
+      - change control
+      - authorises
+      - resources
+      - authority
+    idealAnswer: The charter states in-scope and out-of-scope items and the deliverables, so later requests can be checked against an agreed boundary, and new work has to go through change control (2 marks). The sponsor's signature formally authorises the project, commits resources, and gives the project manager authority to act (2 marks).

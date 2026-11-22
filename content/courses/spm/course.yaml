@@ -1,0 +1,210 @@
+# Course pack — see content/README.md for the schema.
+id: spm
+code: SYE3104
+title: Software Project Management
+shortTitle: Project Management
+tagline: "How a software project is started, planned, run, kept on track and closed: charters, schedules, earned value, risk, Scrum and lessons learned."
+accent: "#C2255C"
+persona: |
+  You are an experienced lecturer in Software Project Management teaching SYE3104 at Uganda Christian
+  University, examining a theory paper (2 hours: Section A short answers, Section B 20-mark scenarios).
+  You hold students to the course's own wording: projects and the triple constraint, the life cycle,
+  initiation and the project charter (signed by the sponsor), assumptions vs constraints vs risks, the WBS
+  and its 100% rule, CPM forward and backward passes, slack, PERT three-point estimates and Z-scores,
+  Gantt charts, schedule compression, RACI, procurement and weighted vendor scoring, QA vs QC, RAG status,
+  earned value analysis (PV, EV, AC, SV, CV, SPI, CPI, EAC, VAC, CR), corrective action vs change request,
+  risk exposure and leverage, risk responses for threats and opportunities, risks vs issues, change control,
+  Lewin and Kotter, the Agile Manifesto, Scrum (pillars, values, accountabilities, events and timeboxes,
+  artifacts and commitments, velocity), and closure types, closedown steps, final reports and retrospectives.
+  Reward answers that define, explain why it matters, apply to a software example (UniConnect, mobile money,
+  a university portal) and note a trade-off. In calculations, expect the formula first, then substitution,
+  then an interpretation in words.
+formulas:
+  - name: Earliest start / finish (forward pass)
+    expr: ES = max(EF of predecessors);  EF = ES + duration
+  - name: Latest start / finish (backward pass)
+    expr: LF = min(LS of successors);  LS = LF − duration
+  - name: Slack (float)
+    expr: Slack = LS − ES = LF − EF  (critical activity ⇔ slack = 0)
+  - name: PERT expected time
+    expr: TE = (a + 4m + b) / 6
+  - name: PERT standard deviation and variance
+    expr: σ = (b − a) / 6;  σ² = ((b − a) / 6)²  (project variance = Σσ² along the critical path)
+  - name: Probability of meeting a deadline D
+    expr: Z = (D − μ) / σ_project  (Z 1.0 → 84.1%, 1.22 → 88.9%, 1.645 → 95%, 2.33 → 99%)
+  - name: Deadline for a confidence level
+    expr: D = μ + Z·σ  (95% → Z = 1.645)
+  - name: Crash cost slope
+    expr: (crash cost − normal cost) / (normal time − crash time)
+  - name: Planned value / earned value / actual cost
+    expr: PV = BAC × planned % complete;  EV = BAC × actual % complete;  AC = actual spend
+  - name: Schedule and cost variance
+    expr: SV = EV − PV;  CV = EV − AC  (negative = behind schedule / over budget)
+  - name: Schedule and cost performance index
+    expr: SPI = EV / PV;  CPI = EV / AC  (below 1 = behind / over budget)
+  - name: Estimate at completion
+    expr: EAC = BAC / CPI;  ETC = EAC − AC;  VAC = BAC − EAC
+  - name: To-complete performance index
+    expr: TCPI = (BAC − EV) / (BAC − AC)
+  - name: Critical ratio
+    expr: CR = SPI × CPI  (1 = on track; 0.9–1.2 acceptable)
+  - name: Risk exposure
+    expr: RE = probability × loss
+  - name: Risk leverage
+    expr: (RE before − RE after) / cost of risk reduction  (above 1 = worthwhile)
+  - name: Weighted score (vendors, projects)
+    expr: Σ weight × score
+  - name: Velocity forecast
+    expr: Sprints needed = ⌈remaining story points / average velocity⌉
+exam:
+  durationMinutes: 10
+  written:
+    - prompt: Define a project and explain two characteristics that set a project apart from routine operations.
+      module: foundations-initiation
+      keywords: [temporary, unique, start and end, operations, ongoing, progressive elaboration, objectives]
+      idealAnswer: >-
+        A project is a temporary endeavour undertaken to produce a unique product, service or result. It is
+        temporary: it has a defined start and end, while operations (like running payroll each month) carry on
+        indefinitely. It is unique: it makes something new, so it carries uncertainty, while operations repeat
+        the same work. Projects are also progressively elaborated (details sharpen as you learn) and have
+        specific objectives and deliverables.
+    - prompt: Using the triple constraint, explain what happens when a sponsor tightens a software project's deadline but keeps the budget fixed.
+      module: foundations-initiation
+      keywords: [scope, time, cost, quality, interdependent, reduce scope, change control, sponsor]
+      idealAnswer: >-
+        Scope, time and cost depend on each other, with quality in the middle. If time shrinks and cost is
+        fixed, the team cannot simply add people, so either scope must shrink (defer features to a later
+        release) or quality suffers (less testing, more defects). The project manager should lay these options
+        out through change control and let the sponsor decide.
+    - prompt: List eight components of a project charter and state who signs it.
+      module: foundations-initiation
+      keywords: [objectives, scope, stakeholders, milestones, budget, risks, assumptions, sponsor]
+      idealAnswer: >-
+        Title and description; purpose or business case; SMART objectives and success criteria; scope (in and
+        out, deliverables); stakeholders; roles and responsibilities; milestones and timeline; resources and
+        budget; key risks; assumptions and constraints; approval requirements. The project sponsor signs it,
+        which authorises the project and gives the project manager authority to use resources.
+    - prompt: Distinguish an assumption, a constraint and a risk, giving a software-project example of each.
+      module: foundations-initiation
+      keywords: [assumption, treated as true, constraint, fixed limit, risk, uncertain event, example]
+      idealAnswer: >-
+        An assumption is something treated as true for planning but not yet confirmed ("users will be
+        available for acceptance testing"). A constraint is a fixed limit the project must work within ("must
+        launch before semester starts"; "budget UGX 36 million"). A risk is an uncertain future event that could
+        affect the objectives if it happens ("the SMS vendor may deliver late").
+    - prompt: '"The purpose of project management is prediction and prevention, not recognition and reaction." Explain this with two examples of tools that support prediction or prevention.'
+      module: foundations-initiation
+      keywords: [anticipate, early, cheap, risk register, PERT, EVA, early warning, WBS]
+      idealAnswer: >-
+        Good project management spots and prevents problems early, while they are cheap to fix, rather than
+        noticing them after the damage is done. Examples: a risk register with owners and triggers; PERT
+        probability analysis to set realistic deadlines; earned value as an early warning of overruns; QA
+        reviews that prevent defects; a charter and WBS that stop scope gaps.
+    - prompt: Explain the 100% rule of a Work Breakdown Structure and why it matters for estimating.
+      module: planning-scheduling
+      keywords: [100%, parent, children, nothing missing, no duplication, work packages, roll up, scope creep]
+      idealAnswer: >-
+        Each level of the WBS must represent 100% of its parent's scope: the children together cover all of the
+        parent's work, with nothing missing and nothing counted twice. Estimates are rolled up from the work
+        packages, so missing work makes cost and time too low and duplicated work makes them too high. It also
+        stops unplanned work creeping in.
+    - prompt: An activity has optimistic time 4 days, most likely 7 days and pessimistic 16 days. Calculate its PERT expected time, standard deviation and variance.
+      module: planning-scheduling
+      keywords: [TE, "(a + 4m + b) / 6", 8 days, "(b − a) / 6", 2 days, variance, "4"]
+      idealAnswer: >-
+        TE = (a + 4m + b) / 6 = (4 + 28 + 16) / 6 = 48 / 6 = 8 days. σ = (b − a) / 6 = (16 − 4) / 6 = 2 days.
+        Variance σ² = 2² = 4.
+    - prompt: Compare a Gantt chart with an activity-on-node network diagram, giving one strength and one weakness of each.
+      module: planning-scheduling
+      keywords: [Gantt, calendar, easy to read, hides dependencies, network, critical path, slack, less intuitive]
+      idealAnswer: >-
+        A Gantt chart is easy to read and shows progress against the calendar, but it hides dependencies and
+        the critical path and gets hard to follow on complex projects. A network diagram shows the logic,
+        the critical path and the slack, but it is less intuitive for stakeholders and has no calendar view.
+    - prompt: Distinguish quality assurance from quality control, with one practice of each.
+      module: execution-monitoring
+      keywords: [QA, prevent, process, code review, Definition of Done, QC, detect, product, testing]
+      idealAnswer: >-
+        Quality assurance prevents defects by improving the process: code-review standards, a Definition of
+        Done, requirement reviews. Quality control detects defects in the product: testing, inspection, user
+        acceptance testing.
+    - prompt: In the RACI model, what do the four letters mean, and why should an activity have only one "A"?
+      module: execution-monitoring
+      keywords: [Responsible, Accountable, Consulted, Informed, one owner, clear ownership]
+      idealAnswer: >-
+        Responsible: does the work. Accountable: owns the outcome and approves it. Consulted: gives input before
+        the work. Informed: is told afterwards. Only one A keeps ownership clear, so decisions don't fall
+        between people and someone answers for the result even when the work is delegated.
+    - prompt: Distinguish corrective action from a change request, with an example of each.
+      module: execution-monitoring
+      keywords: [corrective action, within baseline, change request, changes baseline, impact assessment, sponsor approval]
+      idealAnswer: >-
+        Corrective action brings performance back in line within the approved baseline, for example moving a
+        developer onto a testing backlog. A change request proposes changing the baseline itself, for example
+        adding an analytics dashboard or extending the end date; it needs an impact assessment and the
+        sponsor's approval before work starts.
+    - prompt: A project has BAC = USD 120,000, PV = 60,000, EV = 66,000 and AC = 72,000. Calculate SV, CV, SPI, CPI, EAC and CR, and interpret them.
+      module: execution-monitoring
+      keywords: [SV, "6,000", CV, "−6,000", SPI, "1.1", CPI, "0.917", EAC, "130,909", CR, ahead of schedule, over budget]
+      idealAnswer: >-
+        SV = EV − PV = 66,000 − 60,000 = +6,000 (ahead of schedule). CV = EV − AC = 66,000 − 72,000 = −6,000
+        (over budget). SPI = 66/60 = 1.10; CPI = 66/72 ≈ 0.917. EAC = BAC / CPI = 120,000 / 0.917 ≈ 130,909, so
+        VAC ≈ −10,909. CR = 1.10 × 0.917 ≈ 1.01. The project is ahead of schedule but spending too much: the
+        overall ratio looks fine, but the cost overrun needs attention.
+    - prompt: A risk has probability 0.25 and potential loss UGX 20 million. A mitigation costing UGX 2 million cuts the probability to 0.05. Calculate the exposure before and after and the risk leverage. Is it worthwhile?
+      module: risk-change
+      keywords: [risk exposure, probability × loss, 5 million, 1 million, leverage, "2", worthwhile, greater than 1]
+      idealAnswer: >-
+        RE before = 0.25 × 20m = UGX 5m. RE after = 0.05 × 20m = UGX 1m. Leverage = (5 − 1) / 2 = 2.0. Leverage
+        is above 1, so the mitigation is worthwhile: each UGX 1 spent removes UGX 2 of exposure.
+    - prompt: Describe Kurt Lewin's three-step model of change.
+      module: risk-change
+      keywords: [unfreeze, transition, change, refreeze, readiness, training, embed]
+      idealAnswer: >-
+        Unfreeze: build readiness and let go of the old way by explaining why the change is needed. Transition
+        (change): adopt the new way with training and support. Refreeze: embed it as business as usual through
+        policies, rewards and retiring the old system.
+    - prompt: Distinguish scope management from change control management.
+      module: risk-change
+      keywords: [scope, what is included, WBS, change control, how changes, impact, sponsor signature, recorded]
+      idealAnswer: >-
+        Scope management defines and controls what is and is not included in the project: all the work
+        required and only that (scope statement, WBS). Change control defines how changes to scope, schedule,
+        technical specification or training are requested, assessed for impact, approved by the sponsor before
+        implementation, and recorded.
+    - prompt: Name the three pillars of empiricism in Scrum and explain how the Daily Scrum supports them.
+      module: agile-scrum
+      keywords: [transparency, inspection, adaptation, Daily Scrum, 15 minutes, Sprint Goal, Developers]
+      idealAnswer: >-
+        Transparency, inspection and adaptation. The Daily Scrum makes progress visible to the Developers
+        (transparency), checks progress toward the Sprint Goal every day (inspection), and adjusts the Sprint
+        Backlog into a plan for the next day (adaptation). It lasts 15 minutes and is run by the Developers.
+    - prompt: State the four values of the Agile Manifesto.
+      module: agile-scrum
+      keywords: [individuals and interactions, working software, customer collaboration, responding to change]
+      idealAnswer: >-
+        Individuals and interactions over processes and tools; working software over comprehensive
+        documentation; customer collaboration over contract negotiation; responding to change over following
+        a plan. (The items on the right still have value; the left is valued more.)
+    - prompt: Name the three Scrum artifacts and the commitment attached to each.
+      module: agile-scrum
+      keywords: [Product Backlog, Product Goal, Sprint Backlog, Sprint Goal, Increment, Definition of Done]
+      idealAnswer: >-
+        Product Backlog → Product Goal. Sprint Backlog → Sprint Goal. Increment → Definition of Done.
+    - prompt: List five types of project closure and explain what a "perpetual" project is.
+      module: closure
+      keywords: [normal, premature, perpetual, failed, changed priority, never finishes, scope creep]
+      idealAnswer: >-
+        Normal, premature, perpetual, failed, and changed priority. A perpetual project never seems to finish:
+        it keeps getting additions, has unclear completion criteria and suffers scope creep until it is forced
+        to close.
+    - prompt: Explain why formal project closure is important and list the steps of implementing closedown.
+      module: closure
+      keywords: [delivery acceptance, shut down resources, evaluate, close accounts, deliver, final report, lessons learned]
+      idealAnswer: >-
+        Formal closure confirms the client has accepted the deliverables, releases people and resources,
+        closes contracts and accounts, and captures lessons so the next project is better. Without it,
+        projects drift on, costs keep running and knowledge is lost. The six closedown steps: (1) get delivery
+        acceptance from the customer; (2) shut down resources and release them to new uses; (3) evaluate the
+        team, team members and project manager, and reassign team members; (4) close accounts and pay all
+        bills; (5) deliver the project to the customer; (6) create the final report.

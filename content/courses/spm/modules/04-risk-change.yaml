@@ -1,0 +1,634 @@
+id: risk-change
+title: Risk, Issues & Change
+subtitle: Preparing for what might go wrong, dealing with what has gone wrong, and guiding people through change
+recap: |
+  A risk is a possible future problem (or opportunity). An issue is a problem that has already happened. Risks are
+  rated by exposure: RE = probability × loss, and a response is judged by risk leverage = (RE before − RE after) /
+  cost of reduction, where above 1 means the response is worth its cost. The four threat responses are avoid,
+  mitigate, transfer and accept; the opportunity responses are exploit, share, enhance and accept. Changes to the
+  baseline go through formal change control with the sponsor's signature before work starts. People side: Lewin's
+  unfreeze, transition, refreeze, and the five reactions denial, resistance, anger, indifference and acceptance.
+traps:
+  - "Mixing up risk and issue. A risk might happen (the vendor may be late). An issue has already happened (the vendor is late and testing is blocked). Once a risk occurs it becomes an issue."
+  - "Getting the leverage formula wrong. Risk leverage = (RE before − RE after) / cost of the reduction. Do not divide by RE before, and do not forget to subtract. Above 1 is worthwhile; below 1 costs more than it saves."
+  - "Forgetting that RE is probability × loss. With P = 0.25 and loss UGX 20 million, RE is UGX 5 million, not 0.25 million or 20 million."
+  - "Calling any response 'mitigation'. Avoid removes the threat by changing the plan. Mitigate lowers probability or impact. Transfer moves ownership to a third party (insurance, vendor). Accept keeps it knowingly. Give an example of each."
+  - "Mixing the opportunity strategies with the threat ones. Opportunities use exploit, share, enhance and accept. Do not write 'avoid' or 'transfer' for an opportunity."
+  - "Swapping budget reserve and management reserve. Budget (contingency) reserve covers identified risks of specific work packages (known unknowns). Management reserve covers major unforeseen risks of the whole project (unknown unknowns)."
+  - "Implementing a change first and asking later. All changes need the sponsor's signature before implementation, after an impact assessment."
+  - "Writing only 'Lewin has three steps' without naming them or applying them. Unfreeze, transition (change or move), refreeze, each tied to what you would do. Also remember the five reactions in order: denial, resistance, anger, indifference, acceptance."
+lesson:
+  checkpointStep: 4
+  steps:
+    - A risk is an anticipated unfavourable event that may happen while the project runs and, if it does, could hurt timely and successful completion. PMI also counts positive risks, called opportunities. Risk management is a continuous cycle of identify, analyse, plan, track and control, with communication throughout.
+    - "Risks come in three categories. Project risks (budget, schedule, people, resources, customer). Technical risks (design, implementation, interfacing, testing, maintenance, new technology). Business risks (an excellent product no one wants, losing budget). External sources include market conditions, government mandates, weather and geography, labour availability, customer and supplier relationships, and exchange rates."
+    - "Rate each risk by exposure: risk exposure RE = probability × loss. Example: probability 0.3 and loss UGX 9 million gives RE = UGX 2.7 million. Qualitative rating uses high, medium and low on a heat map. Quantitative rating uses numbers such as expected monetary value."
+    - "Risk leverage compares a response with its price: leverage = (RE before − RE after) / cost of reduction. If a UGX 1 million mitigation cuts RE from 2.7 to 0.9 million, leverage = 1.8 / 1 = 1.8. Above 1 means worth doing. Pick the response with the highest leverage."
+    - "Checkpoint: a risk has probability 0.25 and a potential loss of UGX 20 million. A mitigation costing UGX 2 million cuts the probability to 0.05. Work out the exposure before and after, the risk leverage, and say whether it is worthwhile."
+    - "The four responses to a threat. Avoid: change the plan so the threat disappears (cut scope, drop an immature framework). Mitigate: lower probability or impact (prototype early, cross-train staff). Transfer: give ownership to a third party (insurance, vendor with penalties). Accept: knowingly keep it, actively with a contingency plan and reserves, or passively by monitoring."
+    - "For opportunities the four responses are exploit (make it certain), share (with a party better placed to capture it), enhance (raise its probability or impact) and accept (take it if it comes). Make each risk actionable with an owner, a trigger, mitigation, contingency and residual risk."
+    - "Reserves pay for risk. Budget reserves (contingency) cover identified risks of specific work packages, the known unknowns. Management reserves cover major unforeseen risks of the whole project, the unknown unknowns. Time buffers protect the schedule, but using slack raises the risk of a late finish."
+    - "A risk is a potential event. An issue has already happened and is hurting cost, time or quality. The issue process is log with evidence, assess, assign an owner and contain, analyse the cause and agree corrective action, then track to verified closure. Escalate when the team lacks the authority or capacity to decide."
+    - "Changes to the baseline need formal change control: impact assessment, plan adjustment, stakeholder approval, then update and communicate, with the sponsor's signature before implementation. People change follows Lewin: unfreeze, transition, refreeze. People react with denial, resistance, anger, indifference, then acceptance. Kotter's 8 steps and ADKAR earn extra marks."
+checkpoint:
+  question: A risk has probability 0.25 and a potential loss of UGX 20 million. A mitigation costing UGX 2 million would reduce the probability to 0.05. Calculate the risk exposure before and after, and the risk leverage. Is the mitigation worthwhile?
+  hint: RE is probability × loss. Leverage is (RE before − RE after) divided by the cost of the mitigation. Then compare the answer with 1.
+  keywords:
+    - risk exposure
+    - probability
+    - loss
+    - leverage
+    - 5 million
+    - 1 million
+    - 2.0
+    - worthwhile
+  idealAnswer: "RE before = 0.25 × 20 million = UGX 5 million. RE after = 0.05 × 20 million = UGX 1 million. Risk leverage = (RE before − RE after) / cost of reduction = (5 − 1) / 2 = 2.0. Because leverage is greater than 1, the mitigation is worthwhile: it removes UGX 2 million of exposure for every UGX 1 million spent."
+terms:
+  - term: Risk
+    definition: An anticipated unfavourable event or circumstance that may occur during the project and, if it does, could hamper successful and timely completion. PMI also counts positive risks (opportunities).
+  - term: Risk management
+    definition: A continuous cycle of identify, analyse, plan, track and control, with communication throughout. It reduces the impact of risks and reduces rework (often 40–50% of software costs).
+  - term: Project, technical and business risk
+    definition: Project risks concern budget, schedule, people, resources and customer. Technical risks concern design, implementation, interfacing, testing and maintenance. Business risks concern the market and the organisation.
+  - term: Risk Breakdown Structure (RBS)
+    definition: A hierarchy of risk categories, like a WBS for risks. It helps you find macro risks first, then specific events.
+  - term: Risk exposure (RE)
+    definition: How big a risk is. RE (also called priority p) = likelihood × severity; in money terms, RE = probability × loss.
+  - term: Expected monetary value (EMV)
+    definition: A quantitative measure equal to the sum of probability × impact over the risks.
+  - term: Risk leverage
+    definition: (RE before − RE after) / cost of risk reduction. A value above 1 means the mitigation is worth more than it costs.
+  - term: Avoid
+    definition: A threat response that changes the plan so the threat no longer exists, for example reducing scope or not using an immature framework.
+  - term: Mitigate (reduce)
+    definition: A threat response that lowers the probability or the impact, for example early prototyping, pair work or planned recruitment.
+  - term: Transfer
+    definition: A threat response that shifts ownership of the risk to a third party, for example insurance, a vendor building the risky part, contract penalties or BOOT provisions.
+  - term: Accept (retain)
+    definition: Knowingly keeping a risk. Active acceptance uses a contingency plan and reserves; passive acceptance just monitors. Used when exposure is tolerable or the response costs more than the risk.
+  - term: Exploit, share, enhance
+    definition: Opportunity responses. Exploit makes the opportunity certain, share gives part to a party better able to capture it, enhance raises its probability or impact. (Accept takes it if it comes.)
+  - term: Trigger
+    definition: An observable warning sign that a risk is about to happen or that a contingency plan should start.
+  - term: Residual risk
+    definition: The exposure left over after the response has been applied.
+  - term: Budget reserve vs management reserve
+    definition: Budget (contingency) reserve covers identified risks of specific work packages (known unknowns). Management reserve covers major unforeseen risks of the whole project (unknown unknowns), for example a scope change.
+  - term: Issue
+    definition: A problem that has already occurred and is affecting cost, time or quality.
+  - term: Escalation
+    definition: Bringing in a decision or authority that the team does not have, such as a sponsor decision on scope or date.
+  - term: Change control
+    definition: The formal process that defines how changes to scope, schedule, technical specification and training are assessed and approved, with the sponsor's signature before implementation.
+  - term: Lewin's model
+    definition: Unfreeze (let go of the old way), transition (adopt the new way), refreeze (make it business as usual).
+  - term: Kotter and ADKAR
+    definition: "Kotter's 8 steps: urgency, guiding coalition, vision, communicate, empower, short-term wins, build on change, anchor in culture. ADKAR: Awareness, Desire, Knowledge, Ability, Reinforcement."
+quiz:
+  - question: Which formula gives risk exposure in money terms?
+    options:
+      - Loss ÷ probability
+      - Probability + loss
+      - Probability × loss
+      - Cost of mitigation × probability
+    answer: 2
+    explanation: RE = probability × loss. For example 0.25 × UGX 20 million = UGX 5 million.
+  - question: P = 0.25, loss = UGX 20 million. A UGX 2 million mitigation cuts P to 0.05. What is the risk leverage?
+    options:
+      - 2.0
+      - 2.5
+      - 4.0
+      - 1.0
+    answer: 0
+    explanation: RE before = 5 million, RE after = 1 million. Leverage = (5 − 1) / 2 = 2.0.
+  - question: P = 0.4, loss = USD 50,000. A USD 8,000 mitigation cuts P to 0.1. What is the leverage?
+    options:
+      - 1.5
+      - 2.5
+      - 0.53
+      - 1.875
+    answer: 3
+    explanation: RE before = 20,000, RE after = 5,000. Leverage = 15,000 / 8,000 = 1.875, above 1 so worthwhile.
+  - question: A risk leverage of 0.33 means what?
+    options:
+      - The mitigation is very good value
+      - The mitigation costs more than the exposure it removes
+      - The risk has a 33% probability
+      - The risk should be transferred
+    answer: 1
+    explanation: Below 1 means the response costs more than the risk reduction it brings. It is not worthwhile on that basis.
+  - question: A company buys insurance against a data-centre fire. Which threat response is this?
+    options:
+      - Avoid
+      - Transfer
+      - Accept
+      - Mitigate
+    answer: 1
+    explanation: Insurance moves the financial consequence to a third party, so it is transfer. Vendor penalties and BOOT provisions are the same idea.
+  - question: The team drops an immature framework and uses a proven one. Which response is this?
+    options:
+      - Enhance
+      - Transfer
+      - Mitigate
+      - Avoid
+    answer: 3
+    explanation: Changing the plan so the threat no longer exists is avoid.
+  - question: Which is a set of opportunity responses?
+    options:
+      - Exploit, share, enhance, accept
+      - Avoid, mitigate, transfer, accept
+      - Identify, analyse, plan, track
+      - Unfreeze, transition, refreeze
+    answer: 0
+    explanation: Opportunities are exploited, shared, enhanced or accepted. The second set is for threats.
+  - question: Which describes a management reserve?
+    options:
+      - Money for identified risks of one work package
+      - Spare days in the schedule
+      - A fund for major unforeseen risks of the whole project (unknown unknowns)
+      - The sum of all task costs
+    answer: 2
+    explanation: Management reserve covers unknown unknowns for the whole project. Budget reserve covers known unknowns in specific work packages.
+  - question: "The SMS vendor 'may' deliver late. Next week the vendor says it is already 5 days late. What has the item become?"
+    options:
+      - A bigger risk
+      - An assumption
+      - An issue
+      - A constraint
+    answer: 2
+    explanation: It has now occurred and is affecting the project, so it is an issue. It needs containment, a cause analysis and possibly escalation.
+  - question: When should an issue be escalated?
+    options:
+      - When a decision or authority is needed that the team does not have
+      - Never, the team must fix everything
+      - Only at project closure
+      - Always, immediately
+    answer: 0
+    explanation: Escalation brings in decisions the team cannot make, for example a milestone moving, or the fix threatening the release or an access policy.
+  - question: When must the sponsor's signature on a change be obtained?
+    options:
+      - Only for changes over a set cost
+      - After implementation
+      - At project closure
+      - Before implementation
+    answer: 3
+    explanation: All changes need collaboration and buy-in via the sponsor's signature before implementation.
+  - question: What is the correct order of the PM's change process?
+    options:
+      - Approval, impact assessment, plan adjustment, update
+      - Impact assessment, plan adjustment, stakeholder approval, update baseline and communicate
+      - Plan adjustment, update, impact assessment, approval
+      - Communicate, approve, assess, adjust
+    answer: 1
+    explanation: Impact assessment (schedule, budget, quality, risk), plan adjustment, stakeholder approval, then update the baseline and communicate.
+  - question: What are Lewin's three steps in order?
+    options:
+      - Transition, unfreeze, refreeze
+      - Unfreeze, transition, refreeze
+      - Unfreeze, refreeze, transition
+      - Refreeze, transition, unfreeze
+    answer: 1
+    explanation: Unfreeze (let go of the old), transition (adopt the new), refreeze (make it business as usual).
+  - question: Which is the correct order of typical reactions to change?
+    options:
+      - Acceptance, denial, anger, resistance, indifference
+      - Resistance, denial, indifference, anger, acceptance
+      - Anger, denial, resistance, acceptance, indifference
+      - Denial, resistance, anger, indifference, acceptance
+    answer: 3
+    explanation: Denial, then resistance (fear of the unknown), anger, indifference (watch for it, they may not understand), and finally acceptance.
+  - question: Which pair of figures about change initiatives is in the slides?
+    options:
+      - 54% succeed (Strategy&); about 70% fail (McKinsey)
+      - 10% succeed; 90% fail
+      - 90% succeed; 10% fail
+      - 25% succeed; 25% fail
+    answer: 0
+    explanation: Only 54% of major change initiatives succeed (Strategy&/Katzenbach 2013) and McKinsey puts failure around 70%.
+  - question: Which type of change is infrequent, short-term and usually scheduled in one unit, such as a new enterprise system?
+    options:
+      - Incremental
+      - Transformational
+      - Episodic
+      - Continuous
+    answer: 2
+    explanation: Incremental means ongoing improvements, episodic means infrequent scheduled programmes, and transformational means many impacts across many departments at once.
+fact:
+  title: The tree and the rope
+  body: The intro lecture explained risk and issue with a tree. The tree might fall, given its location and the weather, so that is a risk. The rope is not thick enough, so that is already a problem, an issue. Tom Gilb's warning fits both, "If you don't actively attack the risks, the risks will actively attack you."
+lab:
+  title: Risk Exposure & Leverage Drills
+  variations:
+    - title: Risk leverage (Paper A, A10)
+      question: A risk has <b>probability 0.25</b> and a potential <b>loss of UGX 20 million</b>. A mitigation costing <b>UGX 2 million</b> reduces the probability to <b>0.05</b>. What is the <b>risk leverage</b>?
+      answer: 2
+      tolerance: 0.01
+      hint: RE before = 0.25 × 20, RE after = 0.05 × 20. Leverage = (RE before − RE after) / 2.
+      explanation: RE before = 5 million and RE after = 1 million. Leverage = (5 − 1) / 2 = 2.0, above 1 so worthwhile.
+    - title: Risk exposure (key developer leaves)
+      question: A key developer may leave. <b>Probability 0.3</b>, <b>loss UGX 9 million</b> (re-hiring and delay). What is the risk exposure in <b>UGX million</b>?
+      answer: 2.7
+      tolerance: 0.01
+      unit: UGX million
+      hint: RE = probability × loss.
+      explanation: RE = 0.3 × 9 = 2.7 million. With a UGX 1 million mitigation that cuts P to 0.1, RE after = 0.9 and leverage = 1.8.
+    - title: Leverage in dollars (Q&A drill)
+      question: <b>P = 0.4</b>, <b>loss = USD 50,000</b>. A mitigation costing <b>USD 8,000</b> cuts P to <b>0.1</b>. What is the <b>risk leverage</b>? Give three decimals.
+      answer: 1.875
+      tolerance: 0.005
+      hint: RE before = 20,000, RE after = 5,000. Divide the difference by 8,000.
+      explanation: Leverage = (20,000 − 5,000) / 8,000 = 1.875. It is above 1, so the mitigation is worthwhile.
+    - title: A mitigation that is not worth it
+      question: A risk has <b>probability 0.5</b> and <b>loss UGX 10 million</b>. A mitigation costing <b>UGX 6 million</b> reduces the probability to <b>0.3</b>. What is the <b>risk leverage</b>? Give two decimals.
+      answer: 0.33
+      tolerance: 0.01
+      hint: RE before = 5, RE after = 3. Divide the saving by 6.
+      explanation: Leverage = (5 − 3) / 6 = 0.33. It is below 1, so the mitigation costs more than it saves and is not worthwhile.
+    - title: Mitigation that cuts the loss, not the probability
+      question: A risk has <b>probability 0.2</b> and <b>loss UGX 40 million</b>. A mitigation costing <b>UGX 2.5 million</b> keeps the probability but cuts the loss to <b>UGX 20 million</b>. What is the <b>risk leverage</b>?
+      answer: 1.6
+      tolerance: 0.01
+      hint: RE before = 0.2 × 40, RE after = 0.2 × 20.
+      explanation: RE before = 8 million, RE after = 4 million. Leverage = (8 − 4) / 2.5 = 1.6, so worthwhile.
+notes:
+  - heading: "Start here: the big idea in plain words"
+    body: |
+      **The idea:** every project walks into the unknown. Some things might go wrong, some might go surprisingly well, and some things have already gone wrong. This topic is about three jobs: **prepare** for what might happen (risk), **deal with** what has happened (issues), and **handle changes** to the plan and to the people (change).
+
+      **Everyday comparison:** a road trip. A risk is "the road might flood" (not yet happened). An issue is "the road is flooded and we are stuck". A change is "let's go to a different city", which needs everyone to agree before you drive.
+
+      **Words you need first:**
+
+      - **Risk:** a possible future event that could hurt the project (or help it, if positive).
+      - **Issue:** a problem that has already happened.
+      - **Exposure:** how big a risk is, as probability × loss.
+      - **Mitigation:** an action that reduces a risk.
+      - **Baseline:** the approved plan. A change to it needs formal approval.
+
+      **In the exam:** expect an exposure and leverage calculation (Paper A A10), four threat responses with examples, opportunity responses, risk vs issue, budget vs management reserve, and Lewin with the five reactions to change.
+  - heading: Risk definitions, categories and the risk process
+    body: |
+      **What it is and why it matters:** a **risk** is an anticipated unfavourable event or circumstance that may occur while the project is underway and, if it occurs, could hamper successful and timely completion. PMI also counts **positive** risks, called **opportunities**. **Risk management** reduces the impact of all the risks that might affect a project. *"If you don't actively attack the risks, the risks will actively attack you."* (Tom Gilb)
+
+      **Why it matters for software:** it focuses the project on the critical risk items, gives techniques to handle them, and **reduces rework**, which is often **40–50% of software costs**. It also supports informed decisions about costs, benefits and future options.
+
+      **Everyday comparison:** checking the weather and packing an umbrella before a trip, not after you are wet.
+
+      **The process (SEI):** a **continuous** cycle of **identify → analyse → plan → track → control**, with **communication** all the way through.
+
+      **UniConnect version of the process:**
+
+      1. **Identify** the uncertain event and the objective it affects.
+      2. **Assess** probability, impact and urgency.
+      3. **Select a response and assign an owner.**
+      4. **Watch triggers** and implement the response.
+      5. **Review** exposure, then close or revise the risk.
+
+      **In the exam:** name the cycle (identify, analyse, plan, track, control) and add that it is continuous, with communication throughout.
+
+      **Categories, sources and identification tools.** Risks are grouped so you can find them systematically.
+
+      | Category | Concerns | Examples |
+      |---|---|---|
+      | **Project risks** | Budget, schedule, personnel, resources, customer | Schedule slippage; software is intangible, so it is hard to monitor |
+      | **Technical risks** | Design, implementation, interfacing, testing, maintenance | Incomplete or changing specification; new technology |
+      | **Business risks** | Market and organisational | "An excellent product that no one wants"; losing budget |
+
+      **Sources:**
+
+      - **Internal/project:** "needs and definition" risk (misunderstanding requirements); **technical** risk (high complexity, low maturity, low reliability or testability, high concurrency).
+      - **External/environment:** market conditions, government mandates, weather and geography, labour availability, project priorities, customer/supplier relationships, **exchange rates**.
+
+      **Roots of uncertainty:** who is involved (parties), what they want (motives), what they are interested in (design), how it will be done (activities), what resources, and when (schedule).
+
+      **Identification tools:** brainstorming, **SWOT**, expert interviews, **checklists** (past projects, post-mortems), analogy, the **WBS and work packages**, process flow charts, and the **Risk Breakdown Structure (RBS)**, a hierarchy of risk categories like a WBS for risk. Rule: *macro risks first, then specific events.*
+
+      **In the exam:** "Explain the risk categories and three sources of external risk" (Paper B B5a, 5 marks). Give the three categories with what each covers, then any three external sources, for example market conditions, government mandates, exchange rates.
+  - heading: Assessing risk and the exposure formula
+    body: |
+      **What it is and why it matters:** you cannot treat every risk, so you rank them. Rate each risk on **likelihood (r)** and **severity of damage (s)**. **Priority p = r × s.** This is **risk exposure**; in money terms **RE = probability × loss**.
+
+      **Two ways to assess:**
+
+      - **Qualitative:** relative scales (high, medium, low) on a **probability–impact heat map**.
+      - **Quantitative:** data and models for cost or time impact, for example **expected monetary value (EMV)** = Σ (probability × impact). (Standard PM knowledge, not from the slides.)
+
+      **Everyday comparison:** a small chance of a huge loss (house fire) and a big chance of a small loss (a lost umbrella) can have similar exposure. Multiplying gives one comparable number.
+
+      **Tiny example with real numbers:** a key developer may leave. Probability **0.3**, loss **UGX 9 million** (re-hiring, delay). RE = 0.3 × 9 = **UGX 2.7 million**.
+
+      **In the exam:** show RE = probability × loss, plug in numbers, and state the unit (UGX million).
+  - heading: Risk leverage
+    body: |
+      **What it is and why it matters:** a mitigation costs money. **Risk leverage** tells you whether it is worth it by comparing how much exposure it removes with what it costs.
+
+      **The formula:**
+
+      $$\text{Risk leverage} = \frac{RE_{before} - RE_{after}}{\text{cost of risk reduction}}$$
+
+      **Everyday comparison:** paying for a lock. If it costs 1 and prevents an expected loss of 2, it is a bargain (leverage 2). If it costs 6 and prevents an expected loss of 2, it is a bad deal (leverage 0.33).
+
+      **Worked example from the slides:** key developer leaves. P = 0.3, loss UGX 9 million, so RE = 2.7 million. Mitigation (pair programming and documentation) costs **UGX 1 million** and cuts P to **0.1**, so RE after = 0.9 million. Leverage = (2.7 − 0.9) / 1 = **1.8**.
+
+      **Paper A A10:** P 0.25, loss UGX 20 million, mitigation UGX 2 million cuts P to 0.05. RE before 5 million, RE after 1 million. Leverage = (5 − 1) / 2 = **2.0**. Worthwhile.
+
+      **Q&A drill:** P = 0.4, loss USD 50,000, mitigation USD 8,000 cuts P to 0.1. RE 20,000 → 5,000. Leverage = 15,000 / 8,000 = **1.875**.
+
+      **The rule:** leverage **greater than 1** means the mitigation is worth more than it costs. **Choose the response with the highest leverage.** Below 1 means it costs more than it saves.
+
+      **In the exam (4 marks, A10):** RE before (1), RE after (1), leverage (1), and the conclusion that above 1 is worthwhile (1). Always write the conclusion.
+  - heading: Response strategies for threats and opportunities
+    body: |
+      **What it is and why it matters:** once a risk is rated, you choose what to do about it. Choose a strategy by **comparing the cost of handling the risk with the reduction in risk achieved.**
+
+      **For threats:**
+
+      | Strategy | What | Example |
+      |---|---|---|
+      | **Avoid** | Change the plan so the threat no longer exists | Reduce scope with the customer; don't use the immature framework |
+      | **Mitigate / reduce** | Lower the probability or impact | Plan recruitment in case key staff leave; prototype early; pair work |
+      | **Transfer** | Shift ownership to a third party | Have a vendor develop the risky component; **insurance**; contract penalties; BOOT provisions |
+      | **Accept / retain** | Consciously accept the risk | *Active*: contingency plan and reserves. *Passive*: just monitor. Use when the exposure is tolerable or the response costs more than the risk |
+
+      **For opportunities:**
+
+      | Strategy | What | Example (Paper B marking guide) |
+      |---|---|---|
+      | **Exploit** | Make sure it happens | Assign the best developer to finish early and capture a bonus |
+      | **Share** | Give part to a party better able to capture it | A joint venture with a partner better placed |
+      | **Enhance** | Raise its probability or impact | Add resources to qualify for an early-delivery incentive |
+      | **Accept** | Take it if it comes | Do nothing special; benefit if it arises |
+
+      **Making a risk actionable:** an **owner** (monitors and coordinates), a **trigger** (an observable warning sign), **mitigation** (before the event), **contingency** (if it happens) and **residual risk** (exposure left over).
+
+      **In the exam:** "Explain four risk response strategies with examples." Name each strategy, define it in one phrase and give one example. For opportunities, do not use avoid or transfer.
+  - heading: The risk register
+    body: |
+      **What it is and why it matters:** a table that records each risk and who handles it, so nothing is forgotten.
+
+      **UniConnect extract (from the slides):**
+
+      | Risk | P | I | Response | Owner | Trigger |
+      |---|---|---|---|---|---|
+      | SMS sandbox access may arrive late | H | H | Mitigate: early readiness check + simulator | DevOps | No credentials by end of week 5 |
+      | Advisors may miss UAT sessions | M | M | Book alternates, offer two sessions | BA/UX | Fewer than 6 confirmations |
+      | Booking data may expose private notes | M | H | Security review before pilot | QA | Failed access-control test |
+      | A developer may become unavailable | M | H | Pair work, document critical modules | Tech lead | Unplanned absence over 2 days |
+
+      **What makes an entry actionable:** a clear statement (cause → event → effect on an objective), probability and impact (exposure), a chosen response, a named owner, a trigger or warning sign, mitigation and contingency actions, residual risk, and a review date.
+
+      **Paper A B3 example (exam-results portal):**
+
+      | Risk | P | I | Response | Owner | Trigger |
+      |---|---|---|---|---|---|
+      | Identity API not ready by integration week | H | H | Mitigate: early sandbox, mock service, weekly vendor check; contingency: manual verification | Tech lead | No sandbox credentials by week X |
+      | Results-day traffic overloads the portal | M | H | Mitigate: load testing, autoscaling, caching, staggered release | DevOps | Load test p95 above 2 s at 50% of expected load |
+      | Senior developer unavailable | M | M | Mitigate: pair work, documentation; accept with a contractor on standby | PM | Absence over 2 days or overtime on the other project |
+
+      **In the exam (9 marks for three rows):** 3 marks per row for probability and impact, a sensible response type and action, and an owner plus a trigger.
+  - heading: Contingency, reserves and the SEI methodology
+    body: |
+      **What it is and why it matters:** you plan for the risks you can name, and you keep money and time aside for the ones you cannot.
+
+      **Everyday comparison:** a household budget with an emergency envelope for known repairs (the roof is old) and a savings account for surprises (illness).
+
+      - **Contingency planning:** alternative actions prepared in case a risk becomes an issue. **Contingency triggers** are thresholds that activate them.
+      - **Contingency funds** cover project risks, identified and unknown. Their size reflects the overall risk.
+      - **Budget reserves** (contingency): linked to **identified** risks of specific work packages, the **known unknowns**. The PM controls them.
+      - **Management reserves:** larger funds for **major unforeseen** risks of the whole project, for example a scope change, the **unknown unknowns**. Controlled by management or the sponsor, outside the cost baseline.
+      - **Time buffers:** schedule slack for risk. From the planning topic: *using slack increases the risk of a late finish.*
+
+      **Common risk types:** *Schedule* (imposed finish dates, compressed schedules). *Cost* (time/cost dependency: problems that take longer cost more; price protection: input costs rise on a longer project). *Funding* (changes in the supply of funds).
+
+      **SEI software risk methodology:**
+
+      - **Seven principles:** shared product vision, teamwork, forward-looking view, global perspective, open communication, integrated management, continuous process.
+      - **Frameworks:** **Software Risk Evaluation (SRE)**; **Continuous Risk Management (CRM)**, a principle-based practice for the whole project lifetime with core, sustaining and defining principles; **Team Risk Management (TRM)**; **Boehm's risk management paradigm**; the **risk taxonomy**; the **risk clinic**, a workshop adapting CRM/TRM to a client's organisation.
+      - **Methodologies:** risk prevention, mitigation and correction, ensuring **safe system failure**. Linked to the **SA-CMM / CMM** maturity models (Watts Humphrey).
+
+      **In the exam (2 marks, Paper A B3d):** budget reserve = identified risks of specific work packages, known unknowns, PM control. Management reserve = unforeseen major risks across the whole project, unknown unknowns, controlled by management.
+  - heading: Issues, risk vs issue and escalation
+    body: |
+      **What it is and why it matters:** a **risk** is a *potential* future event. An **issue** is a problem that **has already occurred** and is affecting cost, time or quality. The two need different handling: risks get planned responses, owners and triggers; issues need immediate containment, root-cause analysis and possibly escalation.
+
+      **Everyday comparison (intro lecture):** the *risk* is that the tree *might* fall given its location and the weather. The *issue* is that the rope isn't thick enough, *already* a problem.
+
+      **Example:** "the payment API vendor may miss the integration date" is a risk. "The vendor missed the date and testing is blocked" is an issue.
+
+      **Issue process:**
+
+      1. **Log** with evidence.
+      2. **Assess** severity, urgency and affected objectives.
+      3. **Assign an owner** and contain.
+      4. **Analyse the cause** and agree corrective action.
+      5. **Track to verified closure** and capture lessons.
+
+      **Escalation** brings in decisions or authority the team does not have. Plan where issues are kept, how they are updated, the escalation path, and how the team accesses them.
+
+      | Issue | Impact | Owner | Action | Escalate when |
+      |---|---|---|---|---|
+      | SMS credentials 5 days late | Reminder testing blocked | DevOps | Vendor recovery plan + simulator | Milestone moves or vendor stays silent |
+      | Two privacy defects | Pilot can't proceed safely | QA | Contain, fix, retest | Fix threatens release or access policy |
+      | Backend developer absent | Critical capacity reduced | Tech lead | Reassign, pair on handover | Absence exceeds contingency |
+      | Sponsor requests analytics | Scope and schedule may grow | PM | Submit impact assessment | Sponsor seeks approval to add scope |
+
+      **In the exam (Paper A B3c, 5 marks):** "The identity API is still unavailable two weeks before go-live." Say it is now an issue (1), give the steps, using the contingency (mock or manual verification) and a written recovery plan (3), and say escalate to the sponsor or ministry because the go-live date or scope may need to change, with an impact assessment and options (1).
+  - heading: Project change control
+    body: |
+      **What it is and why it matters:** change control defines **how changes to scope will be executed**. Formal change control is required for **scope changes, schedule changes, technical specification changes and training changes**. **All changes need collaboration and buy-in via the sponsor's signature *before* implementation.**
+
+      **Everyday comparison:** building a house. If the owner asks for an extra room, the builder prices it, shows the effect on time and cost, and gets a signature before laying a brick.
+
+      **PM's change process:**
+
+      1. **Impact assessment:** effect on schedule, budget, quality, risk.
+      2. **Plan adjustment.**
+      3. **Stakeholder approval.**
+      4. **Update the baseline and communicate.**
+
+      **Why formal change control prevents scope creep:** scope creep is change *without* control: small additions accepted informally, each "just a small thing", until schedule and budget no longer match the work. Change control does not block change. It makes the **trade-off visible** (the triple constraint) and puts the decision with the person who owns the budget, the sponsor. In Scrum, new requests go to the **Product Owner** and the Product Backlog, never straight to a Developer mid-Sprint.
+
+      **Scope management vs change control (Paper B A2, 4 marks):** scope management defines and controls what is and is not included (scope statement, WBS) (2). Change control defines how changes to scope, schedule, specification or training are requested, assessed, approved by the sponsor's signature before implementation, and recorded (2).
+
+      **Corrective action vs change request:** a corrective action restores performance inside the baseline (reassign a developer to clear a testing backlog). A change request changes the baseline (add an analytics dashboard, extend the date) and needs an impact assessment and sponsor approval.
+
+      **In the exam:** the first response to an out-of-scope request is neither yes nor no. It is an impact assessment and a change request.
+  - heading: Organisational change management
+    body: |
+      **What it is and why it matters:** **change management** covers all approaches to preparing and supporting individuals, teams and organisations through organisational change. A software project is often *the cause* of such change, because new systems change jobs.
+
+      **Why change happens.** *External forces:* globalisation, workforce diversity, ethics, **technology**, government regulation, the economy, competition, market trends, mergers and acquisitions. *Internal causes:* poor financial performance, internal crisis (strike, shutdown), changing employee expectations, structural and administrative changes.
+
+      **Success rates:** only **54%** of major change initiatives succeed (Strategy&/Katzenbach 2013). McKinsey puts failure around **70%**. **Contributing factors:** unclear future-state vision, lack of leadership alignment, resistance, poor culture, ineffective engagement and communication, underestimated impacts, poor coordination, low change capability.
+
+      **Three hurdles:** **change fatigue** (too many transitions at once); sustaining change initiatives (lacking skills); transformation efforts (**44%** of employees didn't understand the changes and **38%** didn't agree).
+
+      **Kurt Lewin's three-step model:**
+
+      1. **Unfreeze:** let go of the existing ways. Create the case for change.
+      2. **Transition (change/move):** adopt the new way.
+      3. **Refreeze:** make the new way business as usual.
+
+      **Everyday comparison:** an ice cube. Melt it (unfreeze), pour it into a new mould (transition), freeze it again (refreeze).
+
+      **Reactions to change, in order:**
+
+      | Reaction | What it looks like | What helps (Paper B) |
+      |---|---|---|
+      | **Denial** | "It isn't necessary" | Share evidence |
+      | **Resistance** | Fear of the unknown; very common | Listen, involve, address fears |
+      | **Anger** | Uncooperative | Acknowledge, give channels |
+      | **Indifference** | Watch for this: they may not understand it | Explain personal relevance |
+      | **Acceptance** | Faster for positive change | Reinforce with champions |
+
+      **Types of change:**
+
+      | Type | Description |
+      |---|---|
+      | **Incremental** | Process or system improvements and upgrades; focus on user experience and adoption |
+      | **Episodic** | Infrequent, short-term, scheduled programmes (a new enterprise system), usually one unit |
+      | **Transformational** | Many impacts at once (culture, leadership, operating model, technology, location) across many departments; needs a holistic strategy |
+
+      **Strategy elements:** situational awareness (scope, who is impacted and how, what changes, timeframe, perceived need) and organisational attributes (how past changes went, shared vision, change load, groups invested in the status quo). **Framework:** (1) understand change early, (2) set the change strategy, (3) engagement approach and actions, (4) execution. **Team:** change manager, financial analyst, business-unit liaison, team members (HR, operations, logistics, marketing), reviewing officer (Director/COO).
+
+      **Examples from the slides:** **Nokia** (missed smartphones; reinvented under a new CEO), **Coca-Cola** (New Coke failure, then Coca-Cola Classic: admitting a mistake fast), **GE** (Jack Welch, Six Sigma in 1995; USD 12 billion to USD 280 billion), **Amazon** (books to everything; Prime).
+
+      **Extra marks (standard PM knowledge):** **Kotter's 8 steps**: urgency, guiding coalition, vision, communicate, empower, short-term wins, build on change, anchor in culture. **ADKAR**: Awareness, Desire, Knowledge, Ability, Reinforcement. Lewin maps onto both.
+
+      **In the exam:** "Using Lewin's model and the five reactions, propose a change-management plan" (Paper B B5c, 7 marks): unfreeze (2), transition (2), refreeze (1), reactions (2).
+examples:
+  - title: "Exposure and leverage: key developer leaves"
+    problem: |
+      A key developer may leave. The probability is **0.3** and the loss (re-hiring and delay) is **UGX 9 million**. Mitigation by pair programming and documentation costs **UGX 1 million** and cuts the probability to **0.1**. Find RE before, RE after and the risk leverage, and decide.
+    steps:
+      - "**RE before** = 0.3 × 9 = **UGX 2.7 million**."
+      - "**RE after** = 0.1 × 9 = **UGX 0.9 million**."
+      - "**Leverage** = (2.7 − 0.9) / 1 = **1.8**."
+      - "Leverage is above 1, so the mitigation is worth more than it costs. Choose it (or whichever option has the highest leverage)."
+    answer: RE before 2.7 million; RE after 0.9 million; leverage 1.8, worthwhile.
+    takeaway: Calculate RE twice, subtract, divide by the cost, then say whether it is above 1.
+  - title: "Paper A A10: exposure and leverage"
+    problem: |
+      A risk has a probability of **0.25** and a potential loss of **UGX 20 million**. A mitigation costing **UGX 2 million** reduces the probability to **0.05**. Calculate the risk exposure before and after, and the risk leverage. Is the mitigation worthwhile? (4 marks)
+    steps:
+      - "**RE before** = 0.25 × 20 = **UGX 5 million** (1 mark)."
+      - "**RE after** = 0.05 × 20 = **UGX 1 million** (1 mark)."
+      - "**Leverage** = (5 − 1) / 2 = **2.0** (1 mark)."
+      - "Since leverage is above 1, the mitigation is worthwhile: it saves UGX 2 million of exposure for every UGX 1 million spent (1 mark)."
+    answer: RE 5 million to 1 million; leverage 2.0; worthwhile.
+    takeaway: Four marks, four lines. Never skip the final judgement.
+  - title: "Q&A drill: P = 0.4, loss USD 50,000"
+    problem: |
+      P = 0.4, loss = USD 50,000. A mitigation costing USD 8,000 cuts P to 0.1. Calculate exposure before and after and the leverage.
+    steps:
+      - "**RE before** = 0.4 × 50,000 = **USD 20,000**."
+      - "**RE after** = 0.1 × 50,000 = **USD 5,000**."
+      - "**Leverage** = (20,000 − 5,000) / 8,000 = 15,000 / 8,000 = **1.875**."
+      - "1.875 is above 1, so the mitigation is worthwhile."
+    answer: RE 20,000 to 5,000; leverage 1.875; worthwhile.
+    takeaway: The loss can be in any currency. The cost of the mitigation must be in the same unit.
+  - title: "Applying Lewin to a new student information system"
+    problem: |
+      A university replaces its manual records process with a new student information system, and staff are worried. Use Lewin's model and the five reactions to describe how you would guide them.
+    steps:
+      - "**Unfreeze:** explain why the old process fails (lost records, delays), show leadership commitment, involve staff representatives and address fears."
+      - "**Transition:** train staff, use super-users and a pilot, run a help desk and feedback channels, and celebrate quick wins."
+      - "**Refreeze:** retire the old forms, update procedures and performance goals, reward use and monitor usage so people do not slip back."
+      - "**Reactions:** denial (share evidence), resistance (listen and involve), anger (acknowledge and give channels), indifference (explain what it means for them), acceptance (reinforce with champions)."
+    answer: Unfreeze with the case for change; transition with training and support; refreeze by embedding and retiring the old; match each of the five reactions to a response.
+    takeaway: Tie each Lewin step to a concrete action, and mention the five reactions for the extra marks.
+questions:
+  - question: A risk has a probability of 0.25 and a potential loss of UGX 20 million. A mitigation costing UGX 2 million would reduce the probability to 0.05. Calculate the risk exposure before and after, and the risk leverage. Is the mitigation worthwhile? [4 marks]
+    kind: short
+    marks: 4
+    keywords:
+      - risk exposure
+      - 5 million
+      - 1 million
+      - leverage
+      - 2.0
+      - worthwhile
+    idealAnswer: "RE before = 0.25 × 20 = UGX 5 million (1). RE after = 0.05 × 20 = UGX 1 million (1). Leverage = (RE before − RE after) / cost of reduction = (5 − 1) / 2 = 2.0 (1). Since leverage is greater than 1, the mitigation is worthwhile: it saves UGX 2 of exposure per UGX 1 spent (1)."
+  - question: Describe Kurt Lewin's three-step model of change. [4 marks]
+    kind: short
+    marks: 4
+    keywords:
+      - unfreeze
+      - transition
+      - refreeze
+      - training
+      - business as usual
+    idealAnswer: "Unfreeze: create readiness and let go of the old way by explaining why the change is needed. Transition (change or move): adopt the new way with training and support. Refreeze: embed the new way as business as usual through policies, rewards and retiring the old system, so people do not slip back."
+  - question: Distinguish a budget reserve from a management reserve. [2 marks]
+    kind: short
+    marks: 2
+    keywords:
+      - budget reserve
+      - management reserve
+      - known unknowns
+      - unknown unknowns
+      - identified
+      - work package
+    idealAnswer: "A budget (contingency) reserve is for identified risks of specific work packages, the known unknowns, and is within the PM's control. A management reserve is for major unforeseen risks across the whole project, the unknown unknowns, and is controlled by management or the sponsor."
+  - question: Distinguish a risk from an issue with a software example, and explain why the distinction matters. [4 marks]
+    kind: short
+    marks: 4
+    keywords:
+      - potential
+      - already occurred
+      - owner
+      - trigger
+      - containment
+      - escalation
+    idealAnswer: "A risk is uncertain and in the future, for example the payment API vendor may miss the integration date. An issue has already happened, for example the vendor missed the date and testing is blocked. Risks are handled with planned responses, owners and triggers. Issues need immediate containment, root-cause analysis and possibly escalation. Mislabelling wastes effort or delays action."
+  - question: "Explain the strategies for opportunities (as opposed to threats), with an example of each. [4 marks]"
+    kind: short
+    marks: 4
+    keywords:
+      - exploit
+      - share
+      - enhance
+      - accept
+      - opportunity
+    idealAnswer: "Exploit: make it certain, for example assign the best developer to finish early and capture a bonus (1). Share: partner with a party better placed to capture it, for example a joint venture (1). Enhance: raise its probability or impact, for example add resources to qualify for an early-delivery incentive (1). Accept: take the benefit if it arises without special action (1)."
+  - question: "Paper A B3: an exam-results portal depends on an external SMS gateway and a government identity API, and two senior developers also work on another project. (a) Identify four risks, one each from project, technical, business and external. (b) Build a register for three, showing probability, impact, response, owner and trigger. (c) Two weeks before go-live the identity API is still unavailable. Explain why this is an issue and how you would manage it, including when to escalate. (d) Distinguish budget from management reserve. [20 marks]"
+    kind: long
+    marks: 20
+    keywords:
+      - project risk
+      - technical risk
+      - business risk
+      - external
+      - probability
+      - impact
+      - mitigate
+      - owner
+      - trigger
+      - issue
+      - contingency
+      - escalate
+      - impact assessment
+      - budget reserve
+      - management reserve
+    idealAnswer: "(a) Project: senior developers split across projects, so schedule slippage. Technical: identity API integration complexity or performance under results-day load. Business: the ministry changes its result-release policy. External: SMS gateway unavailable or slow on release day, or exchange rates raise vendor costs. (b) Register: identity API not ready (P high, I high), mitigate with early sandbox, mock service and weekly vendor check, contingency manual verification, owner tech lead, trigger no sandbox credentials by week X. Results-day traffic (P medium, I high), mitigate with load testing, autoscaling, caching and staggered release, owner DevOps, trigger p95 above 2 s at 50% of expected load. Senior developer unavailable (P medium, I medium), mitigate with pair work and documentation and accept with a contractor on standby, owner PM, trigger absence over 2 days. (c) It has now occurred and is affecting the schedule, so it is an issue. Log it with evidence, assess severity, urgency and effect on go-live, assign an owner and contain (activate the mock or manual verification, re-sequence testing), analyse the cause and agree corrective action with a written recovery plan from the provider, track to closure. Escalate to the sponsor or ministry when the team lacks authority, because the go-live date or scope may need to change, presenting an impact assessment and options. (d) Budget reserve: identified risks of specific work packages (known unknowns), PM control. Management reserve: unforeseen major risks across the project (unknown unknowns), controlled by management."
+  - question: "Paper B B5: (a) Explain the risk categories (project, technical, business) and three sources of external risk. (b) Explain the strategies for opportunities, with an example of each. (c) A bank's new loan-processing system meets strong staff resistance. Using Lewin's model and the five typical reactions to change, propose a change-management plan. [16 marks]"
+    kind: long
+    marks: 16
+    keywords:
+      - project risk
+      - technical risk
+      - business risk
+      - market conditions
+      - exchange rates
+      - exploit
+      - share
+      - enhance
+      - unfreeze
+      - transition
+      - refreeze
+      - denial
+      - resistance
+      - anger
+      - indifference
+      - acceptance
+    idealAnswer: "(a) Project risks: budget, schedule, people, customer. Technical risks: design, integration, testing, changing specifications. Business risks: no market, budget loss. External sources (any three): market conditions, government mandates, physical environment, labour availability, customer and supplier relationships, exchange rates. (b) Exploit: make it certain, for example assign the best developer to finish early for a bonus. Share: partner with a party better placed, for example a joint venture. Enhance: raise probability or impact, for example add resources to qualify for an early-delivery incentive. Accept: take it if it arises. (c) Unfreeze: explain why (error rates, slow approvals), show leadership commitment, involve staff representatives, address fears of job loss. Transition: training, super-users, phased rollout or pilot, help desk, feedback loops, quick wins. Refreeze: retire the old process, update procedures and KPIs, recognise adoption, monitor usage. Reactions: denial (share evidence), resistance (listen, involve, address fears), anger (acknowledge, give channels), indifference (explain personal relevance), acceptance (reinforce with champions)."

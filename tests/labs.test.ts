@@ -70,8 +70,10 @@ describe("course content", () => {
     for (const c of courses) for (const m of c.modules) assert.ok(m.lesson.steps.length > 0, `${c.id}/${m.id}`);
   });
 
-  it("has a lab definition for every module that declares a lab", () => {
-    for (const c of loadAllCourses()) for (const m of c.modules) if (m.lab) assert.ok(ALL[c.id]?.[m.id], `missing lab ${c.id}/${m.id}`);
+  // Courses without lab code (e.g. spm) are YAML-only: their lab page shows the variations and
+  // AI challenges, as content/README.md documents. Courses that register lab code must cover every lab.
+  it("has a lab definition for every module that declares a lab, in courses with lab code", () => {
+    for (const c of loadAllCourses()) for (const m of c.modules) if (m.lab && ALL[c.id]) assert.ok(ALL[c.id][m.id], `missing lab ${c.id}/${m.id}`);
   });
 });
 

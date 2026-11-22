@@ -1,0 +1,681 @@
+id: planning-scheduling
+title: Planning, WBS & Scheduling
+subtitle: Turning an approved idea into a workable route, and calculating how long it will really take
+recap: |
+  Planning turns an approved idea into a route: break the work into pieces (the WBS), put the pieces in order,
+  and estimate time, cost and people. The WBS follows the 100% rule: each level covers all of its parent, with
+  nothing missing and nothing counted twice. To find the project length, draw a network and do a forward pass
+  (earliest times) and a backward pass (latest times). The longest path is the critical path, and its activities
+  have zero slack. PERT adds uncertainty with three estimates: TE = (a + 4m + b) / 6 and sigma = (b - a) / 6.
+  Then Z = (D - mean) / sigma gives the chance of finishing on time. A plan with no spare time is a coin toss
+  (50%).
+traps:
+  - "Forgetting that the forward pass takes the LARGEST earlier finish (EF) of all predecessors, while the backward pass takes the SMALLEST later start (LS) of all successors."
+  - "Mixing up the formulas: slack = LS - ES (or LF - EF), and EF = ES + duration, LS = LF - duration."
+  - "Using sigma = (b - a) / 6 for the project. Project variance is the SUM of the variances on the critical path only; then take the square root once."
+  - "Adding standard deviations instead of variances along the critical path."
+  - "Crashing a non-critical activity. It costs money and does not shorten the project."
+  - "Believing a plan with D equal to the mean is safe. Z = 0 means only a 50% chance of finishing on time."
+  - "Saying a Gantt chart shows dependencies and the critical path clearly. It does not; the network diagram does."
+  - "Forgetting that there can be more than one critical path, and that near-critical paths (low slack, high variance) can become critical."
+lesson:
+  checkpointStep: 4
+  steps:
+    - "Planning turns the approved idea into a workable route. You clarify scope, break the work into tasks, put them in order, estimate time, cost and people, then fix the schedule and milestones. Typical outputs are the scope statement, WBS, schedule, budget, risk plan and communication plan."
+    - "The Work Breakdown Structure (WBS) splits the total scope into a tree of deliverables and work packages. The 100% rule says each level covers all of its parent's scope, with nothing missing and nothing counted twice."
+    - "To schedule, draw an activity-on-node network: boxes are activities and arrows show which must finish first. A path is a chain of connected activities. The longest path is the critical path: any delay on it delays the whole project."
+    - "Forward pass: ES = the largest EF of all predecessors, and EF = ES + duration. Backward pass: LF = the smallest LS of all successors, and LS = LF - duration. Slack = LS - ES = LF - EF, and critical activities have zero slack."
+    - "Checkpoint: in the example A(3) -> B(4) -> D(5) -> F(2), with C(2) and E(3) running alongside, what is the project duration, which path is critical, and why do C and E have 4 days of slack?"
+    - "PERT handles uncertainty with three estimates: optimistic a, most likely m, pessimistic b. The expected time is TE = (a + 4m + b) / 6 and the standard deviation is sigma = (b - a) / 6."
+    - "Project variance is the sum of the variances of the activities on the critical path. The project sigma is the square root of that sum."
+    - "Z = (D - mean) / sigma_project, where D is the target date and the mean is the critical-path length. Look Z up in the normal table to get the probability. If D equals the mean, Z = 0 and the chance is only 50%."
+    - "Lecture example: mean 43 days, variance 33, sigma 5.745. For D = 50, Z = 1.22, about 88.9%. For 95% confidence, D = 43 + 1.645 x 5.745 = 52.45 days."
+    - "If the deadline is too early, compress the schedule only on the critical path. Crash (add resources, with more cost; pick the lowest cost slope first), fast-track (overlap tasks, with more risk) or cut scope through change control. A Gantt chart then shows the plan to stakeholders."
+checkpoint:
+  question: "In the worked example, A (3 days) is followed by B (4) and C (2); D (5) follows B; E (3) follows C; F (2) follows D and E. Find the project duration and the critical path, and explain why C and E have 4 days of slack."
+  hint: "Add up each path: A-B-D-F and A-C-E-F. The longer one is critical. Slack is how much longer the shorter path could take before it becomes the longest."
+  keywords:
+    - forward pass
+    - backward pass
+    - critical path
+    - slack
+    - 14
+    - 10
+    - zero
+    - longest
+  idealAnswer: "Forward pass: A 0-3, B 3-7, C 3-5, D 7-12, E 5-8. F starts at the largest predecessor finish, max(12, 8) = 12, and ends at 14. So the project takes 14 days. The critical path is A -> B -> D -> F (3 + 4 + 5 + 2 = 14), the longest path, and its activities have zero slack. The other path A -> C -> E -> F is only 3 + 2 + 3 + 2 = 10 days, so C and E each have 14 - 10 = 4 days of slack (for example C: LS 7 - ES 3 = 4). Hosting setup and SMS configuration can slip 4 days without moving the end date."
+terms:
+  - term: Planning
+    definition: "The phase that turns the approved idea into a workable route: scope, tasks, order, estimates, schedule, budget and plans."
+  - term: Schedule
+    definition: "The conversion of a project action plan into an operating timetable; the basis for monitoring and controlling."
+  - term: WBS (Work Breakdown Structure)
+    definition: "A hierarchy that breaks the total project scope into deliverables and work packages."
+  - term: 100% rule
+    definition: "Each WBS level collectively and exclusively makes up 100% of its parent's scope: nothing missing, nothing counted twice."
+  - term: Work package
+    definition: "The lowest-level piece of work in the WBS (level 5 of 6) that can be estimated, assigned and tracked."
+  - term: Linear Responsibility Chart (LRC)
+    definition: "A matrix of WBS elements against people showing who is responsible, approves, is consulted or notified; the ancestor of RACI."
+  - term: CPM
+    definition: "Critical Path Method, from DuPont: one fixed (deterministic) time per activity; allows time-cost trade-offs (crashing)."
+  - term: PERT
+    definition: "Program Evaluation and Review Technique, from 1958 Polaris: three time estimates per activity (probabilistic), giving expected time and variance."
+  - term: AON / AOA
+    definition: "Activity-on-node (boxes are activities, arrows show order; the modern form) versus activity-on-arrow (arrows are activities, nodes are events)."
+  - term: Critical path
+    definition: "The longest path through the network; any delay on it delays the project; zero slack. There can be more than one."
+  - term: ES / EF
+    definition: "Earliest start and earliest finish, found on the forward pass; EF = ES + duration."
+  - term: LS / LF
+    definition: "Latest start and latest finish, found on the backward pass; LS = LF - duration."
+  - term: Slack (float)
+    definition: "How long an activity can be delayed without delaying the project: LS - ES = LF - EF."
+  - term: Expected time (TE)
+    definition: "PERT weighted average (a + 4m + b) / 6 of optimistic, most likely and pessimistic estimates."
+  - term: Standard deviation and variance
+    definition: "Spread of an estimate: sigma = (b - a) / 6 and variance = sigma squared."
+  - term: Z-score
+    definition: "Z = (D - mean) / sigma_project; the number of standard deviations the target date is from the mean, read from the normal table as a probability."
+  - term: Gantt chart
+    definition: "A bar chart of tasks against time (Henry Gantt, 1917) showing planned and actual progress; easy to read but hides dependencies."
+  - term: Crashing
+    definition: "Adding resources to critical activities to shorten the schedule, at extra cost; do the lowest cost slope first."
+  - term: Fast-tracking
+    definition: "Overlapping activities normally done in sequence to save time, at the price of more risk and rework."
+quiz:
+  - question: "Which rule does the forward pass use to find the ES of an activity with several predecessors?"
+    options:
+      - The smallest EF of the predecessors
+      - The sum of the predecessors' durations
+      - The largest EF of the predecessors
+      - The average of the predecessors' EF
+    answer: 2
+    explanation: "ES = the largest (max) EF of all predecessors, because the activity cannot start until every predecessor has finished."
+  - question: "In the backward pass, LF of an activity with several successors is…"
+    options:
+      - The smallest LS of its successors
+      - The largest LS of its successors
+      - Its own EF
+      - The sum of the successors' durations
+    answer: 0
+    explanation: "LF = the smallest (min) LS of all successors. The tightest successor sets the latest you can finish."
+  - question: "An activity has ES 3 and LS 7. What is its slack?"
+    options:
+      - 3
+      - 7
+      - 10
+      - 4
+    answer: 3
+    explanation: "Slack = LS - ES = 7 - 3 = 4 days."
+  - question: "Paths through a network last 14 days (A-B-D-F) and 10 days (A-C-E-F). Which statement is true?"
+    options:
+      - A-C-E-F is critical because it has the most slack
+      - A-B-D-F is critical and the project takes 14 days
+      - Both paths are critical
+      - The project takes 24 days
+    answer: 1
+    explanation: "The critical path is the longest path, so it sets the project length: 14 days. The 10-day path has 4 days of slack."
+  - question: "In the hospital-system network (A4, B6, C3, D5, E7, F4, G2; B and C follow A, D follows B, E follows C, F follows D and E, G follows F), what is the project duration?"
+    options:
+      - 20 weeks
+      - 21 weeks
+      - 31 weeks
+      - 19 weeks
+    answer: 1
+    explanation: "A-B-D-F-G = 4 + 6 + 5 + 4 + 2 = 21 weeks. A-C-E-F-G = 4 + 3 + 7 + 4 + 2 = 20 weeks. The longest wins: 21."
+  - question: "PERT estimates are a = 2, m = 4, b = 12. What is TE?"
+    options:
+      - 4
+      - 7
+      - 6
+      - 5
+    answer: 3
+    explanation: "TE = (2 + 4 x 4 + 12) / 6 = 30 / 6 = 5."
+  - question: "An activity has a = 4, m = 7, b = 16. What are its standard deviation and variance?"
+    options:
+      - "sigma 2, variance 4"
+      - "sigma 3, variance 9"
+      - "sigma 12, variance 144"
+      - "sigma 2, variance 2"
+    answer: 0
+    explanation: "sigma = (16 - 4) / 6 = 2, so variance = 2 x 2 = 4. (Its TE is (4 + 28 + 16) / 6 = 8.)"
+  - question: "Critical-path activities have variances 0.111, 2.778 and 0.444. What is the project sigma?"
+    options:
+      - 3.333
+      - 0.577
+      - 1.826
+      - 5.77
+    answer: 2
+    explanation: "Add the variances first: 0.111 + 2.778 + 0.444 = 3.333. Then take the square root: 1.826."
+  - question: "Critical path mean 21 weeks, variance 4. What is Z for finishing within 24 weeks?"
+    options:
+      - 0.75
+      - 3
+      - 1.5
+      - 1.22
+    answer: 2
+    explanation: "sigma = square root of 4 = 2. Z = (24 - 21) / 2 = 1.5, which is about 93.3%."
+  - question: "If the planned completion date D equals the critical-path mean, the chance of finishing on time is about…"
+    options:
+      - 50%
+      - 95%
+      - 100%
+      - 84%
+    answer: 0
+    explanation: "Z = 0 sits at the middle of the normal curve, so the chance is 50%: a coin toss. You need schedule buffer."
+  - question: "Which Z value is used to set a deadline with 95% confidence?"
+    options:
+      - 1.0
+      - 1.28
+      - 2.33
+      - 1.645
+    answer: 3
+    explanation: "D = mean + Z x sigma, with Z = 1.645 for 95% and 2.33 for 99%."
+  - question: "Which is a disadvantage of a Gantt chart?"
+    options:
+      - It cannot show planned progress
+      - It is hard to follow on complex projects and does not clearly show dependencies or the critical path
+      - It needs three time estimates per task
+      - It was invented in 1958
+    answer: 1
+    explanation: "Gantt charts (Henry Gantt, 1917) are easy to understand, but they hide dependencies and get cluttered. The network diagram shows logic."
+  - question: "The sponsor wants the project 2 weeks sooner. Which action actually helps?"
+    options:
+      - Crash a non-critical activity with lots of slack
+      - Crash the critical activity with the lowest cost slope
+      - Add slack to the critical path
+      - Remove the WBS
+    answer: 1
+    explanation: "Only compressing critical activities shortens the project. Crash the cheapest per day first; stop when another path becomes critical."
+  - question: "An activity normally costs 1,000 and takes 5 days. Crashed, it costs 1,600 and takes 3 days. What is its crash cost slope?"
+    options:
+      - 200 per day
+      - 800 per day
+      - 600 per day
+      - 300 per day
+    answer: 3
+    explanation: "Slope = (crash cost - normal cost) / (normal time - crash time) = (1,600 - 1,000) / (5 - 3) = 300 per day."
+  - question: "Which statement about CPM and PERT is correct?"
+    options:
+      - PERT (Polaris, 1958) is probabilistic; CPM (DuPont) is deterministic and allows crashing
+      - Both use the same three estimates
+      - CPM is probabilistic and PERT is deterministic
+      - PERT cannot find the critical path
+    answer: 0
+    explanation: "PERT uses a, m and b to give expected time and variance. CPM uses one fixed duration and supports time-cost trade-offs."
+fact:
+  title: Why a plan with no slack is a coin toss
+  body: "PERT was built in 1958 for the Polaris submarine missile project. Its key lesson is still true today: if you promise the date that equals the average finish time, you will miss it about half the time. Adding buffer moves the target to the right on the normal curve, for example 43 days of mean becomes 52.45 days for 95% confidence."
+lab:
+  title: CPM, Slack and PERT Probability Drill
+  variations:
+    - title: Project duration by forward pass
+      question: "A hospital appointment system has these activities. A (4 weeks, no predecessor); B (6, after A); C (3, after A); D (5, after B); E (7, after C); F (4, after D and E); G (2, after F). What is the <b>project duration in weeks</b>?"
+      answer: 21
+      tolerance: 0
+      unit: weeks
+      hint: "Add up each path and take the longest. F starts at the larger of the finishes of D and E."
+      explanation: "A 0-4, B 4-10, C 4-7, D 10-15, E 7-14. F starts at max(15, 14) = 15 and ends at 19; G ends at 21. Critical path A-B-D-F-G = 21 weeks."
+    - title: Slack of a non-critical activity
+      question: "In the same hospital network, activity C (infrastructure procurement) has ES = 4 and EF = 7. Its LF is 8. What is the <b>slack of C in weeks</b>?"
+      answer: 1
+      tolerance: 0
+      unit: weeks
+      hint: "Slack = LF - EF."
+      explanation: "Slack = LF - EF = 8 - 7 = 1 week. (Check: LS = 8 - 3 = 5, and LS - ES = 5 - 4 = 1.) C is near-critical."
+    - title: PERT expected time
+      question: "An activity has optimistic <b>4 days</b>, most likely <b>7 days</b> and pessimistic <b>16 days</b>. Find <b>TE in days</b>."
+      answer: 8
+      tolerance: 0
+      unit: days
+      hint: "TE = (a + 4m + b) / 6."
+      explanation: "TE = (4 + 4 x 7 + 16) / 6 = 48 / 6 = 8 days."
+    - title: PERT standard deviation
+      question: "For the same activity (a = <b>4</b>, b = <b>16</b>), what is the <b>standard deviation sigma in days</b>?"
+      answer: 2
+      tolerance: 0
+      unit: days
+      hint: "sigma = (b - a) / 6."
+      explanation: "sigma = (16 - 4) / 6 = 12 / 6 = 2 days, so the variance is 4."
+    - title: Z-score from the lecture example
+      question: "The critical path has mean <b>43 days</b> and variance <b>33</b>. Find <b>Z</b> for finishing within <b>50 days</b>. Give Z to 2 decimal places."
+      answer: 1.22
+      tolerance: 0.01
+      unit: Z
+      hint: "sigma = square root of 33 = 5.745. Z = (D - mean) / sigma."
+      explanation: "Z = (50 - 43) / 5.745 = 1.22, which is about 88.9% probability of finishing on time."
+    - title: Deadline for 95% confidence
+      question: "The critical path has mean <b>21 weeks</b> and variance <b>4</b>. What deadline gives <b>95%</b> confidence (Z = 1.645)? Answer in weeks to 1 decimal place."
+      answer: 24.3
+      tolerance: 0.1
+      unit: weeks
+      hint: "sigma = square root of 4 = 2. D = mean + Z x sigma."
+      explanation: "D = 21 + 1.645 x 2 = 24.29, about 24.3 weeks."
+notes:
+  - heading: "Start here: the big idea in plain words"
+    body: |
+      **The idea:** planning is working out the route before you drive. This topic answers three questions. What exactly is the work (the **WBS**)? In what order must it happen (the **network**)? And how long will it really take, and how sure are we (**CPM and PERT**)?
+
+      **Everyday comparison:** cooking a family meal. You list every dish (the WBS). Some jobs must wait (rice cannot cook before the water boils) while others run side by side (chop onions while the rice cooks). The whole meal is ready when the *longest chain* of waiting jobs is done. That longest chain is the **critical path**.
+
+      **Tiny example with numbers:** rice takes 20 minutes. Stew takes 45 minutes. They cook at the same time. Dinner is ready after 45 minutes, not 65. The stew is critical; the rice has 25 minutes of **slack** (spare time).
+
+      **What planning produces:** scope statement, WBS, schedule, budget, risk plan, communication plan. A **schedule** is the conversion of a project action plan into an operating timetable. It is the basis for monitoring and controlling, because "work changes daily". With the plan and budget, it is the major tool for managing projects.
+
+      **In the exam:** this is the most calculation-heavy topic. Expect a forward and backward pass, slack, and PERT TE, sigma and Z. Write the formula first, substitute, compute, then say what it means in words.
+  - heading: What planning produces
+    body: |
+      **What it is (from slides):** planning "translates the approved idea into a workable route". The steps, in order:
+
+      1. Clarify detailed scope and requirements.
+      2. Break the work into manageable tasks.
+      3. **Sequence** activities and **estimate** time, cost and resources.
+      4. Assign responsibilities and communication routines.
+      5. Plan quality, risk, procurement and change control.
+      6. Set the **schedule, milestones** and reporting approach.
+
+      **Typical outputs:** scope statement, **WBS**, schedule, budget, risk plan, communication plan.
+
+      **Why a schedule matters:** it turns the plan into a timetable people can follow, and it is what you compare progress against. Without it, you cannot say whether the project is late.
+
+      **In the exam:** if asked "what does planning produce?", list the six outputs above and say the schedule is the basis for monitoring and controlling.
+  - heading: Work Breakdown Structure (WBS) and the 100% rule
+    body: |
+      **What it is:** the **WBS** splits the *total scope* of a project into a tree of deliverables and work. It answers "what is all the work?" before you ask "how long?".
+
+      **Everyday comparison:** a shopping list sorted by aisle. If an item is missing, you will be short at the till. If an item is listed twice, you overspend.
+
+      **The 100% rule:** the first two levels define a set of planned outcomes that **collectively and exclusively represent 100% of the project scope**, and each lower level represents 100% of the scope of its parent. Nothing is missing; nothing is counted twice. It matters because estimates are rolled up from work packages: missing work underestimates cost and time, duplicated work overestimates them, and it stops unplanned (creeping) work.
+
+      **Six-level indented structure:**
+
+      | Level | Name |
+      |---|---|
+      | 1 | Total program |
+      | 2 | Project(s) |
+      | 3 | Task(s) |
+      | 4 | Subtask(s) |
+      | 5 | **Work package(s)** |
+      | 6 | Level of effort |
+
+      Levels 1-3 are usually specified by the client and managed by the PM; lower levels by functional managers.
+
+      **What a WBS lets you do:** plan; establish costs and budgets; track time, cost and performance; set schedules and status reporting (which becomes the **Gantt chart**); **assign responsibility** for each element; list vendors and subcontractors; base estimates; document sign-off.
+
+      **Steps to build one:**
+
+      1. List the task breakdown in finer and finer detail until all meaningful work packages are identified.
+      2. For each work package, identify the responsible people and organisations.
+      3. Review with those responsible to verify accuracy.
+
+      **Linear Responsibility Chart (LRC):** a matrix of WBS elements against people showing who is responsible, who approves, who is consulted and who is notified. It is the ancestor of the **RACI** matrix (Topic 3).
+
+      **In the exam:** "Explain the 100% rule and why it matters for estimating" (4 marks): each level covers all of its parent, nothing missing or duplicated (2), and estimates roll up from work packages so gaps or duplicates distort cost and time (2).
+  - heading: "Worked WBS: a student-advising app"
+    body: |
+      **The idea:** see what a WBS looks like for a real software project, and notice what it leaves out.
+
+      **1.0 UniConnect**
+
+      - **1.1 Project management:** charter, plans, status reports
+      - **1.2 Requirements:** interviews, user stories, sign-off
+      - **1.3 Design:** UX, architecture, data model
+      - **1.4 Build:**
+        - 1.4.1 login
+        - 1.4.2 booking
+        - 1.4.3 SMS reminders
+        - 1.4.4 staff dashboard
+      - **1.5 Testing:** unit, integration, UAT (user acceptance testing)
+      - **1.6 Deployment:** hosting, data migration, training
+      - **1.7 Closure:** handover, lessons learned
+
+      **What is NOT there:** a native mobile app, payments, an AI chatbot. These are out of scope. The WBS is where scope boundaries become concrete: if it is not in the WBS, it is not in the project, and adding it later needs a change request.
+
+      **In the exam:** when asked for an example WBS, give a 2-3 level tree for a software project, name the work packages, and say what is out of scope.
+  - heading: Estimation techniques
+    body: |
+      **The idea:** before scheduling, each work package needs a time and cost estimate. Different techniques suit different situations. (This table is standard PM knowledge, added beyond the slides.)
+
+      | Technique | How | When |
+      |---|---|---|
+      | **Analogous (top-down)** | Use the actual duration or cost of a similar past project | Early, little detail; quick but rough |
+      | **Parametric** | A rate x quantity (e.g. 2 days per screen x 15 screens) | Repeatable work with good historical data |
+      | **Bottom-up** | Estimate each work package and roll up through the WBS | Detailed planning; most accurate, most effort |
+      | **Three-point / PERT** | (a + 4m + b) / 6 from optimistic, most likely, pessimistic | Uncertain tasks; gives a variance too |
+      | **Expert judgement / Delphi** | Anonymous rounds of expert estimates converging | New domains |
+      | **Planning poker** (Agile) | The team estimates story points together | Scrum backlog sizing (Topic 5) |
+
+      **Tiny example (parametric):** 2 days per screen x 15 screens = 30 days.
+
+      **In the exam:** be ready to name three techniques and say when each fits. Bottom-up is the most accurate but costs the most effort.
+  - heading: "Network scheduling: CPM, PERT and the vocabulary"
+    body: |
+      **What it is:** a network diagram draws every activity and shows which ones must finish before others can start.
+
+      **History:** **PERT** was developed in 1958 for the Polaris missile/submarine project and uses **probabilistic** time estimates. **CPM** was developed by DuPont at the same time, uses **deterministic** (single, fixed) times, and allowed project "crunching". Tools like MS Project now blend both.
+
+      **Vocabulary:**
+
+      - **Activity:** a task that uses resources and takes time. **Event:** the result of completing activities; it uses no resources.
+      - **Network:** all activities and events, drawn left to right; connections show predecessors.
+      - **Path:** a series of connected activities. **Critical:** if delayed, the project is delayed.
+      - **Critical path:** the path where any delay delays the project. It is the **longest** path through the network. **There is always one, and there can be more than one.**
+      - **Sequential vs parallel** activities; **immediate predecessor** (the activity that must finish just before).
+      - **AOA (activity-on-arrow):** arrows are activities, nodes are events. **AON (activity-on-node):** nodes are activities, arrows show precedence (the common modern form).
+
+      **Building an AON diagram:** START, then add activities with no predecessors, then add activities whose predecessors are already drawn, repeat, and finish at END.
+
+      | CPM | PERT |
+      |---|---|
+      | DuPont | Polaris, 1958 |
+      | One deterministic duration | Three estimates (a, m, b) |
+      | Supports time-cost trade-offs (crashing) | Gives expected time and variance, so probabilities |
+
+      **In the exam:** "Distinguish CPM from PERT" is a standard short question: use the table above.
+  - heading: Forward pass, backward pass and slack
+    body: |
+      **The idea:** the forward pass asks "what is the earliest each job can start and finish?". The backward pass asks "what is the latest each job can start and finish without delaying the end?". The gap between them is slack.
+
+      **Everyday comparison:** catching a 9:00 train. Going forward, the earliest you could leave is 7:30. Going backward from the train, the latest you can leave is 8:15. The 45 minutes between is your slack.
+
+      **The rules:**
+
+      - **Forward pass** (earliest times): ES = the **largest EF** of all predecessors; **EF = ES + duration**.
+      - **Backward pass** (latest times): starting from END, LF = the **smallest LS** of all successors; **LS = LF - duration**.
+      - **Slack (float) = LS - ES = LF - EF.** Critical activities have **zero slack**.
+
+      **Worked example, the lecture's A-F network:**
+
+      | Activity | Duration (days) | Predecessors |
+      |---|---|---|
+      | A Requirements | 3 | n/a |
+      | B Design | 4 | A |
+      | C Set up hosting | 2 | A |
+      | D Build | 5 | B |
+      | E Configure SMS | 3 | C |
+      | F Integrate & test | 2 | D, E |
+
+      **Forward pass:** A 0 to 3; B 3 to 7; C 3 to 5; D 7 to 12; E 5 to 8; F starts at max(12, 8) = 12 and ends at **14**. The project takes **14 days**.
+
+      **Backward pass:** F LF 14, LS 12; D LF 12, LS 7; E LF 12, LS 9; B LF 7, LS 3; C LF = LS of E = 9, LS 7; A LF = min(LS of B = 3, LS of C = 7) = 3, LS 0.
+
+      | Act | ES | EF | LS | LF | Slack |
+      |---|---|---|---|---|---|
+      | A | 0 | 3 | 0 | 3 | **0** |
+      | B | 3 | 7 | 3 | 7 | **0** |
+      | C | 3 | 5 | 7 | 9 | 4 |
+      | D | 7 | 12 | 7 | 12 | **0** |
+      | E | 5 | 8 | 9 | 12 | 4 |
+      | F | 12 | 14 | 12 | 14 | **0** |
+
+      **Critical path: A, B, D, F = 14 days.** The path A, C, E, F is 3 + 2 + 3 + 2 = 10 days, so C and E each have **4 days of slack**: hosting setup can slip 4 days without moving the end date.
+
+      **Second example, a hospital appointment system (Sample Paper A):**
+
+      | Activity | Description | Duration (weeks) | Predecessors |
+      |---|---|---|---|
+      | A | Requirements | 4 | n/a |
+      | B | System design | 6 | A |
+      | C | Infrastructure procurement | 3 | A |
+      | D | Application build | 5 | B |
+      | E | Infrastructure setup | 7 | C |
+      | F | Integration & testing | 4 | D, E |
+      | G | Deployment & training | 2 | F |
+
+      | Act | ES | EF | LS | LF | Slack |
+      |---|---|---|---|---|---|
+      | A | 0 | 4 | 0 | 4 | 0 |
+      | B | 4 | 10 | 4 | 10 | 0 |
+      | C | 4 | 7 | 5 | 8 | **1** |
+      | D | 10 | 15 | 10 | 15 | 0 |
+      | E | 7 | 14 | 8 | 15 | **1** |
+      | F | 15 | 19 | 15 | 19 | 0 |
+      | G | 19 | 21 | 19 | 21 | 0 |
+
+      Critical path **A, B, D, F, G = 21 weeks** (A, C, E, F, G is 20 weeks). C and E have only 1 week of slack, so they are **near-critical**: watch infrastructure procurement.
+
+      **Why slack matters to a PM:** zero-slack activities need the closest control. Slack is flexibility for resource levelling. Low-slack, high-variance paths are hidden risks.
+
+      **In the exam:** show the forward pass, then the backward pass, then a table of ES, EF, LS, LF and slack. Mark the zero-slack row and state the critical path and total duration. In Paper A this part was worth 8 marks: forward 3, backward 3, slack column 2.
+  - heading: "PERT: three-point estimates and probability"
+    body: |
+      **The idea:** real tasks do not take an exact number of days. PERT asks for three guesses and builds a weighted average, plus a measure of how uncertain the task is.
+
+      **Everyday comparison:** your trip to campus usually takes 30 minutes (most likely), 20 on a great day (optimistic), and 90 if there is a jam (pessimistic). The average is pulled toward the bad end.
+
+      **The rules:** for each activity, **a** = optimistic, **m** = most likely (mode), **b** = pessimistic.
+
+      - **Expected time TE = (a + 4m + b) / 6** (a weighted mean, from the beta distribution)
+      - **Standard deviation sigma = (b - a) / 6**; **variance = ((b - a) / 6) squared**
+      - **Project variance** = the **sum of the variances on the critical path** (assuming independent activities)
+      - **Z = (D - mean) / sigma_project**, where D = desired completion time and the mean is the critical-path length; look up the probability in the normal table.
+      - **Deadline for a target confidence:** D = mean + Z x sigma (Z = 1.645 for 95%, 2.33 for 99%).
+
+      **Tiny example (Sample Paper B, A4):** a = 4, m = 7, b = 16. TE = (4 + 28 + 16) / 6 = **8 days**. sigma = (16 - 4) / 6 = **2 days**. Variance = **4**.
+
+      **The lecture's example:** mean = **43 days**, variance = **33**, so sigma = square root of 33 = **5.745**. For D = 50: Z = (50 - 43) / 5.745 = **1.22**, about **88.9%**. For **95%**: D = 43 + 5.745 x 1.645 = **52.45 days**. For **99%**: 43 + 5.745 x 2.33 = **56.39 days**.
+
+      **Useful Z values:**
+
+      | Z | Probability |
+      |---|---|
+      | 0 | 50% |
+      | 0.5 | 69.1% |
+      | 0.84 | 80% |
+      | 1.0 | 84.1% |
+      | 1.22 | 88.9% |
+      | 1.28 | 90% |
+      | 1.5 | 93.3% |
+      | 1.645 | 95% |
+      | 2.0 | 97.7% |
+      | 2.33 | 99% |
+
+      **Implications (slides):** as D gets closer to the mean, Z goes to 0 and the probability goes to **50%**. A plan with no slack is a coin toss. "If you want a high probability of being on time, you need some slack in the schedule." Watch **non-critical paths with low slack and high variance**: they can become critical.
+
+      **In the exam:** state sigma_project as the square root of the *sum of variances* (never the sum of sigmas), and interpret Z in a sentence ("an 88.9% chance of finishing within 50 days").
+  - heading: Gantt charts, and compressing the schedule
+    body: |
+      **Gantt charts (from slides):** developed by **Henry Gantt (1917)**. A bar chart of tasks against time showing **planned and actual progress**.
+
+      | | Gantt chart | Network (AON) diagram |
+      |---|---|---|
+      | Strength | Easily understood; shows the current state against the calendar; good for communication | Shows logic and dependencies, the critical path and slack |
+      | Weakness | **Difficult to follow for complex projects**; does not clearly show dependencies or the critical path | Less intuitive for stakeholders; lacks the calendar view |
+
+      In practice you build the network (the logic) and display it as a Gantt chart (the communication). Use both.
+
+      **Schedule compression (standard PM knowledge):** when the deadline is earlier than the critical path allows:
+
+      - **Crashing:** add resources to **critical** activities (overtime, extra staff), which increases cost. Crash the activity with the **lowest cost slope** first: (crash cost - normal cost) / (normal time - crash time). Stop crashing an activity once another path becomes critical.
+      - **Fast-tracking:** overlap activities normally done in sequence (start building before design is fully finished), which increases **risk** and rework.
+      - **Reduce scope** (the triple constraint), through change control.
+
+      *Crashing a non-critical activity is wasted money: it does not shorten the project.*
+
+      **Tiny example:** normal cost 1,000 for 5 days; crash cost 1,600 for 3 days. Slope = (1,600 - 1,000) / (5 - 3) = 600 / 2 = 300 per day saved.
+
+      **In the exam:** "The sponsor wants it 2 weeks early. What are your options?" Give crashing (more cost), fast-tracking (more risk), reduced scope (change control), explain each trade-off under the triple constraint, and say you only compress critical-path work. In Paper A, fast-tracking example: overlap B (design) and D (build).
+examples:
+  - title: "CPM by hand: the lecture's A-F network"
+    problem: |
+      Activities: A Requirements (3 days, no predecessor), B Design (4, after A), C Set up hosting (2, after A), D Build (5, after B), E Configure SMS (3, after C), F Integrate & test (2, after D and E). Find the project duration, the slack of every activity and the critical path.
+    steps:
+      - "Forward pass. A: ES 0, EF 3. B: ES 3, EF 7. C: ES 3, EF 5. D: ES 7, EF 12. E: ES 5, EF 8."
+      - "F has two predecessors, so ES = max(EF of D, EF of E) = max(12, 8) = 12. EF = 12 + 2 = 14. Project duration = 14 days."
+      - "Backward pass from END (LF of F = 14). F: LS = 14 - 2 = 12. D: LF = 12, LS = 12 - 5 = 7. E: LF = 12, LS = 12 - 3 = 9. B: LF = 7, LS = 7 - 4 = 3."
+      - "C: LF = LS of E = 9, LS = 9 - 2 = 7. A has two successors, so LF = min(LS of B = 3, LS of C = 7) = 3, and LS = 3 - 3 = 0."
+      - |
+        Slack = LS - ES.
+
+        | Act | ES | EF | LS | LF | Slack |
+        |---|---|---|---|---|---|
+        | A | 0 | 3 | 0 | 3 | 0 |
+        | B | 3 | 7 | 3 | 7 | 0 |
+        | C | 3 | 5 | 7 | 9 | 4 |
+        | D | 7 | 12 | 7 | 12 | 0 |
+        | E | 5 | 8 | 9 | 12 | 4 |
+        | F | 12 | 14 | 12 | 14 | 0 |
+      - "Zero-slack activities are A, B, D and F, so the critical path is A, B, D, F = 3 + 4 + 5 + 2 = 14 days. The other path A, C, E, F = 3 + 2 + 3 + 2 = 10 days, which leaves 4 days of slack on C and E."
+    answer: "Project duration 14 days. Critical path A-B-D-F. C and E each have 4 days of slack."
+    takeaway: "Forward pass takes the largest EF; backward pass takes the smallest LS. Zero slack means critical."
+  - title: "CPM exam question: hospital appointment system (Sample Paper A, B1)"
+    problem: |
+      Activities (weeks): A Requirements 4 (none); B System design 6 (A); C Infrastructure procurement 3 (A); D Application build 5 (B); E Infrastructure setup 7 (C); F Integration & testing 4 (D, E); G Deployment & training 2 (F). (a) Sketch the network. (b) Do both passes and tabulate. (c) Give the critical path and duration. (d) PERT gives the critical path a mean of 21 weeks and variance 4. Probability of finishing within 24 weeks? Deadline for 95% confidence? (e) The hospital wants it 2 weeks sooner: two ways?
+    steps:
+      - "(a) Network: START to A. A to B and to C. B to D. C to E. D and E to F. F to G. G to END."
+      - "(b) Forward: A 0-4; B 4-10; C 4-7; D 10-15; E 7-14; F starts at max(15, 14) = 15 and ends at 19; G 19-21."
+      - "Backward: G 19-21; F 15-19; D LF 15, LS 10; E LF 15, LS 8; B LF 10, LS 4; C LF 8, LS 5; A LF = min(4, 5) = 4, LS 0."
+      - |
+        | Act | ES | EF | LS | LF | Slack |
+        |---|---|---|---|---|---|
+        | A | 0 | 4 | 0 | 4 | 0 |
+        | B | 4 | 10 | 4 | 10 | 0 |
+        | C | 4 | 7 | 5 | 8 | 1 |
+        | D | 10 | 15 | 10 | 15 | 0 |
+        | E | 7 | 14 | 8 | 15 | 1 |
+        | F | 15 | 19 | 15 | 19 | 0 |
+        | G | 19 | 21 | 19 | 21 | 0 |
+      - "(c) Critical path A-B-D-F-G, duration 21 weeks (A-C-E-F-G = 20 weeks). C and E are near-critical, with only 1 week of slack."
+      - "(d) sigma = square root of 4 = 2. Z = (24 - 21) / 2 = 1.5, which is about 93.3%. For 95%: D = 21 + 1.645 x 2 = 24.29, about 24.3 weeks."
+      - "(e) Crash critical activities with the lowest cost slope (more cost). Fast-track by overlapping B and D, starting the build before design is final (more risk and rework). Reducing scope through change control is also acceptable. Crashing C or E alone would not help: they are not critical."
+    answer: "A-B-D-F-G, 21 weeks; Z = 1.5, about 93.3%; 95% deadline about 24.3 weeks."
+    takeaway: "Marks in the guide: network 4, passes 8, critical path 2, PERT 4, compression 2."
+  - title: "PERT drill: three critical activities"
+    problem: |
+      Critical path activities: A (a=1, m=2, b=3), B (a=2, m=4, b=12), C (a=3, m=5, b=7). Find TE of each, the project mean, the project sigma, and the probability of finishing within 14 days.
+    steps:
+      - "TE of A = (1 + 4 x 2 + 3) / 6 = 12 / 6 = 2."
+      - "TE of B = (2 + 4 x 4 + 12) / 6 = 30 / 6 = 5. TE of C = (3 + 4 x 5 + 7) / 6 = 30 / 6 = 5. Project mean = 2 + 5 + 5 = 12 days."
+      - "Variances: A = ((3 - 1) / 6) squared = 0.111. B = ((12 - 2) / 6) squared = 2.778. C = ((7 - 3) / 6) squared = 0.444."
+      - "Project variance = 0.111 + 2.778 + 0.444 = 3.333, so sigma = square root of 3.333 = 1.826."
+      - "Z = (14 - 12) / 1.826 = 1.10, which is about 86% (the normal table gives 86.4%)."
+    answer: "Mean 12 days, sigma 1.826, Z = 1.10, about 86% chance of finishing within 14 days."
+    takeaway: "Activity B dominates the uncertainty (variance 2.778 of 3.333), so manage B's risks first."
+  - title: "Z-score and deadline: the lecture's example"
+    problem: |
+      The critical path has mean 43 days and variance 33. What is the probability of finishing within 50 days? What deadline gives 95% and 99% confidence?
+    steps:
+      - "sigma = square root of 33 = 5.745."
+      - "Z = (50 - 43) / 5.745 = 7 / 5.745 = 1.22. From the normal table, Z = 1.22 gives about 88.9%."
+      - "95% confidence uses Z = 1.645: D = 43 + 5.745 x 1.645 = 52.45 days."
+      - "99% confidence uses Z = 2.33: D = 43 + 5.745 x 2.33 = 56.39 days."
+      - "Sanity check: if D = 43 (the mean), Z = 0 and the probability is only 50%."
+    answer: "Z = 1.22, about 88.9%; 95% deadline 52.45 days; 99% deadline 56.39 days."
+    takeaway: "A plan with no slack is a coin toss. More confidence needs a later date."
+  - title: "Three-point estimate: Sample Paper B, A4"
+    problem: |
+      An activity has an optimistic time of 4 days, a most likely time of 7 days and a pessimistic time of 16 days. Calculate its expected time, standard deviation and variance.
+    steps:
+      - "TE = (a + 4m + b) / 6 = (4 + 4 x 7 + 16) / 6 = 48 / 6 = 8 days."
+      - "sigma = (b - a) / 6 = (16 - 4) / 6 = 2 days."
+      - "Variance = sigma squared = 4."
+    answer: "TE = 8 days, sigma = 2 days, variance = 4."
+    takeaway: "TE (8) is above the most likely value (7) because the pessimistic tail is longer than the optimistic one."
+questions:
+  - question: "The development of a hospital appointment system has these activities. A Requirements (4 weeks, none); B System design (6, A); C Infrastructure procurement (3, A); D Application build (5, B); E Infrastructure setup (7, C); F Integration & testing (4, D and E); G Deployment & training (2, F). Perform the forward and backward passes, tabulate ES, EF, LS, LF and slack, and identify the critical path and project duration."
+    kind: long
+    marks: 12
+    keywords:
+      - forward pass
+      - backward pass
+      - slack
+      - critical path
+      - 21 weeks
+      - A-B-D-F-G
+      - near-critical
+      - ES
+      - LS
+    idealAnswer: |
+      Forward pass: A 0-4; B 4-10; C 4-7; D 10-15; E 7-14; F starts at max(15, 14) = 15, ends 19; G 19-21. Backward pass: G 19-21; F 15-19; D LF 15, LS 10; E LF 15, LS 8; B LF 10, LS 4; C LF 8, LS 5; A LF = min(4, 5) = 4, LS 0.
+
+      | Act | ES | EF | LS | LF | Slack |
+      |---|---|---|---|---|---|
+      | A | 0 | 4 | 0 | 4 | 0 |
+      | B | 4 | 10 | 4 | 10 | 0 |
+      | C | 4 | 7 | 5 | 8 | 1 |
+      | D | 10 | 15 | 10 | 15 | 0 |
+      | E | 7 | 14 | 8 | 15 | 1 |
+      | F | 15 | 19 | 15 | 19 | 0 |
+      | G | 19 | 21 | 19 | 21 | 0 |
+
+      Critical path A-B-D-F-G, duration 21 weeks. The path A-C-E-F-G is 20 weeks. C and E have only 1 week of slack, so they are near-critical: watch infrastructure procurement.
+  - question: "The critical path of the hospital project has a PERT mean of 21 weeks and a variance of 4. What is the probability of finishing within 24 weeks? What deadline gives 95% confidence?"
+    kind: short
+    marks: 4
+    keywords:
+      - sigma
+      - Z
+      - 1.5
+      - 93.3%
+      - 1.645
+      - 24.3
+    idealAnswer: |
+      sigma = square root of 4 = 2. Z = (24 - 21) / 2 = 1.5, which is about 93.3% probability of finishing within 24 weeks (2 marks). For 95% confidence, D = mean + Z x sigma = 21 + 1.645 x 2 = 24.29, about 24.3 weeks (2 marks).
+  - question: "An activity has an optimistic time of 4 days, a most likely time of 7 days and a pessimistic time of 16 days. Calculate its expected time, standard deviation and variance."
+    kind: short
+    marks: 4
+    keywords:
+      - TE
+      - 8
+      - sigma
+      - 2
+      - variance
+      - 4
+    idealAnswer: |
+      TE = (a + 4m + b) / 6 = (4 + 28 + 16) / 6 = 8 days. Standard deviation sigma = (b - a) / 6 = (16 - 4) / 6 = 2 days. Variance = sigma squared = 4.
+  - question: "Explain the 100% rule of a Work Breakdown Structure and why it matters for estimating."
+    kind: short
+    marks: 4
+    keywords:
+      - 100%
+      - parent
+      - collectively
+      - exclusively
+      - work packages
+      - scope creep
+      - estimates
+    idealAnswer: |
+      Each level of the WBS must represent 100% of its parent's scope, collectively and exclusively: nothing missing and nothing duplicated (2 marks). It matters because estimates are rolled up from work packages. Missing work underestimates cost and time, and duplicated work overestimates them. It also prevents unplanned (creeping) work (2 marks).
+  - question: "Compare a Gantt chart with a network (AON) diagram: give one strength and one weakness of each."
+    kind: short
+    marks: 4
+    keywords:
+      - Gantt
+      - network
+      - dependencies
+      - critical path
+      - calendar
+      - slack
+      - complex
+    idealAnswer: |
+      Gantt chart: strength, easy to read and shows planned and actual progress over the calendar; weakness, it hides dependencies and the critical path and is hard to follow for complex projects (2 marks). Network diagram: strength, it shows logic and dependencies, the critical path and slack; weakness, it is less intuitive for stakeholders and lacks the calendar view (2 marks). In practice use both: the network for logic, the Gantt for communication.
+  - question: "Distinguish CPM from PERT, and explain why planning with the deadline equal to the critical-path mean gives only a 50% chance of finishing on time."
+    kind: short
+    marks: 6
+    keywords:
+      - CPM
+      - PERT
+      - deterministic
+      - probabilistic
+      - DuPont
+      - Polaris
+      - Z = 0
+      - 50%
+      - buffer
+    idealAnswer: |
+      Both are network techniques for finding the critical path. CPM (DuPont) uses a single deterministic duration per activity and supports time-cost trade-offs such as crashing. PERT (Polaris, 1958) uses three estimates (a, m, b) to compute an expected time and variance, so it can give the probability of meeting a deadline (3 marks). The critical-path length is the mean of the completion-time distribution. If D equals the mean, Z = (D - mean) / sigma = 0, which is the 50th percentile, a coin toss. To be confident you need D greater than the mean, that is, schedule buffer, for example D = mean + 1.645 sigma for 95% (3 marks).
+  - question: "The sponsor wants a project finished 2 weeks early. What are your options? Explain the trade-off of each."
+    kind: short
+    marks: 6
+    keywords:
+      - crashing
+      - fast-tracking
+      - cost slope
+      - critical path
+      - scope
+      - change control
+      - risk
+      - rework
+    idealAnswer: |
+      Only compress critical-path work, because shortening a non-critical activity does not shorten the project. Options: (1) Crash critical activities with the lowest cost slope, (crash cost - normal cost) / (normal time - crash time), by adding resources such as overtime or extra staff: more cost; stop when another path becomes critical. (2) Fast-track by overlapping tasks normally done in sequence, for example starting the build before design is final: more risk and rework. (3) Reduce scope through change control. (4) Negotiate the date. Explain each trade-off under the triple constraint: gaining time costs money, risk or scope.

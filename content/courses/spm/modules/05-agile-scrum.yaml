@@ -1,0 +1,619 @@
+id: agile-scrum
+title: Agile & Scrum
+subtitle: Managing complex software work by inspecting evidence and adapting, the Scrum way
+recap: |
+  Agile is a mindset, set out in the Agile Manifesto (2001): individuals and interactions, working software,
+  customer collaboration and responding to change. Scrum is one lightweight framework that puts that mindset to work.
+  Its theory is empiricism (decide from what you observe) plus Lean thinking (cut waste, small batches), built on
+  three pillars (transparency, inspection, adaptation) and five values (commitment, focus, openness, respect,
+  courage). One small Scrum Team has three accountabilities (Developers, Product Owner, Scrum Master) and works in
+  Sprints of one month or less, with four events inside. Three artifacts each carry a commitment: Product Backlog
+  to Product Goal, Sprint Backlog to Sprint Goal, Increment to Definition of Done. Velocity (points done per Sprint)
+  lets you forecast: 180 points at velocity 30 is 6 Sprints.
+traps:
+  - "Saying the Scrum Master is the boss who assigns tasks or takes minutes. The Scrum Master is a servant-leader who coaches and removes impediments; Developers manage themselves."
+  - "Saying the Product Owner is a committee. One person is accountable (many people may influence)."
+  - "Believing only programmers are Developers. Designers, testers and analysts who build the Increment are Developers too."
+  - "Treating the Daily Scrum as a status report to a manager. It is for the Developers, to inspect progress toward the Sprint Goal and adapt their plan."
+  - "Treating the Sprint Review as a demo, sign-off or release gate. It is a working session to adapt the Product Backlog."
+  - "Counting 90%-complete work. Only work that meets the Definition of Done is part of the Increment."
+  - "Mixing up the timeboxes: Planning 8 h, Daily 15 min, Review 4 h, Retrospective 3 h (for a one-month Sprint). The Daily Scrum stays 15 minutes for any Sprint length."
+  - "Forgetting who can cancel a Sprint (only the Product Owner, and only when the Sprint Goal is obsolete), or who orders the Product Backlog (the PO) versus who sizes it (the Developers)."
+lesson:
+  checkpointStep: 5
+  steps:
+    - "Traditional (plan-driven, Waterfall) work plans in detail up front and delivers one big release at the end, with scope fixed and time and cost estimated. Agile plans just enough, delivers small usable increments every few weeks, and fixes time and cost while scope stays flexible."
+    - "The Agile Manifesto (2001) has four values. We value individuals and interactions over processes and tools, working software over comprehensive documentation, customer collaboration over contract negotiation, and responding to change over following a plan. The items on the right still matter; the left matter more."
+    - "Agile is a mindset. Scrum, Kanban and XP are frameworks or practices that put it into action. Scrum is a lightweight, purposefully incomplete framework for generating value through adaptive solutions to complex problems."
+    - "Scrum theory is empiricism plus Lean. Empiricism: knowledge comes from experience, so decide from what you observe. Lean: reduce waste, focus on essentials, limit unfinished work, use small batches. Three pillars: transparency, inspection, adaptation. Five values: commitment, focus, openness, respect, courage."
+    - "The Scrum Team is one small team (usually 10 or fewer), cross-functional and self-managing, with no sub-teams. It has three accountabilities: Developers (a usable Increment that meets the Definition of Done), the Product Owner (maximise product value, order the Product Backlog) and the Scrum Master (Scrum established and team effectiveness improved)."
+    - "Checkpoint: name the five Scrum events with a purpose and the maximum timebox of each for a one-month Sprint, and say who can cancel a Sprint."
+    - "The Sprint is a fixed length of one month or less and contains all the events. Sprint Planning (8 h) answers why, what and how and produces the Sprint Backlog. The Daily Scrum is 15 minutes for Developers. The Sprint Review (4 h) inspects the outcome with stakeholders. The Sprint Retrospective (3 h) improves quality and effectiveness."
+    - "Three artifacts each carry a commitment. Product Backlog to Product Goal. Sprint Backlog to Sprint Goal. Increment to Definition of Done. The Definition of Done is the formal quality state: work that does not meet it cannot be released or shown as part of the Increment. Nearly finished is still unfinished."
+    - "Worked example from the slides, a school lunch app. Product Goal: reduce lunch queues by letting students reserve meals before break. Sprint Goal: a small pilot group can reserve one meal for a pickup period. The Increment is a pilot meeting the Definition of Done, run with one class. The Review shows meal limits matter, and the Product Owner reorders the backlog."
+    - "Forecasting with velocity. Velocity is the story points completed per Sprint. Average the last Sprints, then divide the remaining points by it. Paper B B3: 180 points, velocity 28, 32 and 30, so average 30, so 180 / 30 = 6 Sprints, and 6 x 2 weeks = 12 weeks."
+    - "Exam angle: list the events with timeboxes, name misconceptions (Scrum Master as boss, Product Owner as committee, Daily Scrum as status report, Review as demo, 90% complete counts), and when forecasting state assumptions such as stable team, consistent estimation and no backlog growth."
+checkpoint:
+  question: "List the five Scrum events (the Sprint and four events inside it) with the purpose and the maximum timebox of each for a one-month Sprint. Who can cancel a Sprint, and when?"
+  hint: "Think of the Sprint as the container, then Planning (why, what, how), Daily, Review and Retrospective. Timeboxes are 8 h, 15 min, 4 h and 3 h."
+  keywords:
+    - Sprint
+    - Sprint Planning
+    - 8 h
+    - Daily Scrum
+    - 15 min
+    - Sprint Review
+    - 4 h
+    - Retrospective
+    - 3 h
+    - Product Owner
+    - obsolete
+  idealAnswer: "The Sprint (one month or less) is the container for creating at least one usable Done Increment. Sprint Planning (max 8 h): decide why (Sprint Goal), what (select Product Backlog items) and how (plan the work); output is the Sprint Backlog. Daily Scrum (15 min, any Sprint length): Developers inspect progress toward the Sprint Goal and adapt their plan. Sprint Review (max 4 h): the Scrum Team and stakeholders inspect the outcome and decide future adaptations to the Product Backlog. Sprint Retrospective (max 3 h): the Scrum Team improves quality and effectiveness (people, process, tools, Definition of Done). Only the Product Owner can cancel a Sprint, and only when the Sprint Goal has become obsolete."
+terms:
+  - term: Agile
+    definition: "A mindset defined by the Manifesto's values and principles (collaboration, working software, responding to change). It prescribes no structure."
+  - term: Waterfall (traditional)
+    definition: "Plan-driven approach: detailed up-front planning, one big release at the end, scope fixed, time and cost estimated."
+  - term: Agile Manifesto
+    definition: "A 2001 statement of four values and twelve principles for software development: individuals and interactions, working software, customer collaboration, responding to change."
+  - term: Scrum
+    definition: "A lightweight, purposefully incomplete, iterative and incremental framework for generating value through adaptive solutions to complex problems."
+  - term: Empiricism
+    definition: "Knowledge comes from experience; decisions are based on what is observed. Create a result, examine it, use the evidence to decide what next."
+  - term: Lean thinking
+    definition: "Reduce waste, focus on essentials, limit unfinished work, build only features with shown value, work in small batches."
+  - term: Three pillars
+    definition: "Transparency (make work visible), inspection (check it often), adaptation (adjust as soon as practical)."
+  - term: Five values
+    definition: "Commitment, Focus, Openness, Respect, Courage."
+  - term: Developers
+    definition: "The accountability for creating a usable Increment that meets the Definition of Done; they own the Sprint Backlog and how the work is done. Not only programmers."
+  - term: Product Owner (PO)
+    definition: "One person accountable for maximising product value: develops the Product Goal, orders the Product Backlog, and is the only one who can cancel a Sprint."
+  - term: Scrum Master (SM)
+    definition: "A servant-leader accountable for Scrum being established and team effectiveness improved: coaches, removes impediments, keeps events within their timeboxes."
+  - term: Sprint
+    definition: "The container for all events: fixed length of one month or less; the next starts immediately; aims at at least one usable Increment."
+  - term: Product Backlog
+    definition: "An emergent, ordered list of what is needed to improve the product; the single source of work. Commitment: the Product Goal."
+  - term: Sprint Backlog
+    definition: "Sprint Goal (why) plus selected items (what) plus an actionable plan (how); created by and for Developers. Commitment: the Sprint Goal."
+  - term: Increment
+    definition: "A concrete, usable stepping stone toward the Product Goal; additive and verified. Commitment: the Definition of Done."
+  - term: Definition of Done (DoD)
+    definition: "The formal description of the quality state an Increment must reach. Work that does not meet it cannot be released or counted."
+  - term: User story
+    definition: "As a [user], I want [goal] so that [benefit], with acceptance criteria. INVEST: Independent, Negotiable, Valuable, Estimable, Small, Testable."
+  - term: Story points and velocity
+    definition: "Story points are a relative size (Fibonacci 1, 2, 3, 5, 8, 13) set by planning poker. Velocity is the points completed per Sprint, used to forecast."
+  - term: Burndown / burnup chart
+    definition: "Burndown shows remaining work against time in the Sprint. Burnup shows completed work and total scope, so scope growth is visible."
+  - term: Kanban and XP
+    definition: "Kanban: visualise workflow on a board and limit work in progress (WIP); no fixed Sprints or roles. XP: engineering practices such as pair programming, test-driven development, continuous integration, refactoring, small releases."
+quiz:
+  - question: "In which approach are time and cost fixed while scope stays flexible?"
+    options:
+      - Traditional Waterfall
+      - Both equally
+      - Agile
+      - Neither
+    answer: 2
+    explanation: "Agile fixes time and cost (timeboxes, the team) and keeps scope flexible. Waterfall fixes scope and estimates time and cost."
+  - question: "Which is one of the four Agile Manifesto values?"
+    options:
+      - Customer collaboration over contract negotiation
+      - Comprehensive documentation over working software
+      - Processes and tools over individuals and interactions
+      - Following a plan over responding to change
+    answer: 0
+    explanation: "The four values: individuals and interactions, working software, customer collaboration, responding to change, each over the item on the right."
+  - question: "Agile and Scrum are best described as…"
+    options:
+      - Two names for the same framework
+      - Agile is a tool; Scrum is a contract
+      - Scrum is a mindset; Agile is a framework
+      - Agile is a mindset; Scrum is a framework that implements it
+    answer: 3
+    explanation: "Agile is a mindset with no prescribed structure. Scrum is a lightweight framework with accountabilities, events and artifacts."
+  - question: "Which are the three pillars of Scrum's empirical process?"
+    options:
+      - Commitment, focus, openness
+      - Transparency, inspection, adaptation
+      - Planning, doing, reviewing
+      - Product, Sprint, Increment
+    answer: 1
+    explanation: "Transparency enables inspection, and inspection creates information for adaptation. Commitment, focus, openness, respect and courage are the five values."
+  - question: "Which list is the five Scrum values?"
+    options:
+      - Transparency, Inspection, Adaptation, Focus, Respect
+      - Commitment, Focus, Openness, Respect, Courage
+      - Speed, Quality, Cost, Scope, Risk
+      - Openness, Honesty, Trust, Respect, Courage
+    answer: 1
+    explanation: "The five values are Commitment, Focus, Openness, Respect and Courage."
+  - question: "Who orders the Product Backlog, and who sizes its items?"
+    options:
+      - The Scrum Master orders; the Product Owner sizes
+      - The Developers order; the Product Owner sizes
+      - The stakeholders order; the Scrum Master sizes
+      - The Product Owner orders; the Developers size
+    answer: 3
+    explanation: "The Product Owner is accountable for ordering the Product Backlog. The Developers size the items."
+  - question: "What is the maximum timebox of Sprint Planning for a one-month Sprint?"
+    options:
+      - 8 hours
+      - 3 hours
+      - 4 hours
+      - 15 minutes
+    answer: 0
+    explanation: "Planning 8 h, Daily 15 min, Review 4 h, Retrospective 3 h for a one-month Sprint."
+  - question: "Who can cancel a Sprint?"
+    options:
+      - The Scrum Master
+      - The Developers
+      - Only the Product Owner, when the Sprint Goal is obsolete
+      - Any stakeholder
+    answer: 2
+    explanation: "Only the Product Owner can cancel a Sprint, and only when the Sprint Goal has become obsolete."
+  - question: "The Daily Scrum is…"
+    options:
+      - A status report to the manager
+      - A 1-hour planning meeting run by the Scrum Master
+      - A 15-minute event for Developers to inspect progress toward the Sprint Goal and adapt the plan
+      - A review of the Increment with stakeholders
+    answer: 2
+    explanation: "It is 15 minutes for any Sprint length, run by and for the Developers. It is not a status report."
+  - question: "Which pairing of artifact and commitment is correct?"
+    options:
+      - Increment and Definition of Done
+      - Sprint Backlog and Definition of Done
+      - Increment and Product Goal
+      - Product Backlog and Sprint Goal
+    answer: 0
+    explanation: "Product Backlog to Product Goal; Sprint Backlog to Sprint Goal; Increment to Definition of Done."
+  - question: "A feature is 90% complete at the end of the Sprint. Does it count in the Increment?"
+    options:
+      - Yes, 90% is close enough
+      - Yes, if the Product Owner agrees
+      - Yes, at 90% of its points
+      - No, only work meeting the Definition of Done counts
+    answer: 3
+    explanation: "Nearly finished is still unfinished. Work that does not meet the Definition of Done cannot be released or counted."
+  - question: "Velocity over three Sprints was 28, 32 and 30. The backlog has 180 points and Sprints are two weeks. How long will it take?"
+    options:
+      - 5 Sprints, 10 weeks
+      - 6 Sprints, 12 weeks
+      - 6 Sprints, 6 weeks
+      - 7 Sprints, 14 weeks
+    answer: 1
+    explanation: "Average velocity = (28 + 32 + 30) / 3 = 30. 180 / 30 = 6 Sprints. 6 x 2 = 12 weeks."
+  - question: "A stakeholder emails a Developer an urgent mid-Sprint request. What should happen?"
+    options:
+      - The Developer quietly does it
+      - It is made transparent and routed to the Product Owner, who decides its order in the Product Backlog
+      - The Scrum Master assigns it to someone
+      - The Sprint is cancelled automatically
+    answer: 1
+    explanation: "Requests enter through transparent Product Backlog decisions. Scope may be renegotiated only if the Sprint Goal and quality are not endangered."
+  - question: "Which statement about the Sprint Review is correct?"
+    options:
+      - It is a release gate; nothing ships before it
+      - It is only a demo for sign-off
+      - It is where the Developers report status to managers
+      - It is a collaborative working session that may lead to Product Backlog adaptations
+    answer: 3
+    explanation: "A Done Increment can be released before the Review. The Review inspects the outcome and adapts what to build next."
+  - question: "When is a traditional (Waterfall) approach a better fit than Agile?"
+    options:
+      - Requirements are stable and well understood, with fixed-price or regulated work
+      - Requirements are uncertain and changing
+      - The product is a new software idea
+      - The customer wants to see work weekly
+    answer: 0
+    explanation: "Waterfall fits stable requirements, construction-like sequential work, fixed-price contracts and regulation needing up-front documentation. Hybrids are common."
+fact:
+  title: The Scrum Master is not a manager
+  body: "Scrum names three accountabilities, not job titles, and none of them is a boss. Developers decide who does what and how. The Product Owner decides what is worth building and in what order. The Scrum Master coaches and removes obstacles. Even the Daily Scrum belongs to the Developers: if a manager turns it into a status report, the Scrum Master treats that as an impediment."
+lab:
+  title: Velocity and Sprint-Count Forecast Drill
+  variations:
+    - title: Average velocity (Paper B, B3)
+      question: "A team's velocity over the last three Sprints was <b>28, 32 and 30</b> story points. What is the <b>average velocity</b> in points per Sprint?"
+      answer: 30
+      tolerance: 0
+      unit: points per Sprint
+      hint: "Add the three velocities and divide by 3."
+      explanation: "(28 + 32 + 30) / 3 = 90 / 3 = 30 points per Sprint."
+    - title: Number of Sprints
+      question: "The Product Backlog holds <b>180 story points</b> and the average velocity is <b>30</b>. How many <b>Sprints</b> will it take?"
+      answer: 6
+      tolerance: 0
+      unit: Sprints
+      hint: "Remaining points divided by velocity."
+      explanation: "180 / 30 = 6 Sprints."
+    - title: Duration in weeks
+      question: "The same forecast is <b>6 Sprints</b>, and each Sprint is <b>2 weeks</b>. How many <b>weeks</b> will the remaining backlog take?"
+      answer: 12
+      tolerance: 0
+      unit: weeks
+      hint: "Sprints times weeks per Sprint."
+      explanation: "6 x 2 = 12 weeks."
+    - title: Slides example
+      question: "<b>120 points</b> remain and velocity is <b>30</b>. About how many <b>Sprints</b>?"
+      answer: 4
+      tolerance: 0
+      unit: Sprints
+      hint: "Remaining points divided by velocity."
+      explanation: "120 / 30 = 4 Sprints."
+    - title: Round up
+      question: "Velocity over three Sprints was <b>24, 27 and 21</b>. The backlog is <b>150 points</b> and Sprints are 2 weeks. How many <b>weeks</b>? (Average velocity first; a part-Sprint counts as a whole Sprint, so round up.)"
+      answer: 14
+      tolerance: 0
+      unit: weeks
+      hint: "Average = 24. 150 / 24 = 6.25, so round up to 7 Sprints."
+      explanation: "Average = (24 + 27 + 21) / 3 = 24. 150 / 24 = 6.25, so 7 Sprints. 7 x 2 = 14 weeks."
+    - title: Three-week Sprints
+      question: "The backlog is <b>200 points</b>, velocity is <b>25</b>, and Sprints last <b>3 weeks</b>. How many <b>weeks</b>?"
+      answer: 24
+      tolerance: 0
+      unit: weeks
+      hint: "200 / 25 Sprints, then times 3 weeks."
+      explanation: "200 / 25 = 8 Sprints. 8 x 3 = 24 weeks."
+notes:
+  - heading: "Start here: the big idea in plain words"
+    body: |
+      **The idea:** software projects are full of surprises. Agile is the habit of building a little, showing it, learning from it and changing course. **Scrum** is a short rulebook for doing that in a team.
+
+      **Everyday comparison:** cooking for a guest you have never met. The traditional way is to write the whole menu, cook everything, then serve it and hope. The Agile way is to serve a small starter, watch their face, then decide the next dish.
+
+      **Tiny example with numbers:** a team finishes about 30 story points each two-week Sprint. The backlog has 180 points. 180 / 30 = 6 Sprints, so about 12 weeks. That is **velocity** forecasting.
+
+      **The key words:**
+
+      - **Sprint:** a fixed block of time (one month or less) in which the team builds a usable piece of the product.
+      - **Increment:** that usable piece.
+      - **Product Backlog:** the ordered to-do list for the whole product.
+      - **Definition of Done:** the checklist that says when work really counts as finished.
+
+      **In the exam:** this topic is mostly list-and-explain. Learn the events table (purpose + timebox), the three artifact-to-commitment pairs, the three accountabilities with their misconceptions, and the velocity forecast.
+  - heading: Agile versus traditional (plan-driven)
+    body: |
+      **What it is:** two ways of running a project. The **traditional** way (Waterfall) plans everything in detail first, builds in order and delivers once at the end. The **Agile** way plans just enough, refines continuously (progressive elaboration) and delivers small working pieces often. (From the gap-fill section: standard PM knowledge.)
+
+      **Everyday comparison:** building a bridge (plan it all, change is costly) versus growing a garden (plant, watch, adjust).
+
+      | | Traditional / Waterfall | Agile |
+      |---|---|---|
+      | Planning | Detailed up front; change is costly | Just enough, refined continuously (progressive elaboration) |
+      | Delivery | One big release at the end | Small usable increments every few weeks |
+      | Scope vs time and cost | **Scope fixed**, time and cost estimated | **Time and cost fixed** (timeboxes, team), **scope flexible** |
+      | Customer | Involved at requirements and acceptance | Collaborates throughout (reviews) |
+      | Risk | Found late (integration, testing at the end) | Exposed early by frequent working software |
+      | Best for | Stable, well-understood requirements; regulated, fixed-price contracts; construction-like work | Complex, uncertain or changing requirements; software products |
+
+      **Hybrid** approaches are common: a plan-driven governance shell (charter, budget, milestones) with Agile delivery inside.
+
+      **In the exam:** Paper A B4(a) (6 marks) asks you to compare across **four** dimensions and say why Agile suits a student-portal project. Pick any four rows (1 mark each), then give 2 marks for why: requirements are uncertain and evolve with user feedback, and early increments reduce risk and deliver value each semester. Waterfall is the better choice when requirements are stable, work is sequential and costly to change, contracts are fixed-price, or regulation demands up-front documentation.
+  - heading: The Agile Manifesto (2001) and what Scrum is
+    body: |
+      **What it is:** a short statement written in 2001 by software practitioners. It has four **values** and twelve **principles**. It says: *while there is value in the items on the right, we value the items on the left more.* (Gap-fill: standard knowledge.)
+
+      **Four values:**
+
+      1. **Individuals and interactions** over processes and tools
+      2. **Working software** over comprehensive documentation
+      3. **Customer collaboration** over contract negotiation
+      4. **Responding to change** over following a plan
+
+      **Twelve principles (paraphrased):**
+
+      - Satisfy the customer through **early and continuous delivery**.
+      - **Welcome changing requirements**, even late.
+      - Deliver working software **frequently** (weeks, not months).
+      - Business people and developers work **together daily**.
+      - Build projects around **motivated individuals** and trust them.
+      - **Face-to-face conversation** is the best way to talk.
+      - **Working software is the primary measure of progress.**
+      - Keep a **sustainable pace**.
+      - Pay attention to **technical excellence** and good design.
+      - **Simplicity**: maximise the amount of work *not* done.
+      - **Self-organising teams** produce the best designs.
+      - Regularly **reflect and adjust** (retrospectives).
+
+      **Agile is a mindset; Scrum, Kanban and XP are frameworks or practices** that put it into action (slide).
+
+      **In the exam:** Paper B A8: "State the four values of the Agile Manifesto" (4 marks, 1 each). Always write them as "X over Y".
+
+      **What Scrum is and is not (from slides):** Scrum is a **lightweight framework** for generating value through adaptive solutions to complex problems. It is a way to reveal what is happening, inspect the evidence and adjust quickly. It is **purposefully incomplete**: it sets essential boundaries and leaves room for your context. It is **iterative and incremental**.
+
+      **Scrum is not:**
+
+      - a complete project plan or engineering method;
+      - a guarantee of speed;
+      - a set of meetings that works without transparency, inspection and adaptation;
+      - a system where the Scrum Master assigns tasks or the Product Owner controls how Developers work.
+
+      **Everyday comparison:** Scrum is like the rules of football (the boundaries and the match structure). It does not tell the players how to play well.
+
+      **In the exam:** "Agile vs Scrum: what is the difference?" Agile is a mindset defined by the Manifesto's values and principles. It prescribes no structure. Scrum is a specific lightweight framework that implements it with three accountabilities, five events (including the Sprint), three artifacts with commitments, rules and timeboxes.
+  - heading: "Theory: empiricism, Lean, three pillars, five values"
+    body: |
+      **What it is:** the thinking behind Scrum.
+
+      - **Empiricism:** knowledge comes from experience; decisions are based on what is observed. Create a result, examine it, use the evidence to decide what next. Frequent feedback shortens the time between a wrong assumption and its correction.
+      - **Lean thinking:** reduce waste, focus on essentials, limit unfinished work, do not build features without shown value, and work in **small batches**.
+
+      *The iterative, incremental approach controls risk by making learning and value visible earlier.*
+
+      **Three pillars:**
+
+      | Pillar | Meaning | Example |
+      |---|---|---|
+      | **Transparency** | Work, decisions and quality are visible | The same Product Backlog and Definition of Done for everyone |
+      | **Inspection** | Check artifacts and progress often | Developers inspect Sprint Goal progress daily |
+      | **Adaptation** | Adjust as soon as practical | Review feedback changes the backlog |
+
+      *Transparency enables inspection; inspection creates information for adaptation. Weaken one and the others fail.*
+
+      **Five values:** **Commitment, Focus, Openness, Respect, Courage.**
+
+      **Everyday comparison:** driving with a map app. You can see the road (transparency), you check it every few seconds (inspection), and you reroute when there is a jam (adaptation).
+
+      **In the exam:** Paper A A8 (4 marks): name the three pillars (1.5) and explain how the Daily Scrum supports them (2.5): it makes progress visible to Developers (transparency), inspects progress toward the Sprint Goal daily (inspection), and adapts the Sprint Backlog into a plan for the next day (adaptation). Paper B B3(b) (6 marks): empiricism (1), pillars and how they depend on each other (2), Review inspects the Increment and adapts the Product Backlog (1.5), Retrospective inspects people, process, tools and DoD and adapts ways of working (1.5). Each event is a formal inspect-and-adapt point.
+  - heading: The Scrum Team and its accountabilities
+    body: |
+      **What it is:** one small team, **usually 10 or fewer**, that is **cross-functional** (has all the skills needed), **self-managing** (decides who does what, when and how), has **no sub-teams or hierarchies**, and works toward one **Product Goal**. Scrum calls these **accountabilities**, not job titles.
+
+      | Accountability | Primary outcome | Key duties | Common misunderstanding |
+      |---|---|---|---|
+      | **Developers** | A usable **Increment** meeting the **Definition of Done** | Create the **Sprint Backlog**; build quality in; adapt the plan daily; hold each other accountable; decide how much work they can take | "Only programmers are Developers" (designers, testers, analysts are too) |
+      | **Product Owner** | **Maximise the value** of the product | Develop and communicate the **Product Goal**; create, **order** and make transparent the **Product Backlog**; balance stakeholders; **can cancel a Sprint** if its goal becomes obsolete | "The PO is a committee or the team manager": the PO is **one person** |
+      | **Scrum Master** | Scrum established; **team effectiveness** improved | Teach and coach Scrum, self-management and cross-functionality; help the team focus on valuable Done increments; **cause impediments to be removed**; ensure events happen positively within their timeboxes; serve the PO and the organisation | "The SM is the boss, assigns tasks, or takes minutes": a **leader who serves** |
+
+      **Others:** stakeholders, customers and users, managers and vendors matter but are **not** Scrum accountabilities. Requests enter through **transparent Product Backlog decisions**. Outsiders should not quietly assign Sprint work to individual Developers.
+
+      **Short version:** the PO owns *what* and *why*; the Developers own *how*; the Scrum Master strengthens the system.
+
+      **In the exam:** Paper A B4(b) (6 marks, 2 per accountability): describe the role and give one misconception for each.
+  - heading: The Sprint and the four events
+    body: |
+      **What it is:** the **Sprint** is the container for all events. It has a **fixed length of one month or less**, and the next one starts immediately. Its purpose is at least one valuable, usable Increment toward the Product Goal.
+
+      **Rules of the Sprint:** no change may endanger the Sprint Goal, and quality must not decrease. Scope can be clarified and renegotiated with the Product Owner. **Only the Product Owner can cancel a Sprint**, and only when the Sprint Goal is obsolete. Shorter Sprints mean more learning cycles and less risk per cycle.
+
+      | Event | Who | Purpose | Output | Max timebox (1-month Sprint) |
+      |---|---|---|---|---|
+      | **Sprint Planning** | Whole Scrum Team (+ invited advisers) | **Why** (Sprint Goal), **What** (select items), **How** (plan to Done) | **Sprint Backlog** | **8 h** |
+      | **Daily Scrum** | **Developers** (PO/SM only if working on items) | Inspect progress toward the Sprint Goal; adapt the plan | Actionable plan for the next day | **15 min** (any Sprint length) |
+      | **Sprint Review** | Scrum Team + key stakeholders invited by the PO | Inspect the outcome and changes; decide future adaptations | Possible Product Backlog adaptations | **4 h** |
+      | **Sprint Retrospective** | Scrum Team | Improve quality and effectiveness (people, process, tools, Definition of Done) | Improvement actions (the most useful may enter the next Sprint Backlog) | **3 h** |
+
+      Shorter Sprints have shorter events, **except the Daily Scrum**, which stays at 15 minutes.
+
+      **Watch-fors (slides):**
+
+      - Planning is collaborative forecasting, not a manager assigning tasks.
+      - **The Daily Scrum is not a status report to a manager.**
+      - **The Review is a working session**, not just a demo, sign-off or release gate.
+      - **The Retrospective is not a blame session.**
+
+      **Releasing early:** a usable Increment that meets the Definition of Done can be released whenever it is ready, even before the Review.
+
+      **In the exam:** Paper A B4(c) (5 marks, 1 each): Sprint (one month or less, container, produce a Done Increment); Planning (8 h, why/what/how, Sprint Backlog); Daily Scrum (15 min); Review (4 h); Retrospective (3 h). Paper A B4(d) (3 marks): an urgent mid-Sprint request from the Dean must not be silently accepted. Make it transparent and route it to the Product Owner, who decides its place in the Product Backlog. Developers assess the impact. Scope may be renegotiated only if the Sprint Goal and quality are not endangered; otherwise it goes into a future Sprint, or the PO cancels the Sprint if its goal is now obsolete.
+  - heading: Artifacts, commitments and the Definition of Done
+    body: |
+      **What it is:** three artifacts that make work visible, each with a **commitment** that makes progress measurable.
+
+      | Artifact | What it is | **Commitment** | Who |
+      |---|---|---|---|
+      | **Product Backlog** | Emergent, **ordered** list of what is needed to improve the product; the **single source** of work; continuously **refined** | **Product Goal**: a future state of the product; fulfil or abandon one before the next | PO accountable for ordering; **Developers size** items |
+      | **Sprint Backlog** | Sprint Goal (**why**) + selected items (**what**) + actionable plan (**how**); updated throughout the Sprint | **Sprint Goal**: the single objective; gives focus while the exact work flexes | Created by and for Developers |
+      | **Increment** | A concrete, usable stepping stone toward the Product Goal; additive and verified; can be several per Sprint; **may be released before the Review** | **Definition of Done**: the formal quality state; work that does not meet it cannot be released or shown as part of the Increment | Whole team; shared DoD across teams on one product |
+
+      *"Nearly finished is still unfinished."* The commitments measure progress toward a product target (Product Goal), a Sprint objective (Sprint Goal) and an agreed quality state (Definition of Done).
+
+      **Everyday comparison:** a "done" cake is baked, cooled and iced, not 90% baked. The Definition of Done is the checklist on the fridge.
+
+      **In the exam:** Paper B A9 (4 marks): name the three artifacts and the commitment of each. Pairs are worth 1.3 each: Product Backlog to Product Goal, Sprint Backlog to Sprint Goal, Increment to Definition of Done.
+  - heading: "Worked example from the slides: a school lunch app"
+    body: |
+      **Who is who:** **PO:** the canteen service owner. **SM:** an Agile coach. **Developers:** designer, programmers, tester, data/security specialist. **Stakeholders:** students, canteen staff, parents, administrators.
+
+      1. **Product Goal:** reduce lunch queues by letting students reserve meals before break.
+      2. **Sprint Planning gives the Sprint Goal:** a small pilot group can reserve one meal for a pickup period.
+      3. **During the Sprint:** build and test the menu, reservation form and staff order list. Daily Scrums keep the plan aligned.
+      4. **Increment:** a usable pilot meeting the Definition of Done, run with one class.
+      5. **Review:** students and staff reveal that meal limits and clearer pickup instructions matter most.
+      6. **Retrospective:** involve a canteen staff member earlier when refining items.
+      7. **Adapt:** the Product Owner reorders the Product Backlog for the next Sprint.
+
+      **What to notice:** the whole inspect-and-adapt loop. The Review adapts the product (backlog); the Retrospective adapts the way of working.
+
+      **In the exam:** use a small example like this to show you understand how the pieces connect.
+  - heading: Misconceptions (likely exam material)
+    body: |
+      | Misconception | Correction |
+      |---|---|
+      | The Scrum Master manages people and assigns tasks | Developers self-manage; the SM coaches, serves and improves effectiveness |
+      | The Product Owner is a committee | One person is accountable (many may influence) |
+      | The Daily Scrum is a status report | Developers inspect Sprint Goal progress and adapt their plan |
+      | The Sprint Review is a demo or approval gate | A collaborative working session to adapt future choices |
+      | The Sprint Backlog must never change | The plan changes as Developers learn; the Sprint Goal is protected |
+      | 90%-complete work counts | Only work meeting the Definition of Done is part of the Increment |
+      | Scrum means no planning or documentation | Purposeful planning and transparency; documentation where it adds value |
+
+      **Paper B B3(c) (6 marks):** a manager attends every Daily Scrum, asks each person for a status update and assigns new tasks. What is wrong? The Daily Scrum is **for the Developers**, to inspect progress toward the Sprint Goal and adapt their plan; it is **not a status report to management** (2). Developers are self-managing: managers do not assign tasks, and work enters via the Product Owner and Product Backlog (2). The Scrum Master should coach the manager and the team on Scrum, protect the event and its 15-minute timebox, offer the manager other channels (Sprint Review, backlog conversations with the PO), and address it as an impediment (2).
+  - heading: "Agile practices and velocity forecasting"
+    body: |
+      **What it is (gap-fill, standard knowledge):** practices that often sit around Scrum.
+
+      - **User story:** "As a [user], I want [goal] so that [benefit]", with **acceptance criteria**. **INVEST:** Independent, Negotiable, Valuable, Estimable, Small, Testable.
+      - **Story points:** a relative size (Fibonacci 1, 2, 3, 5, 8, 13) estimated by **planning poker**.
+      - **Velocity:** story points completed per Sprint, used for forecasting.
+      - **Burndown chart:** remaining work against time in the Sprint. **Burnup chart:** completed work and total scope (shows scope growth).
+      - **Kanban:** visualise the workflow on a board, **limit work in progress (WIP)**, manage flow (lead time and cycle time). No fixed Sprints or roles.
+      - **XP:** engineering practices (pair programming, test-driven development, continuous integration, refactoring, small releases).
+
+      **The forecast rule:**
+
+      $$\text{average velocity} = \frac{\text{sum of recent velocities}}{\text{number of Sprints}}, \qquad \text{Sprints needed} = \frac{\text{remaining points}}{\text{average velocity}}$$
+
+      Then weeks = Sprints x weeks per Sprint. If the answer is not a whole number, round the Sprints **up**.
+
+      **Tiny example (slides):** 120 points remaining / velocity 30 = about 4 Sprints.
+
+      **Paper B B3(a) (4 marks):** 180 points; velocity 28, 32, 30. Average = (28 + 32 + 30) / 3 = 30. 180 / 30 = **6 Sprints = 12 weeks** (2 marks). Two assumptions (1 mark each): a stable team and capacity; consistent estimation; no backlog growth (scope may grow, which a burnup shows); the same Definition of Done.
+
+      **In the exam:** show the average, the division and the weeks, then state two assumptions.
+examples:
+  - title: "Velocity forecast: Paper B, B3(a)"
+    problem: |
+      A team runs two-week Sprints. The Product Backlog holds 180 story points. Velocity over the last three Sprints was 28, 32 and 30. Forecast how many Sprints and how many weeks the remaining backlog will take, and state two assumptions.
+    steps:
+      - "Average velocity = (28 + 32 + 30) / 3 = 90 / 3 = 30 points per Sprint."
+      - "Sprints needed = 180 / 30 = 6 Sprints."
+      - "Weeks = 6 Sprints x 2 weeks = 12 weeks."
+      - "Assumption 1: the team and its capacity stay stable. Assumption 2: estimation stays consistent, the backlog does not grow (scope growth would show on a burnup chart) and the Definition of Done stays the same."
+    answer: "Average velocity 30; 6 Sprints; 12 weeks."
+    takeaway: "A forecast is only as good as its assumptions. Say them out loud."
+  - title: "Round-up forecast"
+    problem: |
+      Velocity over three Sprints was 24, 27 and 21. The backlog is 150 points and Sprints are 2 weeks long. How many Sprints and weeks?
+    steps:
+      - "Average velocity = (24 + 27 + 21) / 3 = 72 / 3 = 24."
+      - "150 / 24 = 6.25 Sprints."
+      - "A part-Sprint still takes a whole Sprint, so round up to 7 Sprints."
+      - "Weeks = 7 x 2 = 14 weeks."
+    answer: "7 Sprints, 14 weeks."
+    takeaway: "Round Sprints up, never down."
+  - title: "Events and timeboxes from memory"
+    problem: |
+      Fill in the events table for a one-month Sprint: purpose and maximum timebox of Planning, Daily Scrum, Review and Retrospective.
+    steps:
+      - "Sprint Planning: why (Sprint Goal), what (select items), how (plan to Done). Output: Sprint Backlog. Max 8 h."
+      - "Daily Scrum: Developers inspect progress toward the Sprint Goal and adapt the plan. 15 min, for any Sprint length."
+      - "Sprint Review: Scrum Team and stakeholders inspect the outcome and decide future adaptations to the Product Backlog. Max 4 h."
+      - "Sprint Retrospective: the Scrum Team improves quality and effectiveness (people, process, tools, Definition of Done). Max 3 h."
+    answer: "Planning 8 h, Daily 15 min, Review 4 h, Retrospective 3 h; the Sprint itself is one month or less."
+    takeaway: "Shorter Sprints have shorter events, except the Daily Scrum."
+  - title: "The slides' school lunch app"
+    problem: |
+      Trace the lunch-reservation app through Scrum: Product Goal, Sprint Goal, Increment, Review, Retrospective and adaptation.
+    steps:
+      - "Product Goal: reduce lunch queues by letting students reserve meals before break."
+      - "Sprint Planning sets the Sprint Goal: a small pilot group can reserve one meal for a pickup period."
+      - "During the Sprint the Developers build and test the menu, reservation form and staff order list, using Daily Scrums to keep the plan aligned."
+      - "Increment: a usable pilot that meets the Definition of Done, run with one class."
+      - "Review: students and staff say meal limits and clearer pickup instructions matter most. Retrospective: involve a canteen staff member earlier when refining items."
+      - "Adapt: the Product Owner reorders the Product Backlog for the next Sprint."
+    answer: "Goal, pilot Increment, feedback, backlog reordered."
+    takeaway: "The Review adapts the product; the Retrospective adapts the way of working."
+questions:
+  - question: "A university IT department is switching from Waterfall to Scrum for its student-portal project. Compare Waterfall and Agile approaches across four dimensions, and explain why Agile may suit this project."
+    kind: long
+    marks: 6
+    keywords:
+      - planning
+      - delivery
+      - scope
+      - time and cost
+      - customer
+      - risk
+      - incremental
+      - changing requirements
+    idealAnswer: |
+      Any four dimensions, 1 mark each. Planning: Waterfall plans in detail up front and change is costly; Agile plans just enough and refines continuously. Delivery: one big release at the end versus small usable increments every few weeks. What is fixed: Waterfall fixes scope and estimates time and cost; Agile fixes time and cost and keeps scope flexible. Customer: involved at requirements and acceptance versus collaborating throughout. Risk: found late versus exposed early by frequent working software. Why Agile here (2 marks): student-portal requirements are uncertain and evolve with user feedback, and early increments reduce risk and deliver value each semester.
+  - question: "Describe the accountabilities of the Product Owner, Scrum Master and Developers. For each, give one common misconception."
+    kind: long
+    marks: 6
+    keywords:
+      - Product Owner
+      - Scrum Master
+      - Developers
+      - Product Goal
+      - Product Backlog
+      - servant-leader
+      - self-managing
+      - Increment
+      - misconception
+    idealAnswer: |
+      Product Owner (2 marks): maximises the value of the product, develops the Product Goal and orders the Product Backlog; one person; can cancel a Sprint. Misconception: the PO is a committee or the team manager. Scrum Master (2 marks): establishes Scrum and improves team effectiveness by teaching, coaching and facilitating, and by removing impediments and keeping events within their timeboxes; a servant-leader. Misconception: the SM is the boss, assigns tasks or takes minutes. Developers (2 marks): create a usable Increment that meets the Definition of Done, own the Sprint Backlog and how the work is done, and are self-managing. Misconception: only programmers are Developers (designers, testers and analysts are too).
+  - question: "Describe the five Scrum events, with their purposes and maximum timeboxes for a one-month Sprint."
+    kind: long
+    marks: 5
+    keywords:
+      - Sprint
+      - Sprint Planning
+      - 8 h
+      - Daily Scrum
+      - 15 min
+      - Sprint Review
+      - 4 h
+      - Retrospective
+      - 3 h
+    idealAnswer: |
+      One mark each. Sprint: one month or less; the container for creating a Done Increment. Sprint Planning: up to 8 h; why, what and how, producing the Sprint Backlog. Daily Scrum: 15 min; Developers inspect progress toward the Sprint Goal and adapt the plan. Sprint Review: up to 4 h; inspect the outcome with stakeholders and adapt the Product Backlog. Sprint Retrospective: up to 3 h; improve quality and effectiveness. Shorter Sprints have shorter events, except the Daily Scrum.
+  - question: "Midway through a Sprint, the Dean emails a Developer asking for an urgent new report. How should the team respond?"
+    kind: short
+    marks: 3
+    keywords:
+      - transparent
+      - Product Owner
+      - Product Backlog
+      - impact
+      - Sprint Goal
+      - renegotiated
+      - cancel
+    idealAnswer: |
+      The Developer should not silently accept it. Make the request transparent and route it to the Product Owner, who decides its order in the Product Backlog. The Developers assess the impact on the Sprint plan. Scope may be renegotiated only if the Sprint Goal and quality are not endangered; otherwise the request goes into a future Sprint, or the Product Owner cancels the Sprint if its goal is now obsolete.
+  - question: "Name the three pillars of empiricism in Scrum and explain how the Daily Scrum supports them."
+    kind: short
+    marks: 4
+    keywords:
+      - transparency
+      - inspection
+      - adaptation
+      - Daily Scrum
+      - Sprint Goal
+      - Sprint Backlog
+      - 15 minutes
+      - Developers
+    idealAnswer: |
+      The three pillars are transparency, inspection and adaptation (1.5 marks). The Daily Scrum makes progress visible to the Developers (transparency), inspects progress toward the Sprint Goal each day (inspection), and adapts the Sprint Backlog into a plan for the next day (adaptation). It lasts 15 minutes and is run by the Developers (2.5 marks).
+  - question: "State the four values of the Agile Manifesto."
+    kind: short
+    marks: 4
+    keywords:
+      - individuals and interactions
+      - working software
+      - customer collaboration
+      - responding to change
+      - over
+    idealAnswer: |
+      Individuals and interactions over processes and tools; working software over comprehensive documentation; customer collaboration over contract negotiation; responding to change over following a plan. While there is value in the items on the right, the items on the left are valued more. (1 mark each.)
+  - question: "Name the three Scrum artifacts and the commitment attached to each."
+    kind: short
+    marks: 4
+    keywords:
+      - Product Backlog
+      - Product Goal
+      - Sprint Backlog
+      - Sprint Goal
+      - Increment
+      - Definition of Done
+    idealAnswer: |
+      Product Backlog and its commitment, the Product Goal; Sprint Backlog and its commitment, the Sprint Goal; Increment and its commitment, the Definition of Done (about 1.3 marks per correct pair). The commitments make progress measurable toward a product target, a Sprint objective and an agreed quality state.
+  - question: "A team runs two-week Sprints. The Product Backlog holds 180 story points. Velocity over the last three Sprints was 28, 32 and 30. Forecast how many Sprints and weeks the remaining backlog will take, and state two assumptions behind the forecast."
+    kind: short
+    marks: 4
+    keywords:
+      - average velocity
+      - 30
+      - 6 Sprints
+      - 12 weeks
+      - assumption
+      - stable team
+      - backlog
+      - Definition of Done
+    idealAnswer: |
+      Average velocity = (28 + 32 + 30) / 3 = 30. Sprints = 180 / 30 = 6, so 6 x 2 = 12 weeks (2 marks). Two assumptions, 1 mark each: the team and its capacity are stable; estimation is consistent; no backlog growth (scope may grow, which a burnup chart shows); the Definition of Done stays the same.

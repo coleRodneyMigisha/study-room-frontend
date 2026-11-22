@@ -1,0 +1,528 @@
+id: closure
+title: Closure, Evaluation & Lessons Learned
+subtitle: "Finishing properly: acceptance, handover, releasing resources, and learning for the next project"
+recap: |
+  Project closure is the last phase: the project is formally closed and the project board receives a report on its
+  overall success. A formal closure is a clear closure, so responsibility is handed over, the team is disbanded
+  and costs stop, and you can check whether the original objectives were met. There are five types of closure
+  (normal, premature, perpetual, failed, changed priority) and six closedown steps, ending in a final report
+  with five sections. Team and individual evaluations should go beyond time, cost and specifications, and
+  lessons-learned reviews only work with an independent facilitator, several learning gates, owners and a
+  repository. A deployed product is not automatically a closed project.
+traps:
+  - "Thinking a deployed product means the project is closed. Closure also needs formal acceptance, handover, closing contracts and accounts, releasing resources, the final report and lessons learned."
+  - "Listing the closure types and forgetting one. There are five: normal, premature, perpetual, failed and changed priority."
+  - "Describing a perpetual project as one that runs for a long time. It never seems to finish because of endless additions and scope creep, until it is forced to close."
+  - "Getting the six closedown steps out of order. Acceptance first, final report last: acceptance, release resources, evaluate and reassign, close accounts, deliver, final report."
+  - "Leaving out a section of the final report. It has five: executive summary, review and analysis, recommendations, lessons learned, appendix."
+  - "Saying one person always evaluates team members. It depends on the structure: functional (area manager), balanced matrix (PM and area manager jointly), project matrix or projectised (the PM)."
+  - "Letting lessons-learned sessions turn into blame sessions, or mixing them with pay reviews, so people stop speaking honestly."
+  - "Waiting for one retrospective at the very end. Use at least three in-process learning gates during the life cycle."
+lesson:
+  checkpointStep: 4
+  steps:
+    - "Project closure is the last phase of a project: the project is formally closed and the project board receives a report on its overall success. Closing confirms the work is complete and accepted."
+    - "Formal closure matters for three reasons. It is a clear closure, so you can hand over the project and responsibility to the client. It lets you disband the team so the project stops incurring costs. It confirms the original objectives were met and teaches lessons from those that were not."
+    - "Closing activities: obtain formal acceptance of the agreed deliverables, hand over software, documentation and operational responsibility, close contracts and financial matters, archive records and release resources, review performance and document lessons learned, and communicate closure to stakeholders."
+    - "There are five types of closure. Normal: finished as planned. Premature: closed early. Perpetual: never seems to end. Failed: objectives cannot be met. Changed priority: the organisation's priorities moved and resources were diverted."
+    - "Checkpoint: list the six steps of implementing closedown, in order."
+    - "The six closedown steps: get delivery acceptance, shut down resources, evaluate the team and project manager and reassign members, close accounts and pay all bills, deliver the project to the customer, and create a final report."
+    - "The final report has five sections: executive summary (goals met or unmet, satisfaction), review and analysis (mission, procedures, resources), recommendations (technical improvements, corrective actions), lessons learned (reminders, retrospectives) and an appendix (backup data, critical information)."
+    - "Evaluations are often poor because individuals are judged by a home-department supervisor who did not see the project work, and teams are measured only on time, cost and specifications. Who assesses an individual depends on the organisation structure: functional manager, both jointly in a balanced matrix, or the PM in a project matrix."
+    - "Lessons learned means analysis during and shortly after the project to capture what worked and what did not. Goals: reuse solutions and stop repeating mistakes. Barriers: no time, no support, blame sessions, lessons not applied, and a culture that does not value learning."
+    - "To make retrospectives effective use an independent facilitator, at least three learning gates during the life cycle, an owner for each point, an easy-to-use learning repository and a mandate for all projects. The Scrum Sprint Retrospective applies the same idea every Sprint."
+checkpoint:
+  question: List the six steps of implementing closedown, in order, and say why formal project closure is important.
+  hint: "The list starts with the customer's acceptance and ends with a written report. For importance, think about handover, costs, objectives and lessons."
+  keywords:
+    - acceptance
+    - release resources
+    - evaluate
+    - close accounts
+    - deliver
+    - final report
+    - handover
+    - lessons learned
+  idealAnswer: "The six steps are, in order: (1) get delivery acceptance from the customer; (2) shut down resources and release them to new uses; (3) evaluate the team, team members and project manager, and reassign team members; (4) close accounts and pay all bills; (5) deliver the project to the customer; (6) create a final report. Formal closure matters because it gives a clear handover of responsibility to the client, lets you disband the team so costs stop, confirms the original objectives were met, closes contracts and finances, captures lessons learned for future projects and archives records."
+terms:
+  - term: Project closure
+    definition: The last phase of a project, when the project is formally closed and the project board receives a report on its overall success.
+  - term: Formal acceptance
+    definition: The customer's sign-off that the agreed deliverables are complete and meet the requirements.
+  - term: Handover
+    definition: Passing the software, documentation and operational responsibility to the client or support team.
+  - term: Closure checklist
+    definition: Deliverables, follow-on action recommendations, updated documents, documentation, finances and resources.
+  - term: Normal closure
+    definition: The project finished as planned, with deliverables accepted and handed over.
+  - term: Premature closure
+    definition: The project closed early, for example because objectives were reached sooner or reduced scope was accepted.
+  - term: Perpetual closure
+    definition: A project that never seems to end because of endless additions and "just one more feature" until it is forced to close.
+  - term: Failed project
+    definition: A project whose objectives cannot be met (technology, cost, market), closed to stop losses.
+  - term: Changed priority
+    definition: A closure where organisational priorities moved, so funding or resources are diverted and the project is stopped or shelved.
+  - term: Close-out plan
+    definition: "A plan answering: what tasks are required to close, who is responsible, when closure begins and ends, and how the project will be delivered."
+  - term: Closedown
+    definition: The six-step process of acceptance, shutting down resources, evaluation, closing accounts, delivery and a final report.
+  - term: Final report
+    definition: A report with an executive summary, review and analysis, recommendations, lessons learned and an appendix.
+  - term: 360-degree feedback
+    definition: Feedback gathered from everyone the person's work affects, such as the PM, area manager, peers, subordinates and customers.
+  - term: Lessons learned
+    definition: Analysis carried out during and shortly after the project to capture what worked and what did not, so solutions are reused and mistakes are not repeated.
+  - term: Learning gate
+    definition: A planned point during the life cycle where lessons are captured, not only at the end.
+  - term: Learning repository
+    definition: An easy-to-use store of lessons so they can be found and reused on later projects.
+  - term: Closure facilitator
+    definition: An independent, impartial person who runs the closure review.
+  - term: Sprint Retrospective
+    definition: The Scrum event that applies the lessons-learned idea every Sprint, as built-in continuous learning.
+quiz:
+  - question: Which best describes project closure?
+    options:
+      - The first phase, where the charter is signed
+      - The moment the software is installed
+      - The last phase, where the project is formally closed and the project board gets a report on its success
+      - The end of the Planning phase
+    answer: 2
+    explanation: Closure is the last phase; the project is formally closed and the board receives a report on overall success.
+  - question: Which is a reason formal closure matters?
+    options:
+      - It lets you disband the team so the project stops incurring costs
+      - It lets the team keep working so benefits continue
+      - It removes the need for a final report
+      - It avoids customer acceptance
+    answer: 0
+    explanation: Disbanding the team stops costs. Closure also gives a clear handover and confirms objectives were met.
+  - question: '"A deployed product is not automatically a closed project." Why?'
+    options:
+      - Deployment is always followed by new features
+      - The project board never accepts deployed products
+      - Deployment is optional
+      - Closure needs acceptance, handover, closing contracts, releasing resources, a final report and lessons
+    answer: 3
+    explanation: Deployment delivers the software, but closure also needs acceptance, handover, closed contracts and accounts, released resources, the final report and lessons learned.
+  - question: How many types of closure does the Closure deck list?
+    options:
+      - Three
+      - Five
+      - Six
+      - Four
+    answer: 1
+    explanation: "Five: normal, premature, perpetual, failed project and changed priority."
+  - question: A project keeps getting "just one more feature" and never seems to finish until it is forced to close. This is...
+    options:
+      - Normal closure
+      - Perpetual closure
+      - Premature closure
+      - Changed priority
+    answer: 1
+    explanation: That is perpetual closure, which is linked to scope creep and unclear completion criteria.
+  - question: Funding is diverted to a new national programme and the project is shelved. This is...
+    options:
+      - Failed project
+      - Normal closure
+      - Premature closure
+      - Changed priority
+    answer: 3
+    explanation: Organisational priorities moved, so resources were diverted. That is changed priority.
+  - question: Which is the first step of implementing closedown?
+    options:
+      - Get delivery acceptance from the customer
+      - Close accounts
+      - Create a final report
+      - Evaluate the team
+    answer: 0
+    explanation: "The order: acceptance, shut down resources, evaluate and reassign, close accounts, deliver, final report."
+  - question: Which is the last step of implementing closedown?
+    options:
+      - Evaluate the team
+      - Deliver the project to the customer
+      - Create a final report
+      - Shut down resources
+    answer: 2
+    explanation: The final report is step 6.
+  - question: Which section of the final report holds technical improvements and corrective actions?
+    options:
+      - Executive summary
+      - Review and analysis
+      - Recommendations
+      - Appendix
+    answer: 2
+    explanation: Recommendations contain technical improvements and corrective actions. The appendix holds backup data and critical information.
+  - question: Who assesses an individual's performance in a balanced matrix organisation?
+    options:
+      - The PM and the area manager jointly
+      - The project manager alone
+      - The sponsor
+      - The area manager alone
+    answer: 0
+    explanation: "Functional (matrix): the area manager. Balanced matrix: PM and area manager jointly. Project matrix or projectised: the PM."
+  - question: Which is a good rule when conducting reviews?
+    options:
+      - Compare people with their teammates
+      - Criticise the person
+      - Use only time, cost and specifications
+      - Keep evaluations separate from pay or merit reviews
+    answer: 3
+    explanation: Evaluations should be separate from pay or merit reviews, criticise behaviours not the person, and be assessed against standards, not teammates.
+  - question: Which is NOT a listed barrier to organisational learning?
+    options:
+      - No post-project time
+      - Too many learning gates
+      - A culture that does not value learning
+      - Lessons becoming blame sessions
+    answer: 1
+    explanation: Learning gates are a remedy, not a barrier. At least three in-process gates are recommended.
+  - question: What is the minimum number of in-process learning gates recommended during the life cycle?
+    options:
+      - One
+      - Three
+      - Two
+      - Five
+    answer: 1
+    explanation: At least three learning gates during the life cycle, not only at the end.
+  - question: Which is a characteristic of an ideal closure facilitator?
+    options:
+      - Directly involved in the project
+      - Has a personal interest in the outcome
+      - Reports to the project manager
+      - Seen as impartial and fair
+    answer: 3
+    explanation: The facilitator has no direct involvement or interest and is seen as impartial and fair, respected by senior management, willing to listen and independent.
+  - question: Which Scrum event applies the lessons-learned idea every Sprint?
+    options:
+      - Sprint Retrospective
+      - Sprint Planning
+      - Daily Scrum
+      - Sprint Review
+    answer: 0
+    explanation: The Sprint Retrospective gives continuous, built-in learning instead of one end-of-project post-mortem.
+fact:
+  title: Why "closed" is more than "launched"
+  body: The slides repeat one line from Topic 1 in the Closure deck, "A deployed product is not automatically a closed project." Deployment hands users the product, but closure is what ends the costs, clears the contracts and keeps the lessons.
+notes:
+  - heading: "Start here: the big idea in plain words"
+    body: |
+      **What it is:** closure is how a project properly ends. Think of moving out of a rented flat. You do not just carry out the last box. You hand back the keys, settle the bills, get the landlord to confirm the flat is fine, and say goodbye to the housemates.
+
+      **Why it matters:** without a formal ending, nobody is sure who owns the product, people keep being paid, bills stay open, and everyone forgets what went well or badly. A **formal** closure is a **clear** closure.
+
+      **How this module fits together:**
+
+      1. What closure is, and the closing checklist.
+      2. Five types of closure.
+      3. Six closedown steps.
+      4. The final report.
+      5. Evaluating the team and individuals.
+      6. Retrospectives and lessons learned.
+
+      **In the exam:** expect why closure matters, types of closure, the closedown steps, final report contents, and retrospectives with their barriers.
+  - heading: Definition and importance of closure
+    body: |
+      **What it is:** **project closure is the last phase of a project: the project is formally closed and the project board receives a report on its overall success.** *(from slides)*
+
+      **Everyday comparison:** a school term ends with a report card, not just a last lesson.
+
+      **Why it matters:**
+
+      - A **formal** closure is a **clear** closure: you can properly **hand over** the project and responsibility to the client.
+      - It lets you **disband the team** so the project **stops incurring costs**.
+      - It confirms the project **met its original objectives** and teaches lessons by identifying objectives that were not achieved.
+
+      Remember from the foundations module: **"A deployed product is not automatically a closed project."** Closing confirms the work is complete **and accepted**.
+
+      **Closing activities (Project Phases lecture):**
+
+      - obtain **formal acceptance** of the agreed deliverables
+      - **hand over** software, documentation and operational responsibility
+      - **close contracts** and financial matters
+      - **archive** records and **release resources**
+      - review performance and document **lessons learned**
+      - **communicate closure** to stakeholders
+
+      The *Intro lecture* version: contractual closeout, post-production transition, lessons learned.
+
+      **In the exam:** "Why is formal project closure important? Give four reasons." Any four: clear handover (acceptance confirmed); release of people and resources so costs stop; closing contracts and finances so no open liabilities remain; evaluating whether objectives were met; capturing lessons learned; archiving records for audit and reference.
+  - heading: Closure checklist
+    body: |
+      **What it is:** a short checklist to tick off before you call a project closed. *(from slides)*
+
+      | Item | What it means |
+      |---|---|
+      | **Deliverables** | Hand over documentation for stakeholders to **sign off** |
+      | **Follow-on action recommendations** | Advice for the people who will support the product after the project |
+      | **Update documents** | Configuration item record, benefits management approach, **lessons report**, **end project report** (PRINCE2-style terms) |
+      | **Documentation** | Organise, file and archive all documents, current and signed off, easy to search for future projects |
+      | **Finances** | Pay remaining invoices, close open contracts |
+      | **Resources** | Release equipment and people; reassign staff to other projects |
+
+      **Everyday comparison:** a pilot's pre-flight checklist, but at the end of the journey.
+
+      **In the exam:** use this list when a question asks what must be done before closing, or when you need to show the project is truly finished and not only deployed.
+  - heading: Types of project closure
+    body: |
+      **What it is:** the five ways a project can end. *(from slides; the explanations are gap-fill)*
+
+      | Type | Meaning |
+      |---|---|
+      | **Normal** | The project finished as planned: deliverables accepted and handed over |
+      | **Premature** | Closed early, for example objectives reached sooner, or reduced scope accepted (risky if corners were cut) |
+      | **Perpetual** | The project never seems to end: endless additions and "just one more feature" (scope creep) until it is forced to close |
+      | **Failed project** | Objectives cannot be met (technology, cost, market); closed to stop losses |
+      | **Changed priority** | Organisational priorities moved: funding or resources are diverted and the project is stopped or shelved |
+
+      **Everyday comparison:** a road trip. Normal is arriving. Premature is turning round early. Perpetual is "one more stop" until night falls. Failed is the car breaking down for good. Changed priority is a phone call saying come home, something else has come up.
+
+      **Close-out plan questions:** what tasks are required to close? Who is responsible? When will closure begin and end? How will the project be delivered?
+
+      **In the exam (sample paper B, A10):** "List five types of project closure, and explain what a 'perpetual' project is." Five types earn 2.5 marks; the perpetual explanation earns 1.5: it never seems to finish, with continual additions, unclear completion criteria and scope creep, until it is forced to close. Each type still needs the same orderly closedown: acceptance (or a termination agreement), release of resources, financial closure and lessons learned.
+  - heading: Implementing closedown, the six steps
+    body: |
+      **What it is:** the ordered list of what to do when closing. *(from slides)*
+
+      1. Get **delivery acceptance** from the customer.
+      2. **Shut down resources** and release them to new uses.
+      3. **Evaluate** the team, team members and the project manager; reassign team members.
+      4. **Close accounts** and pay all bills.
+      5. **Deliver** the project to the customer.
+      6. Create a **final report**.
+
+      **Memory hook:** Accept, Release, Evaluate, Close, Deliver, Report (A-R-E-C-D-R).
+
+      **Everyday comparison:** finishing a catering job: the client signs off the event, you send the staff home, you assess how they did, you settle the suppliers, you hand over the leftovers and keys, and you write up the report.
+
+      **In the exam (sample paper A, B5c, 6 marks):** list the steps in order for 3 marks, and give three reasons formal closure is important (1 mark each): clear handover of responsibility; releases the team so costs stop; confirms objectives and acceptance; closes contracts and finances; captures lessons; archives records.
+  - heading: The final report
+    body: |
+      **What it is:** the written record of how the project went. It has five sections. *(from slides)*
+
+      | Section | Contents |
+      |---|---|
+      | **Executive summary** | Goals met or unmet; stakeholder satisfaction; user reactions to deliverable quality |
+      | **Review and analysis** | Mission and objectives; procedures and systems used; organisational resources used |
+      | **Recommendations** | Technical improvements; corrective actions |
+      | **Lessons learned** | Reminders; retrospectives |
+      | **Appendix** | Backup data; critical information |
+
+      **Everyday comparison:** a summary page up front for the busy reader, a story in the middle, advice, a list of what you would tell your future self, and the paperwork at the back.
+
+      **In the exam:** "What should a project final report contain?" Name all five sections with their contents.
+  - heading: Evaluating team and individual performance
+    body: |
+      **What it is:** how people and teams are judged at the end of a project. *(from slides)*
+
+      **Why evaluations are often poor:** individuals are evaluated by their home department's supervisor (who did not see the project work), and teams are measured only on **time, cost and specifications**.
+
+      **Pre-implementation conditions (team):**
+
+      - clear, challenging, attainable standards and goals
+      - known responsibilities
+      - adequate team rewards and management belief in teams
+      - a career path for PMs
+      - discretionary authority for the team
+      - high trust
+      - **criteria beyond time, cost and specifications**
+
+      **Who assesses individuals depends on the organisation structure:**
+
+      | Structure | Assessor |
+      |---|---|
+      | Functional organisation / functional matrix | The **area (functional) manager**, perhaps asking the PM's opinion |
+      | Balanced matrix | The **PM and the area manager jointly** |
+      | Project matrix / projectised organisation | The **project manager** |
+
+      **Conducting reviews:**
+
+      - start with **self-evaluation**
+      - do not compare with teammates; assess against standards
+      - criticise **behaviours, not the person**
+      - be consistent and fair
+      - treat it as one point in an ongoing process
+      - **keep evaluations separate from pay or merit reviews**
+
+      **360-degree feedback:** feedback from everyone the person's work affects (PM, area manager, peers, subordinates, customers).
+
+      **Everyday comparison:** a football player rated only by goals scored misses the passing, defending and teamwork.
+
+      **In the exam:** "Who should evaluate a team member's individual performance in a matrix organisation?" Answer by matrix type, then mention 360-degree feedback.
+  - heading: Retrospectives and lessons learned
+    body: |
+      **What it is:** **lessons learned** is analysis carried out **during and shortly after** the project to capture what worked and what did not. *(from slides)* **Goals:** **reuse learned solutions** and **stop repetitive mistakes**.
+
+      **Everyday comparison:** a sports team watching the match video to improve next week.
+
+      **Barriers to organisational learning:**
+
+      - no post-project time
+      - no direction or support
+      - **lessons become blame sessions**
+      - lessons are not applied elsewhere
+      - a culture that does not value learning
+
+      **Making retrospectives effective:**
+
+      - an **independent facilitator**
+      - at least **three in-process learning gates** during the life cycle (not only at the end)
+      - an **owner** for each point
+      - an easy-to-use **learning repository**
+      - **mandate** retrospectives for all projects
+
+      **The ideal closure facilitator:** no direct involvement or interest; seen as impartial and fair; respected by senior management; willing to listen; independent, with authority to report without fear; acts in the organisation's best interests; broad experience.
+
+      **Initiating the review:** automatic points when audits happen (no surprises); careful, sensitive conduct; audit staff independent of the project; reports used and accessible; supports the culture; planned and orderly closure; core conditions in place for evaluations; separate from pay reviews. **Steps:** initiation and staffing, then data collection and analysis, then reporting.
+
+      **Process review questionnaire (sample questions):**
+
+      - Were objectives clearly communicated and aligned with strategy?
+      - Were stakeholders identified and involved in planning?
+      - Were resources and skills adequate?
+      - Were time estimates reasonable?
+      - **Were risks identified and assessed before the project started?**
+      - Were processes appropriate?
+      - Did contractors perform?
+      - Were communication methods adequate?
+      - Is the customer satisfied and using the deliverables as intended?
+      - Were objectives, schedule, budget and scope met?
+      - **Has the sponsor formally accepted that the charter and scope were met?**
+
+      **Organisational culture questionnaire:** a supportive culture? Senior management support? The right skills? Did the PMO (project management office) help or hinder? Access to resources? Adequate training? Were earlier lessons useful? A clear link to organisational objectives? Were staff properly reassigned?
+
+      **Link to Scrum:** the **Sprint Retrospective** applies the same idea every Sprint: continuous, built-in learning instead of a single end-of-project post-mortem.
+
+      **In the exam (sample paper B, B5d, 4 marks):** effective retrospectives (any four, 0.5 each): independent facilitator; several learning gates; owners for each lesson; a searchable repository; mandatory for all projects; separate from pay reviews. Facilitator (any four, 0.5 each): not involved in the project; impartial; respected by senior management; good listener; independent authority to report; acts in the organisation's interest; broad experience.
+examples:
+  - title: Putting the six closedown steps in order
+    problem: |
+      A team has finished a clinic-booking system. Their closing to-do list, in random order, is: write the final report; pay all supplier bills; get the clinic director's sign-off; evaluate the team and reassign members; hand the system to the customer; release the servers and contractors. Put the six steps in the right order.
+    steps:
+      - "Closedown always starts with **delivery acceptance**: get the clinic director's sign-off."
+      - "Next, **shut down resources**: release the servers and contractors."
+      - "Then **evaluate** the team, team members and the PM, and **reassign** team members."
+      - "Then **close accounts**: pay all supplier bills."
+      - "Then **deliver** the project to the customer: hand over the system."
+      - "Last, **create the final report**."
+    answer: "Acceptance, release resources, evaluate and reassign, close accounts, deliver, final report."
+    takeaway: A-R-E-C-D-R. Acceptance comes first and the final report last.
+  - title: Sorting five closure scenarios by type
+    problem: |
+      Name the type of closure in each case. (1) A payroll project finished on time and the client signed it off. (2) A project keeps adding "one more report" for two years until the budget forces a stop. (3) The technology chosen proves unable to meet the speed requirement, and the project is closed to stop losses. (4) After a merger, funding is moved to another programme and the project is shelved. (5) Objectives are reached early and the team closes the project with reduced scope accepted.
+    steps:
+      - "(1) Finished as planned, accepted and handed over: **normal**."
+      - "(2) Endless additions, scope creep, forced to close: **perpetual**."
+      - "(3) Objectives cannot be met, closed to stop losses: **failed project**."
+      - "(4) Organisational priorities moved and resources were diverted: **changed priority**."
+      - "(5) Closed early, with objectives reached sooner or reduced scope accepted: **premature**."
+    answer: "(1) normal, (2) perpetual, (3) failed, (4) changed priority, (5) premature."
+    takeaway: Every type still needs the same orderly closedown, with acceptance (or a termination agreement), release of resources, financial closure and lessons learned.
+  - title: Who evaluates a team member?
+    problem: |
+      A developer works on a project for a company. State who evaluates the developer's individual performance in (a) a functional matrix, (b) a balanced matrix, (c) a project matrix, and name a method that gathers wider feedback.
+    steps:
+      - "(a) Functional organisation or functional matrix: the **area (functional) manager**, perhaps asking the PM's opinion."
+      - "(b) Balanced matrix: the **PM and the area manager jointly**."
+      - "(c) Project matrix or projectised organisation: the **project manager**."
+      - "Wider feedback comes from **360-degree feedback**: the PM, area manager, peers, subordinates and customers."
+      - "Remember the review rules: self-evaluation first, assess against standards, criticise behaviours not the person, and keep it separate from pay or merit reviews."
+    answer: "Functional matrix, the area manager; balanced matrix, PM and area manager jointly; project matrix, the PM; 360-degree feedback for wider input."
+    takeaway: The more the organisation is built around the project, the more the project manager has a say in evaluations.
+questions:
+  - question: Why is formal project closure important? Give four reasons.
+    kind: short
+    marks: 4
+    keywords:
+      - acceptance
+      - handover
+      - release
+      - costs
+      - contracts
+      - lessons learned
+      - archive
+    idealAnswer: It confirms deliverables are accepted, so responsibility is clearly handed over. It releases people and resources, so costs stop. It closes contracts and finances, leaving no open liabilities. It evaluates whether objectives were met. It captures lessons learned for future projects. It archives records for audit and reference.
+  - question: List five types of project closure, and explain what a "perpetual" project is.
+    kind: short
+    marks: 4
+    keywords:
+      - normal
+      - premature
+      - perpetual
+      - failed
+      - changed priority
+      - scope creep
+    idealAnswer: The five types are normal, premature, perpetual, failed and changed priority (2.5 marks). A perpetual project never seems to finish. It has continual additions, unclear completion criteria and scope creep, until it is forced to close (1.5 marks).
+  - question: What should a project final report contain?
+    kind: short
+    marks: 5
+    keywords:
+      - executive summary
+      - review and analysis
+      - recommendations
+      - lessons learned
+      - appendix
+    idealAnswer: An executive summary (objectives met or unmet, stakeholder and user satisfaction), review and analysis (mission, procedures, resources used), recommendations (technical improvements, corrective actions), lessons learned (reminders, retrospectives), and an appendix (backup data, critical information).
+  - question: Why do lessons-learned exercises often fail, and how can they be made effective?
+    kind: long
+    marks: 6
+    keywords:
+      - blame
+      - independent facilitator
+      - learning gates
+      - owner
+      - repository
+      - mandatory
+      - pay reviews
+    idealAnswer: "Failures: no time after the project, no direction or support, blame sessions, lessons not reused elsewhere, and a culture that does not value learning. Remedies: an independent facilitator, at least three learning gates during the life cycle, an owner for each lesson, an easy-to-use searchable repository, mandatory retrospectives for all projects, and separation from performance pay reviews so people speak honestly."
+  - question: Describe the characteristics of a good closure facilitator and how a post-project retrospective can be made effective.
+    kind: short
+    marks: 4
+    keywords:
+      - independent
+      - impartial
+      - respected
+      - listener
+      - learning gates
+      - repository
+      - owners
+    idealAnswer: "Effective retrospectives (any four, 0.5 each): independent facilitator; several learning gates during the project; owners for each lesson; a searchable repository; mandatory for all projects; separate from pay reviews. Facilitator (any four, 0.5 each): not involved in the project; impartial; respected by senior management; a good listener; independent authority to report; acts in the organisation's interest; broad experience."
+  - question: Who should evaluate a team member's individual performance in a matrix organisation?
+    kind: short
+    marks: 4
+    keywords:
+      - area manager
+      - functional matrix
+      - balanced matrix
+      - project matrix
+      - 360-degree feedback
+    idealAnswer: It depends on the matrix. In a functional matrix the area manager (with the PM's input); in a balanced matrix the PM and area manager jointly; in a project matrix or projectised organisation the PM. 360-degree feedback adds peers, subordinates and customers. Reviews should start with self-evaluation, be against standards, criticise behaviours not the person, and be separate from pay reviews.
+  - question: 'Explain why formal project closure is important and list the steps of implementing closedown.'
+    kind: long
+    marks: 6
+    keywords:
+      - handover
+      - costs
+      - objectives
+      - contracts
+      - lessons
+      - acceptance
+      - release resources
+      - evaluate
+      - close accounts
+      - deliver
+      - final report
+    idealAnswer: "Importance (any three, 1 mark each): clear handover of responsibility; releases the team so costs stop; confirms objectives and acceptance; closes contracts and finances; captures lessons; archives records. Closedown steps (3 marks): customer acceptance, then release resources, then evaluate the team and PM and reassign, then close accounts and pay bills, then deliver the project, then write a final report."
+  - question: '"A deployed product is not automatically a closed project." Explain.'
+    kind: short
+    marks: 4
+    keywords:
+      - deployment
+      - acceptance
+      - handover
+      - contracts
+      - resources
+      - final report
+      - lessons learned
+    idealAnswer: Deployment delivers the software, but closure also requires formal acceptance, operational handover (support, documentation, training), closing contracts and accounts, releasing resources, the final report and lessons learned. Skipping these leaves unclear ownership, ongoing costs and lost knowledge.

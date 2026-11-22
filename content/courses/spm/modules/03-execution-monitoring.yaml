@@ -1,0 +1,699 @@
+id: execution-monitoring
+title: Execution, Monitoring & Control
+subtitle: Running a project that is already underway, and measuring whether it is still on course (including Earned Value)
+recap: |
+  Execution is doing the work: building the team, running communication, managing vendors and checking quality.
+  Monitoring and control run alongside it: measure real progress, compare it with the approved plan (the baseline),
+  and act on the gap. Know the RACI roles (one Accountable per activity), quality assurance (prevents defects in the
+  process) versus quality control (finds defects in the product), and the traffic-light (RAG) status. Earned Value
+  Analysis puts a number on "what you got for what you paid": EV = BAC × % complete, SV = EV − PV, CV = EV − AC,
+  SPI = EV/PV, CPI = EV/AC, EAC = BAC/CPI and critical ratio CR = SPI × CPI. Below 1 is bad, and a CR outside
+  0.9–1.2 needs action.
+traps:
+  - "Mixing up the EVA letters. PV is what should be done by now (the plan), EV is what is actually done (BAC × % complete) and AC is what it cost. SV and CV both start from EV: SV = EV − PV and CV = EV − AC."
+  - "Reading SPI or CPI the wrong way round. Below 1 is bad (behind schedule or over budget); above 1 is good. A negative SV or CV is also bad."
+  - "Giving two Accountable (A) people for one activity in a RACI chart. There must be exactly one A; the work can be shared among several R's."
+  - "Confusing QA and QC. QA prevents defects by improving the process; QC detects defects in the product. 'Testing' is QC, not QA."
+  - "Treating visible activity as progress. 'Almost done', many tasks in progress and long hours are weak evidence; passed acceptance criteria and a met Definition of Done are strong evidence."
+  - "Saying yes or no straight away to an out-of-scope request. The first response is an impact assessment and a change request to the sponsor. A corrective action only restores performance inside the baseline."
+  - "Choosing a vendor on the highest score alone. The score informs the decision, it does not replace judgement (for example a minimum on security for health data)."
+  - "Treating a CR near 1.0 as healthy when SPI and CPI point in opposite directions. Paper B: SPI 1.10 and CPI 0.92 give CR about 1.01, which hides a cost overrun."
+lesson:
+  checkpointStep: 4
+  steps:
+    - Once the plan is approved, the project is executed and controlled at the same time. Five questions keep the project manager focused. Can the team do the work? What may go wrong or has gone wrong? Are the vendors delivering? Is the quality good enough? Are we still on track?
+    - A team needs a shared goal, clear roles and a safe place to report problems early. Responsibility means doing the work and can be shared. Accountability means owning the final outcome and must belong to one person. Delegating work does not delegate accountability.
+    - "RACI chart: Responsible does the work, Accountable owns the result and gives final approval, Consulted is asked before, Informed is told after. Every important activity gets exactly one A."
+    - Quality assurance (QA) prevents defects by improving the process, for example reviews, standards and a Definition of Done. Quality control (QC) detects defects in the product, for example testing, inspection and acceptance. Vendors are chosen with weighted scores and managed through contracts with service levels.
+    - "Checkpoint: why is Earned Value Analysis better than just comparing planned cost with actual cost, and how do you calculate SPI, CPI and the Estimate at Completion?"
+    - "Monitoring collects and reports performance data. Controlling uses that data to pull actual performance back toward the plan. The cycle: plan the baseline, measure status, compare to the baseline (variance), then take corrective action."
+    - "Reports use a traffic light (RAG). Green means on target. Amber means off target but recoverable. Red means off target and recovery is difficult. Progress must be verified: passed acceptance criteria, not 'almost finished'."
+    - "Inside the baseline you use corrective action (restore performance) or preventive action. Beyond the baseline you raise a change request, with an impact assessment and an authorised decision by the sponsor."
+    - "Earned Value Analysis adds a third number to cost tracking: the value earned. PV is the work that should be done by now, EV is the work actually done (BAC × % complete) and AC is the actual cost."
+    - "Example: BAC is USD 100,000. After 6 months the plan says 50% done, but only 40% is done and USD 60,000 is spent. PV = 50,000, EV = 40,000, AC = 60,000. SV = −10,000, CV = −20,000, SPI = 0.80, CPI = 0.667, EAC = 150,000 and CR = 0.53, so the project is red."
+checkpoint:
+  question: Explain why Earned Value Analysis gives a better picture of project health than comparing planned and actual cost alone, and show how SPI, CPI, EAC and the critical ratio are calculated and read.
+  hint: Plan versus actual cost cannot tell you whether the money spent bought the right amount of finished work. What third number does EVA add, and how do you build it? Then list the formulas and what below 1 means.
+  keywords:
+    - earned value
+    - planned value
+    - actual cost
+    - spi
+    - cpi
+    - eac
+    - critical ratio
+    - baseline
+    - variance
+  idealAnswer: "Comparing planned and actual cost only says how much was spent, not what was achieved. EVA adds the value earned, EV = BAC × % complete, so progress and cost are measured in the same money units. PV is the value of work that should be done by now and AC is the actual cost. SV = EV − PV (negative means behind schedule). CV = EV − AC (negative means over budget). SPI = EV/PV and CPI = EV/AC: below 1 means behind schedule or over budget, above 1 means ahead or under. EAC = ((BAC − EV)/CPI) + AC, which equals BAC/CPI: the remaining work at the current efficiency plus the money already spent. The critical ratio CR = SPI × CPI is 1 when on track; 0.9 to 1.2 is acceptable. Because EVA gives early warning and a forecast, the PM can act sooner. It needs a full WBS and verified % complete to be trustworthy."
+terms:
+  - term: Execution
+    definition: Coordinating people and resources, completing activities, managing communication and vendors, and producing the deliverables.
+  - term: Monitoring and control
+    definition: Comparing actual results with the baseline, finding variances, risks, issues and defects, forecasting, and approving or recommending corrective action.
+  - term: Baseline
+    definition: The approved plan (scope, schedule, cost) that actual work is measured against.
+  - term: Responsibility vs accountability
+    definition: Responsibility is doing the work and can be shared. Accountability is owning the final outcome or decision and should be one clear person.
+  - term: RACI
+    definition: "Responsible (does the work), Accountable (owns the outcome and gives final approval), Consulted (asked for input before), Informed (told after). One A per important activity."
+  - term: Psychological safety
+    definition: A team climate where people feel safe to raise errors and blockers early.
+  - term: Make, buy or subscribe
+    definition: The choice between building something yourself, buying or licensing it, or using it as a service. A hybrid keeps unique logic internal and uses vendors for common services.
+  - term: Vendor lock-in
+    definition: Being so dependent on one supplier that leaving would be costly or hard.
+  - term: Service level (SLA)
+    definition: A promised standard in a contract, such as availability, response time, resolution time or performance.
+  - term: Quality assurance (QA)
+    definition: Preventing defects by improving the process, using standards, reviews, checklists and working agreements.
+  - term: Quality control (QC)
+    definition: Detecting defects in the product, using testing, inspection, measurement and acceptance.
+  - term: Definition of Done
+    definition: The agreed checklist a piece of work must meet to count as finished, for example reviewed, acceptance criteria passed, tests passed, documented and integrated.
+  - term: Severity vs priority
+    definition: Severity is the technical or user impact of a defect. Priority is how soon to fix it, given severity, timing, users affected and release goals.
+  - term: RAG status
+    definition: A traffic-light rating. Green is on target, amber is off target but recoverable, red is off target and recovery is difficult.
+  - term: Corrective action
+    definition: An action that restores current performance to the approved baseline.
+  - term: Change request
+    definition: A formal proposal to change the baseline (scope, time, cost or quality). It needs an impact assessment and authorised approval.
+  - term: Earned Value Analysis (EVA)
+    definition: A method that compares planned value, earned value and actual cost to measure schedule and cost performance. "What you got for what you paid."
+  - term: PV, EV, AC, BAC
+    definition: Planned Value (work that should be done by now), Earned Value (BAC × % complete), Actual Cost (what the work cost) and Budget at Completion (the total budget).
+  - term: SPI and CPI
+    definition: Schedule Performance Index EV/PV and Cost Performance Index EV/AC. Below 1 is behind schedule or over budget.
+  - term: EAC and critical ratio
+    definition: EAC = BAC/CPI is the forecast total cost. The critical ratio CR = SPI × CPI is 1 on track; 0.9 to 1.2 is acceptable.
+quiz:
+  - question: In EVA, which formula gives the Earned Value (EV)?
+    options:
+      - BAC × planned % complete
+      - Actual cost × CPI
+      - BAC × actual % complete
+      - PV − SV
+    answer: 2
+    explanation: EV is the value of the work actually done, so EV = BAC × % complete (verified). Planned % complete gives PV.
+  - question: BAC = USD 100,000. At month 6 the plan says 50% done, 40% is actually done and USD 60,000 is spent. What is the CPI?
+    options:
+      - 0.667
+      - 1.25
+      - 0.50
+      - 0.80
+    answer: 0
+    explanation: EV = 40,000 and AC = 60,000, so CPI = 40,000 / 60,000 = 0.667. (SPI = 40,000 / 50,000 = 0.80.)
+  - question: A project has SV = −10,000. What does this tell you?
+    options:
+      - It is on budget
+      - It is over budget
+      - It is ahead of schedule
+      - It is behind schedule
+    answer: 3
+    explanation: SV = EV − PV. A negative SV means less work is done than planned, so the project is behind schedule.
+  - question: Which pair of RACI letters should appear exactly once for an important activity?
+    options:
+      - R
+      - A
+      - I
+      - C
+    answer: 1
+    explanation: One Accountable role per activity keeps ownership clear. Several people can be Responsible, Consulted or Informed.
+  - question: Which is an example of quality assurance (QA) rather than quality control (QC)?
+    options:
+      - Running the acceptance tests
+      - Setting a code review standard and a Definition of Done
+      - A user acceptance test (UAT) session
+      - Measuring the defects found in a release
+    answer: 1
+    explanation: QA improves the process to prevent defects. Tests, UAT and measurement are QC, which detects defects in the product.
+  - question: The slide formula for EAC is ((BAC − EV) / CPI) + AC. With BAC 100,000, EV 40,000 and AC 60,000, what is EAC?
+    options:
+      - 100,000
+      - 120,000
+      - 160,000
+      - 150,000
+    answer: 3
+    explanation: (100,000 − 40,000) / 0.667 = 90,000, plus 60,000 = 150,000. This equals BAC / CPI = 100,000 / 0.667.
+  - question: A critical ratio of 0.53 means what?
+    options:
+      - Far below 0.9, so red and in need of corrective action
+      - On track, inside the 0.9–1.2 band
+      - Ahead of schedule and under budget
+      - Slightly amber, ignore it
+    answer: 0
+    explanation: CR = SPI × CPI = 0.80 × 0.667 = 0.53. Anything outside 0.9–1.2 needs attention, and 0.53 is well below, so it is red.
+  - question: A student can view another student's private note. What are the severity and the decision?
+    options:
+      - Medium severity, fix if capacity allows
+      - Low severity, backlog after release
+      - Critical severity, immediate priority, block the pilot
+      - High severity, fix before public release
+    answer: 2
+    explanation: A security exposure is critical. It has immediate priority, and the pilot is blocked until it is fixed and retested.
+  - question: In the weighted vendor-scoring example, Vendor B wins with 4.15. What is the main lesson?
+    options:
+      - The cheapest vendor always wins
+      - Weights should be equal for every criterion
+      - The score informs the decision but does not replace judgement
+      - A vendor must lead on every criterion to win
+    answer: 2
+    explanation: B wins overall without leading every criterion. The score informs the choice, and risks such as a sandbox delay may still change it.
+  - question: Which describes corrective action rather than a change request?
+    options:
+      - Reassigning a developer to clear the testing backlog
+      - Extending the release date by a month
+      - Raising the budget by 20%
+      - Adding an analytics dashboard to the scope
+    answer: 0
+    explanation: Corrective action restores performance within the approved baseline. Changing scope, time or cost needs a change request and sponsor approval.
+  - question: Which RAG colour means "not on target, but recoverable"?
+    options:
+      - Green
+      - Blue
+      - Red
+      - Amber
+    answer: 3
+    explanation: Green is on target, amber is not on target but recoverable, and red is not on target with recovery difficult.
+  - question: Which counts as strong evidence of progress?
+    options:
+      - The task is "almost finished"
+      - Acceptance criteria pass and the stakeholder accepted the work
+      - The team works long hours
+      - Many tasks are in progress
+    answer: 1
+    explanation: Visible activity is not verified progress. Passed acceptance criteria, a met Definition of Done and stakeholder acceptance are strong evidence.
+  - question: BAC 200,000, PV 120,000, EV 100,000, AC 125,000. What is the EAC?
+    options:
+      - 225,000
+      - 250,000
+      - 240,000
+      - 200,000
+    answer: 1
+    explanation: CPI = 100,000 / 125,000 = 0.80, so EAC = 200,000 / 0.80 = 250,000 and VAC = −50,000.
+  - question: In the UniConnect week-8 crisis, the sponsor asks for an analytics dashboard (out of scope). What is the right first response?
+    options:
+      - Say yes to keep the sponsor happy
+      - Say no because it is out of scope
+      - Quietly add it using the testers
+      - Do an impact assessment and raise a change request
+    answer: 3
+    explanation: The request goes through change control. It is neither a silent yes nor an automatic no; it needs an impact assessment and a sponsor decision.
+  - question: Which is a benefit of EVA?
+    options:
+      - It gives early warning and forecasting with one unit of measure
+      - It removes the need for a WBS
+      - It guarantees the project finishes on budget
+      - It replaces risk management
+    answer: 0
+    explanation: EVA uses one unit for total progress, a consistent method for cost and work, forecasting and early warning. It still needs a full WBS.
+fact:
+  title: Why "90% done" lasts so long
+  body: Self-reported progress measures effort, not finished value. A task can stay "90% complete" for weeks because the last part (integration, testing, fixing) is the most uncertain. That is why EVA is only as good as the evidence behind the percent complete.
+lab:
+  title: EVA & Weighted Vendor Scoring Drills
+  variations:
+    - title: Estimate at Completion
+      question: A project has <b>BAC = UGX 60 million</b>. The plan says <b>50%</b> should be done, <b>40%</b> is verified complete, and <b>UGX 27 million</b> has been spent. Using EAC = BAC / CPI, what is the EAC in <b>UGX million</b>?
+      answer: 67.5
+      tolerance: 0.05
+      unit: UGX million
+      hint: EV = 0.40 × 60 = 24. CPI = EV / AC. Then divide BAC by CPI.
+      explanation: EV = 0.40 × 60 = 24. CPI = 24 / 27 = 0.889. EAC = 60 / 0.889 = 67.5 (the slide form (60 − 24)/0.889 + 27 gives the same).
+    - title: Critical ratio
+      question: A project has <b>BAC = UGX 240 million</b>. The plan says <b>50%</b> done, <b>45%</b> is verified complete and <b>UGX 135 million</b> is spent. What is the <b>critical ratio</b> (SPI × CPI)? Give two decimal places.
+      answer: 0.72
+      tolerance: 0.01
+      hint: PV = 120, EV = 108, AC = 135. Then SPI = EV/PV and CPI = EV/AC.
+      explanation: SPI = 108/120 = 0.90 and CPI = 108/135 = 0.80. CR = 0.90 × 0.80 = 0.72, which is below 0.9, so it needs action.
+    - title: Variance at completion (Paper A)
+      question: A <b>UGX 80 million</b> mobile-banking project is at month 4. Plan says <b>40%</b> done, verified progress is <b>35%</b> and <b>UGX 30 million</b> is spent. What is VAC = BAC − EAC in <b>UGX million</b>? (Use EAC = BAC / CPI.)
+      answer: -5.71
+      tolerance: 0.05
+      unit: UGX million
+      hint: EV = 28. CPI = 28/30 = 0.9333. EAC = 80 / 0.9333.
+      explanation: EAC = 80 / 0.9333 = 85.71. VAC = 80 − 85.71 = −5.71, a forecast overrun of about UGX 5.7 million.
+    - title: Efficiency needed to finish on budget (TCPI)
+      question: BAC is <b>USD 100,000</b>, EV is <b>USD 40,000</b> and AC is <b>USD 60,000</b>. What is the <b>TCPI</b> = (BAC − EV) / (BAC − AC)?
+      answer: 1.5
+      tolerance: 0.01
+      hint: Remaining work = 100,000 − 40,000. Remaining money = 100,000 − 60,000.
+      explanation: TCPI = 60,000 / 40,000 = 1.5. The team would need 1.5 units of value per unit of money on the rest of the work, which is unrealistic when CPI so far is 0.667.
+    - title: Weighted vendor score (Paper B, Vendor Y)
+      question: "Weights: Security 40%, Reliability and support 30%, Integration 20%, Cost 10%. Vendor Y scores <b>3, 5, 4, 4</b> in that order. What is Y's weighted score?"
+      answer: 3.9
+      tolerance: 0.01
+      hint: 0.4×3 + 0.3×5 + 0.2×4 + 0.1×4.
+      explanation: 1.2 + 1.5 + 0.8 + 0.4 = 3.90. X and Z both score 3.70, so Y has the highest score, but with security at only 3 you would set a minimum threshold.
+    - title: Weighted vendor score (UniConnect, Vendor A)
+      question: "Weights: Integration 30%, Reliability 25%, Support 20%, Security 15%, Cost 10%. Vendor A scores <b>5, 4, 3, 4, 3</b>. What is A's weighted score? (The slide prints 4.10, so check it yourself.)"
+      answer: 4
+      tolerance: 0.01
+      hint: 1.5 + 1.0 + 0.6 + 0.6 + 0.3.
+      explanation: 1.5 + 1.0 + 0.6 + 0.6 + 0.3 = 4.00, not 4.10 (the slide total looks like an error). B (4.15) still wins, and A ties with C at 4.00.
+notes:
+  - heading: "Start here: the big idea in plain words"
+    body: |
+      **The idea:** once a project plan is approved, the work begins. Running a project is like driving a car on a long trip. You drive (execution) and you also watch the dashboard (monitoring) and steer back when you drift (control). You never do one without the other.
+
+      **What this paper covers:**
+
+      - **Execution:** the team, who does what (RACI), how people talk, buying from vendors, and quality.
+      - **Monitoring and control:** checking real progress against the plan, reporting status with traffic lights, and deciding what to do.
+      - **Earned Value Analysis (EVA):** a way to turn "how far are we?" and "what did it cost?" into numbers you can compare.
+
+      **Words you need first:**
+
+      - **Baseline:** the approved plan. It is the line you measure against.
+      - **Variance:** the difference between plan and reality.
+      - **Corrective action:** a fix that brings you back to the plan.
+      - **Change request:** a formal request to change the plan itself.
+
+      **In the exam:** expect an EVA calculation (always show formulas and interpret), RACI, QA versus QC, status or RAG reporting, and corrective action versus change request.
+  - heading: The execution cycle and the UniConnect case
+    body: |
+      **What it is:** five questions keep the project manager (PM) focused while the work is being delivered.
+
+      1. **Can the team perform the work?** (team, roles, communication)
+      2. **What may go wrong, and what has gone wrong?** (risks and issues, see the Risk module)
+      3. **Are vendors delivering what they promised?** (procurement)
+      4. **Does the product meet the required quality?** (QA and QC)
+      5. **Are we still on track, and what should change?** (monitoring and control)
+
+      **Execution and control happen together.** *Execution* coordinates people and resources, completes activities, manages communication and vendors, and produces deliverables. *Monitoring and control* compares actuals with the baseline, finds variance, risks, issues and defects, forecasts outcomes, and approves or recommends corrective action. The PM moves between both.
+
+      **The UniConnect case (from the slides):** a fictional Ugandan university builds a student appointment and academic advising platform.
+
+      | Item | Detail |
+      |---|---|
+      | Baseline | 12 weeks, UGX 36 million, 6-person core team, 2 external vendors |
+      | In release 1 | Login, appointment management, SMS reminders, staff dashboard, basic reports |
+      | Excluded | Native mobile app, online payments, AI advising chatbot, advanced analytics |
+      | Goal | Reduce queues and missed advising appointments before the next semester |
+
+      **In the exam:** a question may give you a case like this. Quote its numbers and link your answer to its goal.
+  - heading: Teams, responsibility, accountability and RACI
+    body: |
+      **What it is and why it matters:** a team needs more than technical skill. It needs a shared goal, **role clarity**, working agreements, **psychological safety** (people raise errors and blockers early) and delivery discipline.
+
+      **Everyday comparison:** a kitchen. Many cooks may chop (responsible), but one head chef answers for the dish going out (accountable).
+
+      **Responsibility vs accountability:**
+
+      - **Responsibility** = carrying out the activity. It can be shared and changes as work moves through analysis, development and testing.
+      - **Accountability** = owning the final outcome or decision. It should be **clear and singular**, and it does not disappear when work is delegated.
+      - *Delegating a task transfers the work, not the ownership of the outcome.*
+
+      **RACI:**
+
+      - **R**esponsible: does the work.
+      - **A**ccountable: owns the outcome, gives final approval.
+      - **C**onsulted: gives input before.
+      - **I**nformed: told after.
+
+      **The rule: one Accountable role per important activity.** It stops "everyone owned it, so no one did".
+
+      **Tiny example (from the slides):**
+
+      | Activity | PM | Product owner | Developers | QA | DevOps |
+      |---|---|---|---|---|---|
+      | Prioritise backlog | C | **A/R** | C | I | I |
+      | Build booking feature | I | C | **A/R** | C | C |
+      | Approve release quality | C | **A** | C | R | C |
+      | Deploy to production | **A** | I | C | C | R |
+      | Escalate vendor delay | **A/R** | I | C | I | C |
+
+      Check each row: exactly one A. A person can be both A and R (A/R) when they own and do the work.
+
+      **In the exam:** "What do the four letters mean, and why only one A?" Four meanings (2 marks), then: one A keeps ownership singular so decisions do not fall between people, and someone answers for the result even when work is delegated (2 marks).
+  - heading: Communication, meetings and conflict
+    body: |
+      **What it is:** a **communication plan** says who gets what information, how, and how often. Each line has an audience, a purpose (the decision or action it supports), the content (level of detail), the channel and frequency, and an owner and record.
+
+      **From the slides (UniConnect):**
+
+      | Audience | Purpose | Channel | Frequency | Owner |
+      |---|---|---|---|---|
+      | Delivery team | Coordinate, expose blockers | Daily stand-up | Daily | Team lead |
+      | Product owner | Clarify priority, accept work | Review session | Twice weekly | PM |
+      | Sponsor | Status, risks, decisions | One-page report | Weekly | PM |
+      | SMS vendor | Integration actions, SLA | Technical call + action log | Weekly / urgent | DevOps |
+      | Pilot users | Usability, acceptance feedback | Test session | Milestones | BA/UX |
+
+      **Meetings must produce movement:**
+
+      - **Daily stand-up:** coordinate, expose impediments.
+      - **Planning:** select work that fits priority and capacity.
+      - **Review:** inspect work with stakeholders.
+      - **Issue huddle:** one urgent problem leads to an assigned action.
+      - **Retrospective:** improve how the team works.
+
+      **Blockers and conflict:**
+
+      - *Healthy:* describe the observable problem, explore impact and cause, agree an owner and next action, escalate when authority or capacity is insufficient.
+      - *Damaging:* blame before understanding the system, hide the issue, wait for the next meeting, confuse disagreement with disloyalty.
+
+      **Scenario from the slides (dev vs QA):** QA says the booking feature fails acceptance tests. The developer says requirements changed mid-sprint. QA says the change was discussed in a meeting. The demo is in 2 days and they are blaming each other in the group chat.
+
+      **First action:** move the discussion out of the group chat and **restore evidence and role clarity**. Get the current acceptance criteria from the product owner (accountable for requirements), confirm which version is authoritative, record the decision, then agree an owner and next action for the fix and the demo scope. Afterwards fix the *system* (requirement changes go through the backlog with updated acceptance criteria), not the people.
+
+      **In the exam:** the answer is evidence and roles first, blame never.
+  - heading: Procurement and vendor management
+    body: |
+      **What it is and why it matters:** software projects buy things: **infrastructure** (hosting, backup), **software** (licences, databases), **digital services** (SMS, payments, identity APIs), **people** (consultants, auditors) and **equipment**. A late or weak vendor can stop your whole project.
+
+      **Everyday comparison:** cooking dinner. You can grow your own vegetables (build), buy them at the market (buy), or sign up for a weekly box (subscribe).
+
+      **Make, buy or subscribe:**
+
+      - **Build:** control and fit, but needs skill, time and maintenance.
+      - **Use a vendor:** speed and proven capability, but brings cost, integration work, **lock-in** and dependence.
+      - **Hybrid:** keep unique logic in-house, use vendors for common services (the UniConnect answer for SMS).
+
+      **Evaluate against the full requirement, not only price:** functional fit and integration effort; reliability, security, compliance; schedule and support; total cost and payment terms; **data ownership and exit options**.
+
+      **Weighted scoring (rule):** score = sum of (weight × score) over all criteria. Weights add to 100%.
+
+      **Tiny example, from the slides (UniConnect SMS vendors):**
+
+      | Criterion | Weight | A | B | C |
+      |---|---|---|---|---|
+      | Integration and sandbox readiness | 30% | 5 | 3 | 4 |
+      | Reliability and delivery reporting | 25% | 4 | 5 | 3 |
+      | Support response | 20% | 3 | 5 | 4 |
+      | Security and data handling | 15% | 4 | 4 | 5 |
+      | Total cost | 10% | 3 | 4 | 5 |
+      | **Weighted score** | 100% | 4.00 | **4.15** | 4.00 |
+
+      **Deck error to know:** the slide prints A as 4.10, but its own working (1.5 + 1.0 + 0.6 + 0.6 + 0.3) adds to **4.00**, and C is also 4.00. The winner does not change: **B at 4.15 wins without leading every criterion.** The score informs the decision rather than replacing judgement (if the sandbox delay is the biggest risk, A's readiness may matter more).
+
+      **Contracts cover:** scope and deliverables; **service levels** (availability, response, resolution, performance); security and data (incident notification, ownership); **acceptance criteria**; change, payment, termination, remedies and exit support.
+
+      **Managing vendors:** onboard (contacts, access, plan) then track milestones and SLAs with evidence, review changes, defects and invoices, **escalate non-performance with facts and recovery options**, and finally handover and exit.
+
+      **In the exam:** show the working for every vendor, then recommend and say why the top score is not automatic (Paper B: health data needs a minimum security score).
+  - heading: Quality assurance vs quality control
+    body: |
+      **What it is and why it matters:** quality means the product does what was required and is fit for use. QA and QC attack quality from two sides.
+
+      **Everyday comparison:** a restaurant. QA is the recipe, training and kitchen hygiene (prevents bad food). QC is the chef tasting the dish before it leaves (detects bad food).
+
+      | Quality assurance (QA) | Quality control (QC) |
+      |---|---|
+      | **Prevents** defects by improving the **process** | **Detects** defects in the **product** |
+      | Standards, reviews, checklists, working agreements | Testing, inspection, measurement, acceptance |
+      | "Are we using a capable method?" | "Does the output meet requirements?" |
+
+      **Practices:**
+
+      - Requirement review (prevent ambiguity).
+      - Code review (prevent and detect).
+      - Automated tests (detect regressions, meaning old features broken by new changes).
+      - Exploratory testing (find the unexpected).
+      - **UAT**, user acceptance testing (confirm fitness for use).
+
+      **Testing levels:** unit, then integration, then system, then acceptance.
+
+      **Definition of Done:** code completed and reviewed; acceptance criteria pass; required tests pass; security and documentation checks complete; integrated into a usable increment.
+
+      **In the exam:** "Distinguish QA from QC with one practice of each" (4 marks): QA prevents via process (code-review standards, Definition of Done); QC detects in the product (testing, UAT).
+  - heading: Defects, severity and priority
+    body: |
+      **What it is:** a defect is a flaw in the product. Two separate questions apply to it.
+
+      - **Severity** = technical or user impact. *Critical:* security exposure, data loss, core service down. *High:* major function fails with no workaround. *Medium:* a workaround exists. *Low:* cosmetic.
+      - **Priority** = how soon to act. It depends on severity, timing, users affected and release goals.
+
+      **Everyday comparison:** a small stain on your shirt (low severity) matters a lot (high priority) five minutes before an interview.
+
+      **UniConnect defects (from the slides):**
+
+      | Defect | Severity | Priority | Decision |
+      |---|---|---|---|
+      | Student can view another student's private note | Critical | Immediate | **Block pilot** until fixed and retested |
+      | SMS reminder sent twice on reschedule | High | High | Fix before public release |
+      | Report exports wrong date label | Medium | Medium | Fix if capacity allows, or document a workaround |
+      | Button misaligned on one phone | Low | Low | Backlog after release |
+
+      **Quality metrics:** defects by severity and age; test pass rate; coverage of critical journeys; **escaped defects** (defects found after release); performance and security measures; **technical debt** accepted (and its repayment plan).
+
+      **In the exam:**
+
+      - Low severity, high priority: a misspelled company name on the login page before a launch demo.
+      - High severity, low priority: a crash in an admin export used once a year after launch.
+  - heading: Monitoring and control, RAG and reporting
+    body: |
+      **What it is and why it matters:** things do not go to plan however well you prepare, so you must detect and respond to deviations.
+
+      - **Monitoring:** collecting, recording and reporting information about project performance.
+      - **Controlling:** using that data to bring actual performance in line with planned performance.
+      - **Outputs:** performance reports, change requests, plan updates.
+
+      **Four control activities:** (1) plan performance (baseline and a control process); (2) **measure** status (actuals); (3) **compare** to the baseline (variances); (4) **take corrective action**. *"The prerequisite to good control is a good plan."*
+
+      **Control principles:** control guides a course of action; it is not domination. **Work is controlled, not workers.** Control is based on **work completed**. Balance too much against too little (micro-managing versus neglect).
+
+      **Three progress-monitoring questions:** What is the actual status? If there is a variance, what is the cause? What do we do about it? **Responses:** ignore, take corrective action, or review the plan.
+
+      **Status report format:** summary; accomplishments this period; plans for next period; risk analysis; issues and actions. Aim for weekly, more often in a crisis.
+
+      **Traffic-light (RAG) assessment:** break key elements into sub-elements, rate each, roll up.
+
+      | Colour | Meaning |
+      |---|---|
+      | **Green** | On target |
+      | **Amber** | Not on target but recoverable |
+      | **Red** | Not on target, recovery difficult (UniConnect version: an objective or baseline needs urgent intervention) |
+
+      **In the exam:** name the four control activities and the three questions (4 marks, Paper B B1c), and justify the RAG colour you choose.
+  - heading: From variance to action
+    body: |
+      **The five steps:** 1. **Baseline:** the approved plan. 2. **Actual:** *verified* work, cost, quality and dates. 3. **Variance:** the meaningful difference. 4. **Forecast:** the likely outcome if conditions continue. 5. **Action:** the decision needed.
+
+      **Visible activity is not verified progress.**
+
+      - *Weak evidence:* "almost finished", many tasks in progress, long hours, code that is not integrated or tested.
+      - *Strong evidence:* acceptance criteria pass, Definition of Done met, the stakeholder accepted it.
+      - *"A task can stay 90% complete for a long time."*
+
+      **Visual controls:** task board, **burndown or burnup** chart, milestone tracker, defect trend, dependency log.
+
+      **Corrective action vs change request:**
+
+      | Within the approved baseline | Beyond the approved baseline |
+      |---|---|
+      | **Corrective action:** restores current performance | **Change request:** proposes a change to scope, time, cost or quality |
+      | **Preventive action:** reduces future exposure | **Impact assessment:** consequences and options |
+      | **Re-planning:** adjust assignments and sequence | **Authorised decision** updates the baseline and is communicated |
+
+      **Case: UniConnect at week 8 (from the slides).** 8 of 12 weeks gone (66.7%); verified scope **56% vs 75% planned**; UGX 25 million of 36 million spent (69.4%); **2 critical privacy defects** (pilot blocked); SMS vendor **10 days late**; one backend developer away for 5 days; the sponsor wants an analytics dashboard (out of scope). **Status: RED.**
+
+      **Recommended 72-hour response:**
+
+      - **0 to 4 hours:** contain the privacy exposure and freeze the pilot (QA and tech lead).
+      - **Same day:** vendor escalation, written recovery plan, assess a backup provider (PM and DevOps); reassign the critical backend work with a documented handover (tech lead).
+      - **24 hours:** reforecast scope, schedule, cost, defects and dependencies.
+      - **48 hours:** **sponsor decision on analytics through change control** and a revised release baseline.
+      - **72 hours:** communicate the plan; monitor recovery daily.
+
+      *Principle: protect users first, restore evidence, route baseline decisions to the sponsor.* The first response to the analytics request is an **impact assessment and change request**, not "yes" and not "no".
+
+      **In the exam:** Paper B A7 (4 marks): corrective action restores performance within the baseline (reassign a developer to clear a testing backlog); a change request changes the baseline (add an analytics dashboard, extend the date) and needs an impact assessment and sponsor approval.
+  - heading: Earned Value Analysis (EVA)
+    body: |
+      **What it is and why it matters:** EVA is "**what you got for what you paid**". Traditional tracking compares only planned cost with actual cost. EVA adds a third number, the **value earned** (physical progress), so you know whether the money bought the right amount of finished work.
+
+      **Everyday comparison:** you budget UGX 100,000 to paint 10 rooms. Halfway through the time you have spent UGX 50,000 but only 3 rooms are painted. Cost alone looks fine; value earned shows you are behind.
+
+      **The four inputs:**
+
+      | Term | Old name | Meaning | Nickname |
+      |---|---|---|---|
+      | **PV** | BCWS | Value of work that *should* be done by now | "Yearned" |
+      | **EV** | BCWP | Value of work *actually* done = BAC × % complete | "Earned" |
+      | **AC** | ACWP | What the done work actually cost | "Burned" |
+      | **BAC** | Budget at Completion | The total original budget | |
+
+      **The formulas:**
+
+      | Measure | Formula | Reading |
+      |---|---|---|
+      | **SV** | EV − PV | Negative = behind schedule |
+      | **CV** | EV − AC | Negative = over budget |
+      | **SPI** | EV / PV | Below 1 behind schedule; above 1 ahead |
+      | **CPI** | EV / AC | Below 1 over budget; above 1 under |
+      | **EAC** (slide formula) | ((BAC − EV) / CPI) + AC | Remaining work at current efficiency plus sunk cost; if CPI is below 1, EAC is above BAC. Algebraically equal to BAC / CPI |
+      | **CR** (critical ratio) | SPI × CPI | 1 = on track; between 0.9 and 1.2 = OK |
+      | *Gap-fill:* **ETC** | EAC − AC | Money still needed |
+      | *Gap-fill:* **VAC** | BAC − EAC | Expected overrun (negative) or saving |
+      | *Gap-fill:* **TCPI** | (BAC − EV) / (BAC − AC) | Efficiency needed on the remaining work to finish on budget |
+
+      The EAC, ETC, VAC and TCPI lines marked gap-fill are standard project-management knowledge, not from the slides. The slide formula for EAC and BAC / CPI give the same answer.
+
+      **Tiny worked case (full version in the examples):** BAC USD 100,000, 50% planned, 40% done, USD 60,000 spent. PV = 50,000, EV = 40,000, AC = 60,000. SPI = 0.80, CPI = 0.667, EAC = 150,000, CR = 0.53 (red).
+
+      **Benefits of EVA:** one unit of measure for total progress; a consistent method across cost and work; forecasting; **early warning**. **Success factor:** a full WBS covering all scope (otherwise "% complete" is guesswork). The **critical ratio** can be charted over time.
+
+      **In the exam:** always (1) write the formula, (2) put in the numbers, (3) interpret each result in words, (4) give a RAG colour and a recommended action. Mixed signals (Paper B: SPI 1.10 but CPI 0.92, CR about 1.01) must be discussed, because a CR near 1 can hide a cost overrun.
+examples:
+  - title: "EVA: the lecture's USD 100,000 project"
+    problem: |
+      A 12-month project has **BAC = USD 100,000**. After 6 months the plan says **50%** should be complete, **USD 60,000** has been spent, and only **40%** is actually complete. Calculate PV, EV, AC, SV, CV, SPI, CPI, EAC, VAC and the critical ratio, and say what to do.
+    steps:
+      - "**PV** = 50% × 100,000 = **USD 50,000**. **EV** = 40% × 100,000 = **USD 40,000**. **AC** = **USD 60,000**."
+      - "**SV** = EV − PV = 40,000 − 50,000 = **−USD 10,000**, so behind schedule. **CV** = EV − AC = 40,000 − 60,000 = **−USD 20,000**, so over budget."
+      - "**SPI** = 40,000 / 50,000 = **0.80** (progressing at 80% of the planned rate). **CPI** = 40,000 / 60,000 = **0.667** (USD 0.67 of value for every USD 1 spent)."
+      - "**EAC** = ((100,000 − 40,000) / 0.667) + 60,000 = 90,000 + 60,000 = **USD 150,000**, the same as 100,000 / 0.667. **VAC** = 100,000 − 150,000 = **−USD 50,000**."
+      - "**CR** = 0.80 × 0.667 = **0.53**. That is far outside 0.9–1.2, so the status is **red**: take corrective action and probably re-baseline through the sponsor."
+    answer: PV 50,000; EV 40,000; AC 60,000; SV −10,000; CV −20,000; SPI 0.80; CPI 0.667; EAC 150,000; VAC −50,000; CR 0.53 (red).
+    takeaway: Behind schedule and over budget at once, with a forecast overrun of 50%. Always interpret, not only calculate.
+  - title: "UniConnect in EVA terms (week 8)"
+    problem: |
+      UniConnect has **BAC = UGX 36 million**. At week 8 the plan says **75%** should be done, verified progress is **56%**, and **UGX 25 million** has been spent. Calculate PV, EV, SPI, CPI, EAC and CR, and give the status.
+    steps:
+      - "**PV** = 0.75 × 36 = **UGX 27 million**. **EV** = 0.56 × 36 = **UGX 20.16 million**. **AC** = **UGX 25 million**."
+      - "**SPI** = 20.16 / 27 = **0.75**. **CPI** = 20.16 / 25 = **0.81** (0.8064)."
+      - "**EAC** = 36 / 0.8064 = **about UGX 44.6 million**, which is about UGX 8.6 million over budget."
+      - "**CR** = 0.7467 × 0.8064 = **about 0.60**, far below 0.9, so **red**. This agrees with the slide's judgement and with the sum of problems (privacy defects, late vendor, absent developer)."
+    answer: PV 27m; EV 20.16m; SPI 0.75; CPI 0.81; EAC about 44.6m (about 8.6m over); CR about 0.60, so red.
+    takeaway: The numbers confirm what the traffic light says. Use both in a report.
+  - title: "Paper B: schedule ahead, cost over"
+    problem: |
+      A software project has **BAC = USD 120,000**. At the status date **PV = USD 60,000**, **EV = USD 66,000** and **AC = USD 72,000**. Calculate SV, CV, SPI, CPI, EAC, VAC and CR, and interpret them.
+    steps:
+      - "**SV** = 66,000 − 60,000 = **+USD 6,000** (ahead). **CV** = 66,000 − 72,000 = **−USD 6,000** (over budget)."
+      - "**SPI** = 66,000 / 60,000 = **1.10**. **CPI** = 66,000 / 72,000 = **0.917**."
+      - "**EAC** = 120,000 / 0.9167 = **about USD 130,900**. **VAC** = 120,000 − 130,909 = **about −USD 10,900**."
+      - "**CR** = 1.10 × 0.917 = **about 1.01**, which looks on track."
+      - "**Interpretation:** the team is ahead of schedule but over budget, perhaps buying speed with overtime or extra staff. CR about 1.0 **masks the cost problem**: the forecast overrun is about USD 10,900 (9%). Investigate the cost drivers and consider trading the schedule lead for lower spend."
+    answer: SV +6,000; CV −6,000; SPI 1.10; CPI 0.917; EAC about 130,900; VAC about −10,900; CR about 1.01. Ahead of schedule but over budget.
+    takeaway: Never read CR alone. Look at SPI and CPI separately.
+  - title: "Q&A drill: BAC 200,000 and Paper A B2"
+    problem: |
+      (a) BAC 200,000, PV 120,000, EV 100,000, AC 125,000. Analyse it. (b) Paper A B2: BAC UGX 80 million, plan 40% done at month 4, verified 35%, UGX 30 million spent. Calculate PV, EV, AC, SV, CV, SPI, CPI, EAC, VAC and CR.
+    steps:
+      - "**(a)** SV = 100,000 − 120,000 = **−20,000** (behind). CV = 100,000 − 125,000 = **−25,000** (over)."
+      - "**(a)** SPI = 100,000 / 120,000 = **0.833**. CPI = 100,000 / 125,000 = **0.80**. EAC = 200,000 / 0.8 = **250,000**. VAC = **−50,000**. CR = 0.833 × 0.80 = **0.67**, so red. Recommend finding root causes, corrective action, and presenting re-plan or scope options to the sponsor."
+      - "**(b)** PV = 0.40 × 80 = **UGX 32 million**. EV = 0.35 × 80 = **UGX 28 million**. AC = **UGX 30 million**."
+      - "**(b)** SV = 28 − 32 = **−4 million**. CV = 28 − 30 = **−2 million**. SPI = 28 / 32 = **0.875**. CPI = 28 / 30 = **0.933**."
+      - "**(b)** EAC = 80 / 0.9333 = **UGX 85.7 million** (or (80 − 28) / 0.9333 + 30 = 85.7). VAC = **−5.7 million**. CR = 0.875 × 0.933 = **0.82**, below 0.9."
+      - "**(b)** Status: **amber leaning red**. Both indices are below 1 and CR is below 0.9, but it is only month 4, so recovery is still credible. Red is acceptable if justified."
+    answer: "(a) EAC 250,000, VAC −50,000, CR 0.67, red. (b) PV 32m, EV 28m, AC 30m, SV −4m, CV −2m, SPI 0.875, CPI 0.933, EAC 85.7m, VAC −5.7m, CR 0.82, amber leaning red."
+    takeaway: Early in the project amber can still be defended, but the actions and sponsor decision must be clear.
+  - title: Weighted vendor scoring (UniConnect and Paper B)
+    problem: |
+      (a) Check the UniConnect SMS vendor scores: weights 30%, 25%, 20%, 15%, 10%; Vendor A scores 5, 4, 3, 4, 3. (b) Paper B: weights Security 40%, Reliability and support 30%, Integration 20%, Cost 10%. X scores 4, 3, 5, 2; Y scores 3, 5, 4, 4; Z scores 5, 2, 3, 5. Calculate each score and recommend.
+    steps:
+      - "**(a)** A = 0.30×5 + 0.25×4 + 0.20×3 + 0.15×4 + 0.10×3 = 1.5 + 1.0 + 0.6 + 0.6 + 0.3 = **4.00** (the slide prints 4.10, an error). B = 0.9 + 1.25 + 1.0 + 0.6 + 0.4 = **4.15**. C = 1.2 + 0.75 + 0.8 + 0.75 + 0.5 = **4.00**."
+      - "**(a)** B wins overall without leading every criterion. The score informs the decision rather than replacing judgement."
+      - "**(b)** X = 0.4(4) + 0.3(3) + 0.2(5) + 0.1(2) = 1.6 + 0.9 + 1.0 + 0.2 = **3.70**."
+      - "**(b)** Y = 1.2 + 1.5 + 0.8 + 0.4 = **3.90**. Z = 2.0 + 0.6 + 0.6 + 0.5 = **3.70**."
+      - "**(b)** Recommend **Y** as the highest score, but do not stop there. Health data is highly sensitive and Y scores only 3 on security. Set a minimum threshold on critical criteria (for example security at least 4), check data-protection law, data residency and breach notification, and verify Z (strongest on security, weak on reliability) with references, SLAs or a pilot."
+    answer: "(a) A 4.00, B 4.15, C 4.00, so B. (b) X 3.70, Y 3.90, Z 3.70, so recommend Y with a security threshold check."
+    takeaway: Show the working line by line, then add the judgement that marks reward.
+questions:
+  - question: Distinguish responsibility from accountability, and explain what the four letters of RACI mean and why an activity should have only one "A". [4 marks]
+    kind: short
+    marks: 4
+    keywords:
+      - responsible
+      - accountable
+      - consulted
+      - informed
+      - one a
+      - ownership
+      - delegate
+    idealAnswer: Responsible (does the work), Accountable (owns the outcome and approves it), Consulted (gives input before), Informed (told after). Responsibility can be shared; accountability must be singular. One A keeps ownership clear so decisions do not fall between people, and someone answers for the result even when the work is delegated. Delegating work does not delegate accountability.
+  - question: Distinguish quality assurance from quality control, with one practice of each. [4 marks]
+    kind: short
+    marks: 4
+    keywords:
+      - prevent
+      - process
+      - detect
+      - product
+      - code review
+      - testing
+      - definition of done
+    idealAnswer: QA prevents defects by improving the process, for example code-review standards, requirement reviews or a Definition of Done. QC detects defects in the product, for example running tests, UAT or inspections. QA asks "is our method capable?"; QC asks "does this output meet requirements?"
+  - question: Distinguish defect severity from priority, and give an example of a defect that is low in severity but high in priority. [4 marks]
+    kind: short
+    marks: 4
+    keywords:
+      - severity
+      - priority
+      - impact
+      - urgency
+      - release
+    idealAnswer: Severity is the technical or user impact of the defect; priority is how soon it should be fixed, given timing, users affected and release goals. Example of low severity but high priority is the client's logo misspelled on the login page just before a launch demo. A reverse example is a crash in an admin export used once a year (high severity, low priority).
+  - question: Distinguish corrective action from a change request, with an example of each. [4 marks]
+    kind: short
+    marks: 4
+    keywords:
+      - corrective action
+      - change request
+      - baseline
+      - impact assessment
+      - sponsor
+      - approval
+    idealAnswer: Corrective action restores performance within the approved baseline, for example reassigning a developer to clear a testing backlog. A change request proposes changing the baseline (scope, time, cost or quality), for example adding an analytics dashboard or extending the date. It needs an impact assessment and sponsor approval before implementation.
+  - question: "A 10-month mobile-banking project has a budget (BAC) of UGX 80 million. At the end of month 4 the schedule says 40% of the work should be complete. Verified progress is 35% and UGX 30 million has been spent. (a) Calculate PV, EV and AC. (b) Calculate SV, CV, SPI and CPI and interpret each. (c) Calculate EAC, VAC and the critical ratio. (d) What RAG status would you report, and why? Outline a one-page status report. (e) State two conditions needed for EVA figures to be trustworthy. [20 marks]"
+    kind: long
+    marks: 20
+    keywords:
+      - pv
+      - ev
+      - ac
+      - spi
+      - cpi
+      - eac
+      - vac
+      - critical ratio
+      - amber
+      - wbs
+      - verified
+    idealAnswer: "(a) PV = 0.40 × 80 = UGX 32m; EV = 0.35 × 80 = UGX 28m; AC = UGX 30m. (b) SV = 28 − 32 = −4m, behind schedule. CV = 28 − 30 = −2m, over budget. SPI = 28/32 = 0.875, so work progresses at 87.5% of the planned rate. CPI = 28/30 = 0.933, about 93 shillings of value per 100 spent. (c) EAC = 80/0.9333 = UGX 85.7m (or (80 − 28)/0.9333 + 30). VAC = 80 − 85.7 = −5.7m, a forecast overrun. CR = 0.875 × 0.933 = 0.82, below 0.9 and so outside the acceptable band. (d) Amber leaning red: both indices are below 1 and CR is below 0.9, but it is early (month 4) so recovery is credible with corrective action; red is acceptable if justified. Report: overall status and reason; progress (35% vs 40% and the EVA indices); top concerns (causes, risks, dependencies); actions with owners and dates (re-sequencing, resolving blockers, vendor follow-up); the decision needed from the sponsor (approve a re-plan or a scope trade-off). (e) A complete WBS covering all scope with budgets per work package; % complete based on verified completion (Definition of Done or acceptance), not effort; accurate actual-cost capture; a stable baseline."
+  - question: "A software project has BAC = USD 120,000. At the status date PV = USD 60,000, EV = USD 66,000 and AC = USD 72,000. (a) Calculate SV, CV, SPI, CPI, EAC, VAC and CR. (b) Interpret the results: is the project in trouble? (c) Describe the four activities of project control and the three progress-monitoring questions. (d) Explain visible activity versus verified progress, with examples. [20 marks]"
+    kind: long
+    marks: 20
+    keywords:
+      - spi
+      - cpi
+      - eac
+      - vac
+      - critical ratio
+      - ahead of schedule
+      - over budget
+      - baseline
+      - verified progress
+      - corrective action
+    idealAnswer: "(a) SV = +6,000; CV = −6,000; SPI = 1.10; CPI = 0.917; EAC = 120,000/0.9167 = about 130,900; VAC = about −10,900; CR = 1.10 × 0.917 = about 1.01. (b) Ahead of schedule (SPI 1.1) but over budget (CPI 0.92): the team may be buying speed with overtime or extra staff. CR about 1.0 looks on track but masks the cost problem: the forecast overrun is about 10,900 (9%). Investigate the cost drivers and consider trading the schedule lead for lower spend. (c) Control activities: plan performance (baseline), measure status, compare with the baseline (variance), take corrective action. Questions: what is the actual status? what caused the variance? what do we do about it? Responses: ignore, take corrective action, or revise the plan. (d) Visible activity is effort that does not prove completion: almost done, many tasks in progress, long hours, code not integrated or tested. Verified progress is evidence against completion criteria: acceptance criteria passed, Definition of Done met, stakeholder acceptance, milestones with traceable results."
+  - question: "A county health office needs a cloud hosting provider for a patient-referral system. Three vendors are scored 1 to 5. Weights: Security and data protection 40%, Reliability and support 30%, Integration effort 20%, Cost 10%. X scores 4, 3, 5, 2; Y scores 3, 5, 4, 4; Z scores 5, 2, 3, 5. (a) Calculate the weighted scores and recommend one. (b) Should the highest score automatically decide? (c) Explain the make, buy or subscribe decision. (d) List six contract items, and describe how you would manage a vendor who misses a milestone. [20 marks]"
+    kind: long
+    marks: 20
+    keywords:
+      - weighted score
+      - threshold
+      - security
+      - subscribe
+      - lock-in
+      - service level
+      - acceptance criteria
+      - escalate
+      - recovery plan
+      - exit
+    idealAnswer: "(a) X = 1.6 + 0.9 + 1.0 + 0.2 = 3.70; Y = 1.2 + 1.5 + 0.8 + 0.4 = 3.90; Z = 2.0 + 0.6 + 0.6 + 0.5 = 3.70. Recommend Y as the highest. (b) No: the score supports judgement. Health data is highly sensitive and Y scored only 3 on security, so set a minimum threshold on critical criteria (for example security at least 4) or check compliance with data-protection law, data residency and breach notification. Z is strongest on security but weak on reliability, so verify with references, SLAs or a pilot. (c) Building and running your own hosting gives control but needs skills, capital and maintenance. Subscribing gives speed, proven reliability and scalability but brings dependence, lock-in, cost and data-location concerns. Recommend subscribing to managed hosting (common, non-differentiating infrastructure) with strict contract terms, and keeping the referral logic in-house. (d) Contract: scope and deliverables; service levels (availability, response, resolution); security and data protection (access, retention, ownership, breach notification); acceptance criteria; change process; payment terms; termination, remedies and penalties; exit support and data return. Missed milestone: confirm the facts and the impact on the critical path; formally notify the vendor and request a written recovery plan with dates; invoke contract remedies or SLA credits; assess a backup option; escalate with evidence and options to the sponsor; update the risk and issue logs; protect the schedule by re-sequencing."
+  - question: At week 8 of UniConnect, verified scope is 56% against 75% planned, UGX 25 million of the 36 million budget is spent, two critical privacy defects block the pilot, the SMS vendor is 10 days late, and the sponsor asks for an out-of-scope analytics dashboard. Give the RAG status and your 72-hour response. [10 marks]
+    kind: long
+    marks: 10
+    keywords:
+      - red
+      - privacy
+      - freeze the pilot
+      - vendor escalation
+      - recovery plan
+      - reforecast
+      - change control
+      - impact assessment
+      - sponsor
+    idealAnswer: "Status is red: scope, cost, quality and schedule are all off target (SPI about 0.75, CPI about 0.81, CR about 0.60, EAC about UGX 44.6m). 0 to 4 hours: contain the privacy exposure and freeze the pilot (QA and tech lead). Same day: escalate to the SMS vendor and obtain a written recovery plan, assess a backup provider (PM and DevOps), and reassign the critical backend work with a documented handover (tech lead). 24 hours: reforecast scope, schedule, cost, defects and dependencies. 48 hours: take the analytics request through change control with an impact assessment, and get a sponsor decision and a revised release baseline. 72 hours: communicate the plan and monitor recovery daily. Principle: protect users first, restore evidence, route baseline decisions to the sponsor. The first response to the analytics request is an impact assessment and change request, not yes and not no."
