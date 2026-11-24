@@ -1,0 +1,595 @@
+id: wan-vpn
+title: WAN Concepts, VPNs and IPsec
+subtitle: WAN topologies and technologies, broadband and ISP connectivity, VPN types, GRE, DMVPN, VTI, MPLS VPNs and the IPsec framework
+recap: |
+  A WAN spans a large geographic area, is provided by a carrier for a fee, and is either private (dedicated, with
+  guaranteed service) or public (the internet). WAN standards are mostly Layer 1 and Layer 2. Traditional links are
+  leased lines (T1 1.544 Mbps, T3 43.7 Mbps, E1 2.048 Mbps, E3 34.368 Mbps), ISDN, Frame Relay and ATM; modern
+  WANs use dark fibre, Metro Ethernet and MPLS, with DSL, cable, FTTx, cellular and satellite as internet-based
+  broadband. A VPN carries private traffic over a public network using encryption, either site-to-site (gateways,
+  hosts unaware) or remote access (user initiated, clientless or client-based). IPsec is an open framework of
+  choices (AH or ESP, encryption, HMAC integrity, PSK or RSA authentication, Diffie-Hellman group) that together
+  form a security association; GRE over IPsec, DMVPN and VTI add multicast and routing-protocol support.
+traps:
+  - "Saying a hub-and-spoke WAN is the most fault tolerant. Full mesh is the most fault tolerant. The hub of hub-and-spoke is a single point of failure."
+  - "Confusing dual-homed and multihomed ISP connections. Dual-homed is two links to the same ISP; multihomed is links to two different ISPs; dual-multihomed (two links to each of two ISPs) is the most resilient and most expensive."
+  - "Calling the wrong layers WAN standards. WAN standards mostly operate at Layer 1 (SDH, SONET, DWDM) and Layer 2 (PPP, HDLC, Frame Relay, ATM, Metro Ethernet, MPLS). Layer 3 is not where WAN technology is defined."
+  - "Mixing up T and E rates. T1 is 1.544 Mbps and T3 is 43.7 Mbps (North America); E1 is 2.048 Mbps and E3 is 34.368 Mbps (Europe)."
+  - "Thinking cable bandwidth is dedicated like DSL. DSL is not shared between customers (modem to DSLAM at the CO); cable bandwidth is shared among subscribers on the segment via the CMTS."
+  - "Believing standard IPsec carries routing protocols. Standard IPsec carries unicast only. To run OSPF or other multicast-using protocols across it you need GRE over IPsec, DMVPN or an IPsec VTI."
+  - "Reversing the GRE terms. The passenger protocol is the original packet, the carrier protocol is GRE, and the transport protocol is IPv4 or IPv6 that actually moves the tunnel."
+  - "Saying AH encrypts. AH gives integrity and authentication only, with no confidentiality. ESP gives confidentiality plus authentication, so ESP is the normal choice."
+  - "Treating DH groups 1, 2 and 5 as acceptable. They should no longer be used; use 14, 15 or 16 (2048, 3072, 4096 bits) or the elliptic-curve groups 19, 20, 21 and 24."
+lesson:
+  checkpointStep: 6
+  steps:
+    - "A LAN covers a small area and the organisation owns it. A WAN spans a large geographic area, is owned by a provider and is paid for by subscription. A private WAN (leased line, Metro Ethernet, MPLS) gives guaranteed service, consistent bandwidth and security. A public WAN is the internet: cheaper and more flexible, but with no guarantees, so a VPN is added for security."
+    - "Topologies. Point-to-point: one link between two sites. Hub-and-spoke: branches connect to a central site, cheap, but the hub is a single point of failure. Dual-homed: each site connects to two hubs. Full mesh: every site to every other, the most fault tolerant but the most links. Partial mesh: a compromise. Carriers can be single-carrier or dual-carrier; dual gives redundancy and separate SLAs, where an SLA states expected reliability and availability."
+    - "The SPAN Engineering example shows WAN growth. Small office with DSL, then a campus (CAN) with a firewall and in-house IT, then branches linked as a MAN over private lines, then a distributed network with site-to-site and remote-access VPNs. Each step adds links and security."
+    - "WAN standards come from TIA/EIA, ISO and IEEE and are mostly Layer 1 and 2. Layer 1: SDH, SONET, DWDM. Layer 2: DSL and cable, wireless, Metro Ethernet, MPLS, PPP, HDLC, with Frame Relay and ATM now legacy. Key terms: CPE, DTE, DCE, demarcation point, local loop (last mile), CO, POP, toll network, backhaul and backbone. A CSU/DSU terminates a leased digital line."
+    - "Circuit-switched networks (PSTN, ISDN) set up a dedicated circuit for each call. Packet-switched networks (Metro Ethernet, MPLS, Frame Relay, ATM) share the carrier infrastructure. Leased lines are dedicated: T1 1.544 Mbps, T3 43.7 Mbps, E1 2.048 Mbps, E3 34.368 Mbps. Pros: simplicity, quality, availability. Cons: cost and limited flexibility. Frame Relay is NBMA with PVCs identified by DLCI; ATM uses fixed 53-byte cells."
+    - "Checkpoint: name the three modern WAN types, say which broadband technologies are not shared, and state what each of CE, PE and P means in an MPLS network."
+    - "Modern WANs. Dedicated broadband: dark fibre you light yourself. Packet-switched: Metro Ethernet (also EoMPLS, VPLS) and MPLS, where CE routers at the customer connect to PE routers at the provider edge and P routers form the core, forwarding by label; MPLS supports QoS, traffic engineering, redundancy and VPNs. Internet-based: DSL (ADSL, SDSL, DSLAM, PPPoE), cable (DOCSIS, CMTS, shared), FTTH/FTTB/FTTN, cellular, satellite, municipal Wi-Fi and WiMAX 802.16."
+    - "A VPN is virtual (a private network carried over a public one) and private (encrypted). Benefits: cost savings, security, scalability, compatibility with broadband. Site-to-site VPNs end on gateways and hosts are unaware; remote-access VPNs are built dynamically from a client. Enterprise VPNs (IPsec, SSL) are managed by the company; provider VPNs are MPLS Layer 2 or Layer 3. Remote access is clientless (browser, SSL) or client-based (for example Cisco AnyConnect)."
+    - "Extending IPsec: GRE is non-secure but carries multicast and other Layer 3 protocols, so GRE over IPsec lets OSPF cross a VPN (passenger = original packet, carrier = GRE, transport = IPv4/IPv6). DMVPN builds a full mesh dynamically from hub-and-spoke config using mGRE. IPsec VTI runs on a virtual interface and carries unicast and multicast without GRE. The IPsec framework: AH or ESP, DES/3DES/AES/SEAL, HMAC-MD5/SHA, PSK or RSA, DH groups, in transport or tunnel mode, all agreed into a security association."
+checkpoint:
+  question: Name the three modern WAN categories, say which of DSL and cable is not shared and why, and state the roles of the CE, PE and P routers in MPLS.
+  hint: Dedicated, packet-switched, internet-based. Think of where each router sits relative to the customer and the provider.
+  keywords:
+    - dark fibre
+    - Metro Ethernet
+    - MPLS
+    - internet-based
+    - DSL
+    - DSLAM
+    - CMTS
+    - shared
+    - CE
+    - PE
+    - P
+    - label
+  idealAnswer: "The three categories are dedicated broadband (dark fibre), packet-switched (Metro Ethernet and MPLS) and internet-based broadband (DSL, cable, fibre, cellular, satellite). DSL is not shared because each subscriber has a line from the DSL modem to the DSLAM at the central office; cable is shared, because subscribers on one segment share bandwidth through the CMTS at the headend. In MPLS the CE (customer edge) router is at the customer site, the PE (provider edge) router connects the customer to the provider network and adds or removes labels, and P (provider) routers in the core forward packets by label only."
+notes:
+  - heading: WAN purpose, ownership and topologies
+    body: |
+      | | LAN | WAN |
+      |---|---|---|
+      | Area | Small (a building or campus) | Large geographic area |
+      | Owner | The organisation | Service provider (leased) |
+      | Cost | Owned equipment, no fee | Subscription fee |
+      | Speed | High | Usually lower, depends on the service |
+
+      **Private WAN** (dedicated leased line, Metro Ethernet, MPLS): guaranteed service levels, consistent bandwidth, built-in security. **Public WAN** (the internet): low cost and available almost anywhere, but no guarantees, so a VPN is used for privacy.
+
+      **Topologies**
+
+      | Topology | Description | Point to remember |
+      |---|---|---|
+      | Point-to-point | One link between two sites | Simple, but not scalable |
+      | Hub-and-spoke | Branches connect to a central hub | Hub is a **single point of failure** |
+      | Dual-homed | Each spoke connects to two hubs | Redundancy for the hub |
+      | Full mesh | Every site linked to every other | **Most fault tolerant**, most expensive; n(n-1)/2 links |
+      | Partial mesh | Some, not all, site pairs linked | Compromise on cost and resilience |
+
+      **Carrier connections.** *Single-carrier*: one provider, simple but a single point of failure for the provider itself. *Dual-carrier*: two providers, giving redundancy and **separate SLAs**. An **SLA** (service level agreement) is the contract describing the expected reliability and availability.
+
+      **SPAN Engineering evolution.** Small office (broadband DSL) leads to a campus network (CAN, with a firewall and in-house IT staff), then branches over a MAN using private lines, then a distributed network that uses site-to-site and remote-access VPNs.
+  - heading: WAN standards, terms and devices
+    body: |
+      WAN access standards are defined by **TIA/EIA, ISO and IEEE** and mostly cover **Layer 1 (physical) and Layer 2 (data link)**.
+
+      | Layer | Technologies |
+      |---|---|
+      | Layer 1 | SDH, SONET, DWDM |
+      | Layer 2 | Broadband (DSL, cable), wireless, Metro Ethernet, MPLS, PPP, HDLC, Frame Relay (legacy), ATM (legacy) |
+
+      **Common terms**
+
+      | Term | Meaning |
+      |---|---|
+      | CPE | Customer premises equipment, at the subscriber site |
+      | DTE | Data terminal equipment, the customer device (router) that passes data to the WAN |
+      | DCE | Data circuit-terminating equipment, supplies clocking and the interface into the provider cloud (modem, CSU/DSU) |
+      | Demarcation point | Where the customer's responsibility ends and the provider's begins |
+      | Local loop (last mile) | Link from the customer to the provider's CO |
+      | CO | Central office, the provider's local facility |
+      | POP | Point of presence, where the carrier's network is accessed |
+      | Toll network | Provider backbone between COs |
+      | Backhaul | Carrying traffic from the edge to the core or another site |
+      | Backbone | High-capacity core network |
+
+      **WAN devices.** Voiceband modem (legacy dial-up), DSL or cable modem, **CSU/DSU** (terminates a leased digital line), optical converter (fibre), wireless router or access point, and WAN core devices (high-capacity routers and switches in the provider network).
+
+      **Serial vs parallel.** Parallel links send several bits at once but suffer **clock skew** over distance, so WANs use serial links.
+  - heading: Circuit-switched, packet-switched and traditional WAN links
+    body: |
+      | | Circuit-switched | Packet-switched |
+      |---|---|---|
+      | Path | Dedicated circuit set up for the call | Shared provider infrastructure |
+      | Examples | PSTN, ISDN | Metro Ethernet, MPLS, Frame Relay, ATM |
+      | Cost | Pay per connect time | Efficient sharing, often cheaper |
+
+      **Leased lines** are permanent point-to-point dedicated links, also called serial lines.
+
+      | Standard | Rate | Region |
+      |---|---|---|
+      | T1 | 1.544 Mbps | North America |
+      | T3 | 43.7 Mbps | North America |
+      | E1 | 2.048 Mbps | Europe |
+      | E3 | 34.368 Mbps | Europe |
+
+      **Pros:** simplicity, quality, availability. **Cons:** cost, limited flexibility (a separate line for each destination).
+
+      **Legacy technologies**
+
+      - **Dial-up**: under 56 kbps over the PSTN.
+      - **ISDN**: circuit switched, 45 kbps to 2.048 Mbps.
+      - **Frame Relay**: packet switched, **NBMA**; virtual circuits (PVCs) are identified by a **DLCI**.
+      - **ATM**: cell-based, with fixed **53-byte cells** (5-byte header and 48-byte payload) so that delay is predictable for voice and video.
+
+      Most of these have been replaced by Ethernet-based WANs and MPLS.
+  - heading: Modern WANs and internet-based broadband
+    body: |
+      **Modern WAN options**
+
+      | Category | Technologies | Notes |
+      |---|---|---|
+      | Dedicated broadband | **Dark fibre** | Unused fibre the customer lights and runs with their own equipment, for example DWDM |
+      | Packet-switched | **Metro Ethernet** (EoMPLS, VPLS), **MPLS** | Ethernet at the WAN edge, simpler and cheaper to manage |
+      | Internet-based | DSL, cable, fibre, cellular, satellite, municipal Wi-Fi, WiMAX | Cheap; needs a VPN for security |
+
+      **MPLS** routers: **CE** (customer edge) at the customer site, **PE** (provider edge) which connects to the CE and adds or removes labels, and **P** (provider) core routers. Provider routers are **label switching routers (LSRs)** that forward on a short label, not an IP lookup at each hop. MPLS supports **QoS, traffic engineering, redundancy and VPNs**, and it is protocol independent.
+
+      **Internet-based wired broadband**
+
+      | Type | Key components | Characteristics |
+      |---|---|---|
+      | DSL | DSL modem at the customer, **DSLAM** at the CO | ADSL (asymmetric) vs SDSL (symmetric); speed falls with distance; line is **not shared** |
+      | Cable | **DOCSIS**, coaxial and optical node, headend with **CMTS** | Bandwidth **shared** with other subscribers |
+      | Fibre (FTTx) | FTTH (home), FTTB (building), FTTN (node/neighbourhood) | **Highest bandwidth** |
+
+      **PPPoE** runs PPP over Ethernet so a DSL provider can authenticate subscribers, assign addresses and monitor link quality. The client can be a host or the router itself.
+
+      **Wireless broadband:** **cellular** (3G/4G/5G), **satellite** (remote areas, high latency), **municipal Wi-Fi** and **WiMAX (IEEE 802.16)**.
+
+      **ISP connectivity options**
+
+      | Option | Meaning | Resilience |
+      |---|---|---|
+      | Single-homed | One link to one ISP | Lowest |
+      | Dual-homed | Two links to the same ISP | Link failure only |
+      | Multihomed | Links to two different ISPs | ISP failure |
+      | Dual-multihomed | Two links to each of two ISPs | Highest, most expensive |
+  - heading: VPN concepts and types
+    body: |
+      A **VPN** is **virtual** (a private network carried over a public network) and **private** (traffic is encrypted and authenticated). It is a tunnel between two endpoints over the internet.
+
+      **Benefits:** cost savings (no leased lines), security (encryption and authentication), scalability (add sites over existing internet), compatibility with broadband.
+
+      | Type | Description |
+      |---|---|
+      | **Site-to-site** | Built permanently between **VPN gateways** (routers, firewalls). Hosts send normal traffic and are **unaware** of the VPN |
+      | **Remote access** | Created **dynamically** between a user's client and a terminating device when the user initiates it |
+
+      **Enterprise vs service-provider VPNs**
+
+      - **Enterprise VPNs** are managed by the company: **IPsec** and **SSL**.
+      - **Service-provider VPNs** are managed by the carrier: **MPLS Layer 2 and Layer 3 VPNs**.
+
+      **Remote access: clientless vs client-based**
+
+      - *Clientless*: a web browser over **SSL/TLS** (HTTPS). Suits web applications and file sharing from any device.
+      - *Client-based*: VPN client software such as **Cisco AnyConnect**, which gives full network access.
+
+      **IPsec vs SSL**
+
+      | Feature | IPsec | SSL |
+      |---|---|---|
+      | Applications | All IP-based applications | Web-enabled applications and file sharing, e-mail |
+      | Authentication | Strong, using two-way (shared secrets or digital certificates) | Moderate, one-way or two-way |
+      | Encryption | 56-bit to 256-bit | 40-bit to 256-bit |
+      | Connection complexity | Medium; needs client software | Low; just a web browser |
+      | Connection options | Limited to devices with the client configured | Any device with a browser |
+  - heading: GRE, DMVPN, IPsec VTI and MPLS VPNs
+    body: |
+      **Why IPsec alone is not enough.** Standard IPsec carries **unicast only**. Routing protocols such as OSPF and EIGRP use multicast, so they cannot cross a plain IPsec VPN.
+
+      **GRE** (Generic Routing Encapsulation) is a tunnelling protocol that can carry **multicast, broadcast and other Layer 3 protocols**, but it is **not secure** (no encryption or authentication). **GRE over IPsec** combines both: GRE carries the routing protocol; IPsec encrypts the GRE packets.
+
+      | Term | Meaning |
+      |---|---|
+      | **Passenger protocol** | The original packet being carried (for example IPv4 data or an OSPF update) |
+      | **Carrier protocol** | **GRE**, which encapsulates the passenger |
+      | **Transport protocol** | **IPv4 or IPv6**, which carries the encapsulated packet across the network |
+
+      **DMVPN** (Dynamic Multipoint VPN) is a Cisco solution. The administrator configures **hub-and-spoke**, but the network builds a **dynamic full mesh**: it uses **mGRE** (multipoint GRE) so spokes create **spoke-to-spoke tunnels on demand** instead of sending everything via the hub.
+
+      **IPsec Virtual Tunnel Interface (VTI)** is configured on a **virtual interface**. It carries **unicast and multicast**, so routing protocols work **without GRE**, and configuration is simpler.
+
+      **MPLS VPNs (service provider)**
+
+      | | Layer 3 MPLS VPN | Layer 2 MPLS VPN |
+      |---|---|---|
+      | Provider role | **Peers with customer routers** and takes part in customer routing | No customer routing; provider just transports frames |
+      | Example | Provider routes customer prefixes via PE routers | **VPLS** emulates an Ethernet multiaccess LAN |
+      | Customer sees | A routed next hop | A switched Ethernet segment |
+  - heading: The IPsec framework
+    body: |
+      **IPsec** is an **open framework** of IETF standards. It does not fix the algorithms; each slot is filled and the choices together form a **security association (SA)**. Its functions are **confidentiality** (encryption), **integrity** (hashing), **origin authentication** (IKE) and **secure key exchange** (Diffie-Hellman).
+
+      | Function | Options | Notes |
+      |---|---|---|
+      | Encapsulation | **AH** | Integrity and authentication only, **no confidentiality** |
+      | | **ESP** | **Confidentiality + authentication** (and integrity); usual choice |
+      | Encryption | **DES** | 56-bit key, weak |
+      | | **3DES** | Three 56-bit keys applied to each 64-bit block |
+      | | **AES** | 128, 192 or 256-bit key; recommended |
+      | | **SEAL** | Stream cipher, 160-bit key |
+      | Integrity | **HMAC-MD5** | MD5, 128-bit |
+      | | **HMAC-SHA** | SHA, 160-bit (as stated on the slides) |
+      | Authentication | **PSK** | Easy to set up but does not scale |
+      | | **RSA** | Digital certificates; scalable and stronger |
+      | Key exchange | **Diffie-Hellman** | See groups below |
+
+      **Diffie-Hellman groups**
+
+      | Groups | Status | Key size |
+      |---|---|---|
+      | 1, 2, 5 | **Should no longer be used** | 768, 1024, 1536 bits |
+      | 14, 15, 16 | Acceptable | 2048, 3072, 4096 bits |
+      | 19, 20, 21, 24 | Elliptic-curve (ECC) and modp | 256, 384, 521 (ECC); 24 is 2048 bits |
+
+      A larger group gives stronger keys but takes more CPU.
+
+      **Transport vs tunnel mode**
+
+      | | Transport mode | Tunnel mode |
+      |---|---|---|
+      | Original IP header | **Kept**; ESP header inserted after it | **Encapsulated**; a **new outer IP header** is added |
+      | Protects | The payload (and ESP trailer) | The whole original packet |
+      | Typical use | Host-to-host traffic | **Site-to-site VPNs** and the default for gateways |
+
+      A minimal site-to-site idea in IOS: create an IKE policy (encryption, hash, authentication, DH group), a transform set (for example `esp-aes 256 esp-sha-hmac`), a crypto ACL for interesting traffic, a crypto map and apply it to the outside interface. Configuration is outside the slides' scope, but the choices above are exactly the knobs.
+  - heading: Sources
+    body: |
+      - Cisco ENSA v7.0 lecture slides, Module 7 (WAN Concepts)
+      - Cisco ENSA v7.0 lecture slides, Module 8 (VPN and IPsec Concepts)
+      - RFC 4301, Security Architecture for the Internet Protocol: https://www.rfc-editor.org/rfc/rfc4301
+      - RFC 4302, IP Authentication Header: https://www.rfc-editor.org/rfc/rfc4302
+      - RFC 4303, IP Encapsulating Security Payload (ESP): https://www.rfc-editor.org/rfc/rfc4303
+      - RFC 2784, Generic Routing Encapsulation (GRE): https://www.rfc-editor.org/rfc/rfc2784
+      - RFC 3031, Multiprotocol Label Switching Architecture: https://www.rfc-editor.org/rfc/rfc3031
+      - RFC 4364, BGP/MPLS IP Virtual Private Networks (VPNs): https://www.rfc-editor.org/rfc/rfc4364
+      - RFC 2516, A Method for Transmitting PPP Over Ethernet (PPPoE): https://www.rfc-editor.org/rfc/rfc2516
+examples:
+  - title: Choosing a WAN topology
+    problem: A company has a head office and 9 branches. Compare the number of links needed for hub-and-spoke and for a full mesh, and say which is more fault tolerant.
+    steps:
+      - "There are 10 sites in total (1 head office + 9 branches)."
+      - "Hub-and-spoke: each branch has one link to the hub, so 9 links."
+      - "Full mesh: every pair of sites is linked, n(n-1)/2 = 10 × 9 / 2 = 45 links."
+      - "Hub-and-spoke has a single point of failure at the hub: if it fails, all branches lose each other and the head office."
+      - "Full mesh survives any single link or site failure, because every pair has a direct path, but it costs 5 times as many links."
+    answer: 9 links for hub-and-spoke, 45 links for full mesh. Full mesh is the more fault tolerant.
+    takeaway: Fault tolerance in full mesh is bought with a quadratic increase in links, which is why partial mesh and DMVPN are popular compromises.
+  - title: Leased line capacity for a branch
+    problem: "A UK branch needs about 6 Mbps of dedicated capacity to head office. How many E1 lines would be required, and what total E1 rate does that give? Would a single E3 do?"
+    steps:
+      - "A UK branch uses the European hierarchy: E1 = 2.048 Mbps, E3 = 34.368 Mbps."
+      - "Lines needed = 6 / 2.048 = 2.93, so round up to 3 E1 lines."
+      - "Total = 3 × 2.048 = 6.144 Mbps, which meets the 6 Mbps requirement."
+      - "A single E3 gives 34.368 Mbps, far more than needed and more expensive. It would only be chosen if growth were expected."
+      - "A T1 (1.544 Mbps) would need 4 lines (6.176 Mbps) but T carriers are the North American standard."
+    answer: 3 × E1 = 6.144 Mbps. An E3 (34.368 Mbps) would work but is oversized.
+    takeaway: Know the rates and the region. Leased lines are sold in fixed steps, one reason Metro Ethernet and MPLS with flexible bandwidth replaced them.
+  - title: Matching the connection to the requirement
+    problem: "Choose the best technology. (a) Home worker, cheap, shares the street's bandwidth. (b) Customer wants the provider to route its prefixes between 12 sites. (c) Remote-area site with no cable or DSL. (d) Company needs maximum bandwidth to a new building."
+    steps:
+      - "(a) Cable broadband: DOCSIS, CMTS at the headend, bandwidth shared with neighbours."
+      - "(b) A Layer 3 MPLS VPN: the provider peers with the customer's CE routers and takes part in the customer's routing. A Layer 2 VPN (VPLS) would leave routing to the customer."
+      - "(c) Satellite (or cellular if covered): works anywhere with line of sight, at the cost of higher latency."
+      - "(d) FTTx, specifically FTTB or FTTH, which gives the highest bandwidth of the wired broadband types."
+      - "Check each against the slide categories: dedicated, packet-switched or internet-based, and note which need a VPN for security (a, c)."
+    answer: (a) Cable. (b) Layer 3 MPLS VPN. (c) Satellite or cellular. (d) FTTx.
+    takeaway: Start from the requirement (sharing, routing, coverage, bandwidth) and map it to a technology and its trade-off.
+  - title: Labelling a GRE over IPsec packet
+    problem: An OSPF Hello from R1 is sent over a GRE over IPsec tunnel between two sites across the internet using IPv4. Identify the passenger, carrier and transport protocols, and explain why IPsec alone would fail.
+    steps:
+      - "The original packet being carried is the OSPF Hello, so the passenger protocol is OSPF (the IP packet carrying it)."
+      - "GRE encapsulates the passenger, so the carrier protocol is GRE."
+      - "The GRE packet is then sent across the network inside IPv4, so the transport protocol is IPv4 (it could be IPv6)."
+      - "IPsec ESP then encrypts and authenticates the GRE packet, giving confidentiality."
+      - "OSPF Hellos go to the multicast address 224.0.0.5. Standard IPsec carries unicast only, so it would not forward them; GRE can carry multicast, then IPsec protects the result as unicast between the tunnel endpoints."
+    answer: Passenger OSPF, carrier GRE, transport IPv4. IPsec alone carries unicast only, so OSPF multicast would not cross it.
+    takeaway: GRE adds multicast and routing-protocol support; IPsec adds the security. DMVPN and IPsec VTI solve the same problem in other ways.
+  - title: Building an IPsec security association
+    problem: "Two routers must build a site-to-site IPsec VPN. The policy requires confidentiality, integrity, scalable authentication, and a Diffie-Hellman group that is currently acceptable. Pick the options and state which mode is used."
+    steps:
+      - "Confidentiality and authentication are both needed, so use ESP (AH gives no confidentiality)."
+      - "Encryption: AES (128, 192 or 256-bit) rather than DES (56-bit) or 3DES."
+      - "Integrity: HMAC with SHA (HMAC-MD5 is weaker)."
+      - "Authentication: RSA digital certificates, since PSK does not scale beyond a few peers."
+      - "Diffie-Hellman: group 14 (2048-bit) or higher; groups 1, 2 and 5 should no longer be used."
+      - "Mode: tunnel mode, because site-to-site gateways protect the whole original packet with a new outer IP header."
+    answer: ESP, AES, HMAC-SHA, RSA certificates, DH group 14 or higher, tunnel mode.
+    takeaway: IPsec is a framework; each choice fills a slot and the agreed set forms the SA.
+terms:
+  - term: WAN
+    definition: A network covering a large geographic area, provided by a carrier for a fee. Standards are mostly Layer 1 and Layer 2.
+  - term: Private WAN
+    definition: A dedicated connection (leased line, Metro Ethernet, MPLS) with guaranteed service, consistent bandwidth and security. The alternative is the public internet.
+  - term: SLA
+    definition: Service level agreement. The contract stating the expected reliability and availability of a service.
+  - term: Full mesh
+    definition: Every site linked to every other. The most fault tolerant WAN topology and the most expensive, with n(n-1)/2 links.
+  - term: Demarcation point
+    definition: The point where the customer's responsibility for the line ends and the provider's begins.
+  - term: Local loop
+    definition: The last-mile link between the customer and the provider's central office.
+  - term: CSU/DSU
+    definition: Device that terminates a leased digital line (T1/E1) at the customer site.
+  - term: Circuit switched vs packet switched
+    definition: Circuit-switched links (PSTN, ISDN) get a dedicated circuit per call. Packet-switched links (Metro Ethernet, MPLS, Frame Relay, ATM) share the provider network.
+  - term: Leased line rates
+    definition: T1 1.544 Mbps, T3 43.7 Mbps (North America); E1 2.048 Mbps, E3 34.368 Mbps (Europe).
+  - term: Frame Relay and ATM
+    definition: Legacy packet-switched WANs. Frame Relay is NBMA with PVCs identified by DLCI; ATM uses fixed 53-byte cells.
+  - term: Dark fibre
+    definition: Unlit fibre leased by a customer, who supplies the equipment (for example DWDM) to light it.
+  - term: Metro Ethernet
+    definition: Ethernet-based WAN service (also EoMPLS and VPLS) that extends Ethernet over the metropolitan area.
+  - term: MPLS (CE, PE, P)
+    definition: Label-switching WAN service. CE is customer edge, PE is provider edge and P is the provider core. It supports QoS, traffic engineering, redundancy and VPNs.
+  - term: DSL, DSLAM and PPPoE
+    definition: DSL uses the telephone line (ADSL asymmetric, SDSL symmetric) with a modem at the customer and a DSLAM at the CO. PPPoE adds authentication and address assignment.
+  - term: DOCSIS and CMTS
+    definition: Cable standard and the headend device that connects cable modems to the provider. Cable bandwidth is shared between subscribers.
+  - term: FTTx
+    definition: Fibre to the home, building or node. Offers the highest bandwidth of the broadband types.
+  - term: Site-to-site vs remote-access VPN
+    definition: Site-to-site VPNs are permanent between gateways and hosts are unaware. Remote-access VPNs are dynamic and started by the user.
+  - term: GRE
+    definition: Non-secure tunnelling protocol that carries multicast and other Layer 3 protocols. Passenger is the original packet, carrier is GRE, transport is IPv4 or IPv6.
+  - term: DMVPN
+    definition: Cisco hub-and-spoke configuration that uses mGRE to build spoke-to-spoke tunnels on demand, giving a dynamic full mesh.
+  - term: IPsec VTI
+    definition: IPsec configured on a virtual interface. Carries unicast and multicast, so routing protocols work without GRE.
+  - term: AH and ESP
+    definition: IPsec protocols. AH gives integrity and authentication only. ESP gives confidentiality plus authentication.
+  - term: Security association (SA)
+    definition: The agreed set of IPsec choices (protocol, encryption, hash, authentication, DH group) between two peers.
+  - term: Tunnel mode vs transport mode
+    definition: Tunnel mode encapsulates the whole original packet with a new outer IP header (site-to-site). Transport mode keeps the original header and protects the payload.
+quiz:
+  - question: Which WAN topology is the most fault tolerant?
+    options:
+      - Point-to-point
+      - Hub-and-spoke
+      - Full mesh
+      - Dual-homed
+    answer: 2
+    explanation: Full mesh gives every pair of sites a direct link, so it tolerates failures best, at the highest cost.
+  - question: Which ISP connectivity option uses two links to two different ISPs?
+    options:
+      - Single-homed
+      - Dual-homed
+      - Multihomed
+      - Dual-multihomed
+    answer: 2
+    explanation: Multihomed is a connection to two ISPs. Dual-homed is two links to the same ISP; dual-multihomed is two links to each of two ISPs.
+  - question: At which layers do WAN standards mainly operate?
+    options:
+      - Layers 1 and 2
+      - Layers 2 and 3
+      - Layers 3 and 4
+      - Layers 4 to 7
+    answer: 0
+    explanation: WAN standards are mostly physical (SDH, SONET, DWDM) and data link (PPP, HDLC, Metro Ethernet, MPLS).
+  - question: What is the data rate of an E1 leased line?
+    options:
+      - 1.544 Mbps
+      - 2.048 Mbps
+      - 34.368 Mbps
+      - 43.7 Mbps
+    answer: 1
+    explanation: E1 is 2.048 Mbps. T1 is 1.544 Mbps, E3 is 34.368 Mbps and T3 is 43.7 Mbps.
+  - question: Which technology uses fixed 53-byte cells?
+    options:
+      - Frame Relay
+      - ISDN
+      - ATM
+      - MPLS
+    answer: 2
+    explanation: ATM uses 53-byte cells (5-byte header, 48-byte payload). Frame Relay uses variable-length frames with DLCIs.
+  - question: In an MPLS network, which router connects to the customer's CE router and adds or removes labels?
+    options:
+      - P router
+      - PE router
+      - DSLAM
+      - CMTS
+    answer: 1
+    explanation: The provider edge (PE) router faces the customer and handles label imposition and removal. P routers form the core.
+  - question: Which broadband technology has bandwidth shared among subscribers?
+    options:
+      - DSL
+      - Cable
+      - Leased line
+      - Dark fibre
+    answer: 1
+    explanation: Cable subscribers share bandwidth on the segment served by the CMTS. DSL lines are not shared.
+  - question: Which device in the provider's central office terminates DSL subscriber lines?
+    options:
+      - CMTS
+      - DSLAM
+      - CSU/DSU
+      - PE router
+    answer: 1
+    explanation: The DSLAM aggregates DSL lines at the CO. The CMTS is the cable equivalent.
+  - question: What type of VPN is created dynamically when a user starts a client, and has the user's device as an endpoint?
+    options:
+      - Site-to-site VPN
+      - Remote-access VPN
+      - MPLS Layer 3 VPN
+      - DMVPN hub
+    answer: 1
+    explanation: Remote-access VPNs are user initiated. Site-to-site VPNs are built between gateways and hosts are unaware.
+  - question: Which statement about IPsec compared with SSL VPNs is correct?
+    options:
+      - SSL supports all IP applications and IPsec only web applications
+      - IPsec offers strong authentication and supports all IP applications, but needs client software
+      - SSL needs client software on every device
+      - IPsec uses only a browser
+    answer: 1
+    explanation: IPsec supports all IP-based applications with strong authentication but needs a client; SSL works from a browser for web and file-sharing applications.
+  - question: In a GRE over IPsec tunnel carrying OSPF, what is the carrier protocol?
+    options:
+      - OSPF
+      - GRE
+      - IPv4
+      - ESP
+    answer: 1
+    explanation: The passenger is the original packet (OSPF), the carrier is GRE and the transport is IPv4 or IPv6.
+  - question: Which Cisco solution builds a dynamic full mesh of tunnels using mGRE from a hub-and-spoke configuration?
+    options:
+      - IPsec VTI
+      - DMVPN
+      - VPLS
+      - PPPoE
+    answer: 1
+    explanation: DMVPN lets spokes build spoke-to-spoke tunnels on demand using multipoint GRE.
+  - question: Which IPsec protocol provides confidentiality as well as authentication?
+    options:
+      - AH
+      - ESP
+      - GRE
+      - IKE only
+    answer: 1
+    explanation: ESP encrypts and authenticates. AH provides integrity and authentication but no confidentiality.
+  - question: Which Diffie-Hellman group should be used instead of group 2?
+    options:
+      - Group 1
+      - Group 5
+      - Group 14
+      - Group 0
+    answer: 2
+    explanation: Groups 1, 2 and 5 should no longer be used. Group 14 (2048-bit) or higher, or ECC groups 19, 20, 21 and 24, are acceptable.
+questions:
+  - question: "Compare private and public WANs, and describe the four main WAN topologies, stating the weakness of hub-and-spoke. [6 marks]"
+    kind: short
+    marks: 6
+    keywords:
+      - private
+      - public
+      - dedicated
+      - internet
+      - point-to-point
+      - hub-and-spoke
+      - single point of failure
+      - full mesh
+      - partial mesh
+    idealAnswer: "A private WAN is dedicated, with guaranteed service, consistent bandwidth and security; a public WAN uses the internet, which is cheap but gives no guarantees (2). Point-to-point is one link between two sites; hub-and-spoke connects branches to a central hub; full mesh links every site to every other; partial mesh links some pairs (2). The hub in hub-and-spoke is a single point of failure, while full mesh is the most fault tolerant (2)."
+  - question: "Describe leased lines: give the T1, T3, E1 and E3 rates and two advantages and two disadvantages. [6 marks]"
+    kind: short
+    marks: 6
+    keywords:
+      - 1.544
+      - 43.7
+      - 2.048
+      - 34.368
+      - simplicity
+      - quality
+      - availability
+      - cost
+      - flexibility
+    idealAnswer: "T1 1.544 Mbps and T3 43.7 Mbps in North America; E1 2.048 Mbps and E3 34.368 Mbps in Europe (2). Advantages (any two): simplicity, quality, availability (2). Disadvantages: high cost and limited flexibility, because each destination needs a separate line (2)."
+  - question: "Describe the modern WAN options (dark fibre, Metro Ethernet, MPLS) and explain the roles of CE, PE and P routers. [6 marks]"
+    kind: long
+    marks: 6
+    keywords:
+      - dark fibre
+      - Metro Ethernet
+      - MPLS
+      - CE
+      - PE
+      - P
+      - label
+      - QoS
+      - traffic engineering
+    idealAnswer: "Dark fibre is unlit fibre the customer lights with its own equipment (1). Metro Ethernet extends Ethernet over a metropolitan area (EoMPLS, VPLS) (1). MPLS forwards by labels using label switching routers and supports QoS, traffic engineering, redundancy and VPNs (1). The CE router is at the customer (1), the PE router is the provider's edge that connects to the CE and adds or removes labels (1), and P routers in the provider core forward by label (1)."
+  - question: "Compare DSL, cable and fibre (FTTx) broadband, naming the key equipment for DSL and cable. [6 marks]"
+    kind: long
+    marks: 6
+    keywords:
+      - DSL
+      - DSLAM
+      - PPPoE
+      - cable
+      - DOCSIS
+      - CMTS
+      - shared
+      - FTTH
+      - highest
+    idealAnswer: "DSL uses the telephone line; a DSL modem at the customer connects to a DSLAM at the CO; it is distance sensitive and not shared, and PPPoE authenticates and assigns addresses (2). Cable uses DOCSIS over coaxial and optical nodes to a headend with a CMTS, and bandwidth is shared between subscribers (2). FTTx (FTTH, FTTB, FTTN) uses fibre and offers the highest bandwidth (2)."
+  - question: "Explain what a VPN is, its benefits, and the difference between site-to-site and remote-access VPNs. [6 marks]"
+    kind: short
+    marks: 6
+    keywords:
+      - virtual
+      - private
+      - encrypted
+      - cost
+      - security
+      - scalability
+      - compatibility
+      - gateway
+      - unaware
+      - client
+    idealAnswer: "A VPN is virtual (carried over a public network) and private (encrypted) (2). Benefits: cost savings, security, scalability and broadband compatibility (2). A site-to-site VPN is terminated on VPN gateways and hosts are unaware of it; a remote-access VPN is created dynamically when a user's client connects to a terminating device (2)."
+  - question: "Compare IPsec and SSL VPNs on applications, authentication, encryption, complexity and connection options. [5 marks]"
+    kind: short
+    marks: 5
+    keywords:
+      - all IP
+      - web
+      - strong
+      - moderate
+      - 56
+      - 40
+      - 256
+      - client
+      - browser
+    idealAnswer: "Applications: IPsec all IP-based applications; SSL web and file sharing (1). Authentication: IPsec strong two-way; SSL moderate (1). Encryption: IPsec 56 to 256-bit; SSL 40 to 256-bit (1). Complexity: IPsec needs client software; SSL needs only a browser (1). Connection options: IPsec limited to configured devices; SSL any device with a browser (1)."
+  - question: "Explain why OSPF cannot run across a standard IPsec VPN and describe three solutions, defining passenger, carrier and transport for GRE over IPsec. [8 marks]"
+    kind: long
+    marks: 8
+    keywords:
+      - unicast only
+      - multicast
+      - GRE
+      - passenger
+      - carrier
+      - transport
+      - DMVPN
+      - mGRE
+      - VTI
+    idealAnswer: "Standard IPsec carries unicast only, but OSPF uses multicast (2). GRE over IPsec: GRE carries multicast and other protocols and IPsec protects it; the passenger is the original packet, the carrier is GRE and the transport is IPv4 or IPv6 (3). DMVPN builds a dynamic full mesh from hub-and-spoke using mGRE with on-demand spoke-to-spoke tunnels (1). IPsec VTI uses a virtual interface that supports unicast and multicast without GRE (2)."
+  - question: "List and explain the IPsec framework options for encapsulation, encryption, integrity, authentication and Diffie-Hellman, and distinguish transport from tunnel mode. [10 marks]"
+    kind: long
+    marks: 10
+    keywords:
+      - AH
+      - ESP
+      - DES
+      - 3DES
+      - AES
+      - SEAL
+      - HMAC
+      - MD5
+      - SHA
+      - PSK
+      - RSA
+      - Diffie-Hellman
+      - group 14
+      - tunnel mode
+      - transport mode
+    idealAnswer: "Encapsulation: AH gives integrity and authentication only; ESP adds confidentiality (2). Encryption: DES 56-bit, 3DES three 56-bit keys per 64-bit block, AES 128, 192 or 256-bit, SEAL 160-bit stream cipher (2). Integrity: HMAC with MD5 or SHA (1). Authentication: PSK is easy but does not scale; RSA digital certificates scale (2). DH: groups 1, 2 and 5 should not be used; 14, 15, 16 (2048, 3072, 4096 bits) and 19, 20, 21, 24 are acceptable (1). Transport mode keeps the original IP header and protects the payload; tunnel mode encapsulates the whole packet in a new IP header and is used for site-to-site VPNs (2). The agreed set forms the security association."

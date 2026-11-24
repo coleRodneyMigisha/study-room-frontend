@@ -1,0 +1,635 @@
+id: ospf-config
+title: Single-Area OSPFv2 Configuration
+subtitle: Router IDs, the network command, passive interfaces, DR priority, cost, timers, default routes and verification
+recap: |
+  Enable OSPFv2 with router ospf process-id, then set the router ID: an explicit router-id wins, then the highest loopback
+  IPv4 address, then the highest active physical interface address. Turn on interfaces with network address wildcard
+  area 0 (wildcard = 255.255.255.255 minus the mask) or with ip ospf process-id area 0 on the interface. Stop hellos on LAN
+  edges with passive-interface. Use ip ospf network point-to-point to remove the DR election on a two-router Ethernet link, and
+  ip ospf priority (0 to 255) to steer the DR on multiaccess LANs. Cost = reference bandwidth / interface bandwidth with a
+  default reference of 100 Mbps, so use auto-cost reference-bandwidth on every router or ip ospf cost per interface. Hello and
+  dead timers must match (10 and 40 s by default). Propagate a default route with ip route 0.0.0.0 0.0.0.0 plus default-information originate.
+traps:
+  - "Router ID order of precedence. 1) explicit router-id, 2) highest loopback IPv4 address, 3) highest active physical interface IPv4 address. A loopback beats a higher physical address. The ID is chosen when OSPF starts, so a new loopback or router-id command does not take effect until clear ip ospf process or a reload."
+  - "Writing a subnet mask where a wildcard mask is needed. network 192.168.1.0 0.0.0.255 area 0 is correct; 255.255.255.0 is not. Wildcard = 255.255.255.255 minus the subnet mask. A /30 is 0.0.0.3, a /26 is 0.0.0.63 and a /22 is 0.0.3.255."
+  - "Thinking the network statement advertises the address you typed. It only selects which interfaces run OSPF. OSPF then advertises the actual connected subnet of each matching interface, with that interface's own mask."
+  - "Forgetting passive-interface hides the network from nobody. A passive interface sends no hellos and forms no neighbours, but its network is still advertised to other routers."
+  - "Mixing up reference bandwidth. Cost = reference bandwidth / interface bandwidth, default reference 100 Mbps, so FastEthernet, Gigabit and 10 Gigabit all cost 1. The value in auto-cost reference-bandwidth is in Mbps and must be set on every router in the domain."
+  - "Forgetting OSPF cost accumulates. The route cost is the sum of the outgoing interface costs along the path plus the cost of the destination network's interface (a loopback defaults to 1). It is not the cost of one link."
+  - "Timer mistakes. Hello and dead intervals must match or no adjacency forms. Changing only the hello interval makes IOS set dead to four times hello automatically; changing only the dead interval does not change hello."
+  - "Expecting ip ospf priority to change the DR at once. Election is non-pre-emptive, so after changing priority you must reset the OSPF process (clear ip ospf process) or bounce the interfaces."
+lesson:
+  checkpointStep: 5
+  steps:
+    - "Start OSPFv2 with router ospf process-id in global configuration mode. The process ID (1 to 65535) is locally significant and can differ between routers. Every router needs a unique 32-bit router ID, which is used in the DBD exchange (highest sends first) and in the DR election."
+    - "Router ID order of precedence. First, an explicit router-id x.x.x.x under router ospf (recommended). Second, the highest IPv4 address on any loopback interface. Third, the highest active IPv4 address on any physical interface. OSPF need not be enabled on the interface for it to be used. To change a live router ID use clear ip ospf process."
+    - "Enable interfaces with network address wildcard area area-id. The wildcard is the inverse of the mask, found by subtracting the mask from 255.255.255.255. A /24 is 0.0.0.255 and a /30 is 0.0.0.3. A quad-zero wildcard such as network 10.1.1.5 0.0.0.0 area 0 matches one exact interface address. Alternatively use ip ospf process-id area area-id on the interface."
+    - "Use passive-interface on LAN-facing interfaces so OSPF stops sending hellos where there are no routers. This saves bandwidth, avoids processing and removes a way to inject false routes. The connected network is still advertised. On Ethernet point-to-point links use ip ospf network point-to-point to skip the DR and BDR election."
+    - "Checkpoint: compute the OSPF cost of a 10 Mbps Ethernet link with the default reference bandwidth, then the cost of a Gigabit Ethernet link after auto-cost reference-bandwidth 10000 is configured. Then give the total cost from R1 to a stub LAN behind R3 across a Gigabit link, a FastEthernet link and the stub Gigabit interface on R3 using the 10000 reference."
+    - "On a multiaccess LAN the DR is the router with the highest ip ospf priority (0 to 255, default 1, 0 means never DR or BDR), with the highest router ID as tie-break. The election is not pre-emptive, so after changing the priority run clear ip ospf process. Verify roles with show ip ospf interface and show ip ospf neighbor (FULL/DR, FULL/BDR, FULL/DROTHER, 2WAY/DROTHER)."
+    - "OSPF cost = reference bandwidth / interface bandwidth. The default reference is 100 Mbps so FastEthernet, Gigabit and 10 Gigabit all cost 1. Fix it with auto-cost reference-bandwidth Mbps (for example 1000 or 10000) on every router, or set ip ospf cost on chosen interfaces. A route's cost is the accumulated cost along the path."
+    - "Hello and dead intervals default to 10 s and 40 s and must match between neighbours. Change them with ip ospf hello-interval and ip ospf dead-interval. If only the hello is changed, IOS sets dead to four times hello. To advertise a default route, give the edge router a default static route and then enter default-information originate under router ospf. Other routers learn it as O*E2."
+    - "Verify with show ip interface brief, show ip route, show ip ospf neighbor, show ip protocols and show ip ospf interface. Adjacency problems are usually mismatched masks, timers, network types, area IDs or a missing or wrong network command."
+checkpoint:
+  question: "Calculate the OSPF cost of (a) a 10 Mbps Ethernet link using the default reference bandwidth, and (b) a Gigabit Ethernet link after auto-cost reference-bandwidth 10000. Then give the total cost for R1 to reach a stub LAN on R3 via a Gigabit link R1-R2, a FastEthernet link R2-R3, and R3's Gigabit LAN interface, with the 10000 reference on all routers."
+  hint: Cost = reference bandwidth / interface bandwidth, using the same units. With reference 10000 Mbps, Gigabit is 10000/1000, FastEthernet is 10000/100. Add every outgoing interface cost along the path plus the cost of the destination interface.
+  keywords:
+    - 100000000
+    - 10
+    - 100
+    - cost
+    - reference bandwidth
+    - accumulate
+    - 120
+  idealAnswer: "(a) 100,000,000 / 10,000,000 = 10. (b) With reference 10,000 Mbps, Gigabit cost = 10,000 / 1,000 = 10. Path cost: R1 to R2 Gigabit = 10, R2 to R3 FastEthernet = 10,000 / 100 = 100, R3 stub Gigabit LAN interface = 10, so the total is 10 + 100 + 10 = 120. OSPF cost accumulates across the outgoing interfaces to the destination."
+notes:
+  - heading: Starting OSPFv2 and choosing the router ID
+    body: |
+      ```
+      R1(config)# router ospf 10
+      R1(config-router)# router-id 1.1.1.1
+      R1(config-router)# end
+      R1# show ip protocols | include Router ID
+      Router ID 1.1.1.1
+      ```
+
+      The **process ID** is a number from 1 to 65535. It is only **locally significant**: R1 can use 10 and R2 can use 20 and still become
+      neighbours. The router ID must be unique across the OSPF domain.
+
+      The router ID is used to:
+
+      - decide who sends the first **DBD** in the ExStart/Exchange states (highest router ID);
+      - break ties in the **DR/BDR election** when priorities are equal.
+
+      **Order of precedence**
+
+      1. The ID set with `router-id x.x.x.x` (recommended).
+      2. The **highest IPv4 address on a loopback interface**.
+      3. The **highest active IPv4 address on a physical interface**.
+
+      ```
+      R1(config)# interface loopback 0
+      R1(config-if)# ip address 1.1.1.1 255.255.255.255
+      ```
+
+      A /32 loopback is stable (it never goes down with a cable) and OSPF does **not** need to be running on it to use its address as the ID.
+
+      **Changing the ID.** A running router keeps its ID until the process is restarted. The router tells you:
+
+      ```
+      R1(config-router)# router-id 1.1.1.1
+      % OSPF: Reload or use "clear ip ospf process" command, for this to take effect
+      R1# clear ip ospf process
+      Reset ALL OSPF processes? [no]: y
+      ```
+
+      Clearing the process drops adjacencies briefly, so do it in a maintenance window. It is preferred over reloading.
+  - heading: Enabling interfaces with network and wildcard masks
+    body: |
+      ```
+      Router(config-router)# network network-address wildcard-mask area area-id
+      ```
+
+      The statement tells the router: **any interface whose IPv4 address falls inside this range runs OSPF in this area**. Those
+      interfaces send and receive OSPF packets, and their connected networks are advertised. The advertised prefix is the interface's
+      **real subnet**, not the range you typed.
+
+      **Wildcard mask** = 255.255.255.255 minus the subnet mask. A 0 bit must match, a 1 bit is ignored.
+
+      | Prefix | Subnet mask | Wildcard |
+      |---|---|---|
+      | /30 | 255.255.255.252 | 0.0.0.3 |
+      | /27 | 255.255.255.224 | 0.0.0.31 |
+      | /26 | 255.255.255.192 | 0.0.0.63 |
+      | /24 | 255.255.255.0 | 0.0.0.255 |
+      | /22 | 255.255.252.0 | 0.0.3.255 |
+      | /16 | 255.255.0.0 | 0.0.255.255 |
+      | host | 255.255.255.255 | 0.0.0.0 |
+
+      **Three styles that all work**
+
+      ```
+      ! 1. Match by network, using the subnet's wildcard
+      R1(config-router)# network 10.10.1.0 0.0.0.255 area 0
+      R1(config-router)# network 10.1.1.4 0.0.0.3 area 0
+
+      ! 2. Quad-zero wildcard: match exactly one interface address
+      R1(config-router)# network 10.10.1.1 0.0.0.0 area 0
+      R1(config-router)# network 10.1.1.5 0.0.0.0 area 0
+
+      ! 3. Directly on the interface (no network command)
+      R1(config)# interface GigabitEthernet 0/0/0
+      R1(config-if)# ip ospf 10 area 0
+      ```
+
+      The quad-zero style avoids any wildcard calculation. The interface method is clear in the configuration and shows up in `show ip protocols` as
+      "Routing on Interfaces Configured Explicitly (Area 0)".
+
+      For single-area OSPFv2 the **area ID must be the same on all routers**, and best practice is area 0. If you switch method, remove the
+      old statements with `no network ...` first.
+
+      **Loopbacks** are advertised as /32 host routes by default. Configure `ip ospf network point-to-point` on a loopback to advertise its real prefix, for
+      example 10.10.1.0/24 instead of 10.10.1.1/32.
+  - heading: Passive interfaces and point-to-point networks
+    body: |
+      By default OSPF sends hellos out **every** OSPF-enabled interface. On a LAN with only hosts this:
+
+      - wastes bandwidth;
+      - wastes CPU on every device that has to receive and discard the messages;
+      - is a **security risk**: packets can be sniffed, and a rogue device could inject false routes.
+
+      ```
+      R1(config)# router ospf 10
+      R1(config-router)# passive-interface GigabitEthernet 0/0/1
+      ! or make all passive, then re-enable the interfaces facing routers
+      R1(config-router)# passive-interface default
+      R1(config-router)# no passive-interface GigabitEthernet 0/0/0
+      R1# show ip protocols
+      ```
+
+      A passive interface **still advertises its network**, but sends no hellos and forms no adjacency. `show ip protocols` lists it under "Passive Interface(s)".
+
+      **Point-to-point networks on Ethernet.** Cisco routers treat Ethernet as a *broadcast* network type and elect a DR and BDR even when only two
+      routers are on the link. This is unnecessary. Change it on both ends:
+
+      ```
+      R1(config)# interface GigabitEthernet 0/0/0
+      R1(config-if)# ip ospf network point-to-point
+      R1# show ip ospf interface GigabitEthernet 0/0/0
+      ... Network Type POINT_TO_POINT, Cost: 1
+      ```
+
+      After this the neighbour shows as `FULL/ -` (no DR role). The network types must match on both ends of a link, otherwise
+      adjacencies or routes may fail. Changing the type resets the adjacency, as the `%OSPF-5-ADJCHG` message shows.
+  - heading: DR and BDR on multiaccess networks
+    body: |
+      On a broadcast network, OSPF elects the DR and BDR. DROTHERs send to 224.0.0.6 and the DR floods to 224.0.0.5.
+
+      **Election order**
+
+      1. Highest **interface priority** (0 to 255). Default is **1**.
+      2. Highest **router ID** if priorities are equal.
+      3. Priority **0** can never be DR or BDR.
+
+      The election happens when the **first router with an OSPF-enabled interface becomes active**. A router with a lower router ID may become DR
+      if the others are still booting. Adding a new router does **not** start a new election.
+
+      Once elected, the DR stays until its interface or OSPF process fails or is shut down. Then the **BDR becomes the DR** and a new BDR is elected.
+
+      **Steering the election**
+
+      ```
+      R1(config)# interface GigabitEthernet 0/0/0
+      R1(config-if)# ip ospf priority 255
+      R1(config-if)# end
+      R1# clear ip ospf process
+      Reset ALL OSPF processes? [no]: y
+      ```
+
+      Because the election is non-pre-emptive, a change in priority has no visible effect until the OSPF process is cleared (or the interface bounced) on the
+      routers involved.
+
+      **Reading the roles**
+
+      ```
+      R1# show ip ospf interface GigabitEthernet 0/0/0
+      ... State DROTHER, Priority 1
+      Designated Router (ID) 3.3.3.3, Interface address 192.168.1.3
+      Backup Designated Router (ID) 2.2.2.2, Interface address 192.168.1.2
+      Neighbor Count is 2, Adjacent neighbor count is 2
+      R2# show ip ospf neighbor
+      Neighbor ID  Pri  State        Dead Time  Address       Interface
+      1.1.1.1      1    FULL/DROTHER 00:00:31   192.168.1.1   Gi0/0/0
+      3.3.3.3      1    FULL/DR      00:00:34   192.168.1.3   Gi0/0/0
+      ```
+
+      | Neighbour state | Meaning |
+      |---|---|
+      | FULL/DR, FULL/BDR | Fully adjacent with the DR or BDR |
+      | FULL/DROTHER | The neighbour is a DROTHER and this router is a DR or BDR, fully adjacent |
+      | 2WAY/DROTHER | Two non-DR routers: **normal**, no database exchange between them |
+      | FULL/ - | Point-to-point link, no DR roles |
+
+      A neighbour stuck in any state other than Full (apart from the legitimate 2-Way) indicates an adjacency problem.
+  - heading: OSPF cost and the reference bandwidth
+    body: |
+      OSPF's metric is **cost**. Lower is better.
+
+      **Cost = reference bandwidth / interface bandwidth**
+
+      The default reference bandwidth is **100 Mbps** (10^8 bps). Costs must be whole numbers: IOS discards the fraction (T1 gives 64) and never goes below 1.
+
+      | Link | Cost, ref 100 Mbps (default) | Cost, ref 1000 Mbps | Cost, ref 10000 Mbps |
+      |---|---|---|---|
+      | 10 Gbps Ethernet | 1 | 1 | 1 |
+      | 1 Gbps Ethernet | 1 | 1 | 10 |
+      | 100 Mbps FastEthernet | 1 | 10 | 100 |
+      | 10 Mbps Ethernet | 10 | 100 | 1000 |
+      | T1 serial, 1.544 Mbps | 64 | 647 | 6476 |
+
+      **The problem.** With the default reference, FastEthernet, Gigabit and 10 Gigabit all cost **1**, so OSPF cannot tell a fast link from a slow one.
+
+      **Two fixes**
+
+      ```
+      ! 1. Change the reference bandwidth (value in Mbps) on EVERY router in the domain
+      R1(config-router)# auto-cost reference-bandwidth 10000
+      % OSPF: Reference bandwidth is changed.
+               Please ensure reference bandwidth is consistent across all routers.
+
+      ! 2. Set the cost of a particular interface
+      R1(config)# interface GigabitEthernet 0/0/1
+      R1(config-if)# ip ospf cost 30
+      ```
+
+      - Changing the reference bandwidth does **not** change the link's real speed. It only changes the calculation.
+      - Use `auto-cost reference-bandwidth 1000` for Gigabit, `10000` for 10 Gigabit, `100` to return to the default.
+      - Inconsistent values across routers give inconsistent path choices.
+      - `ip ospf cost` overrides the calculation. It is also used to match other vendors' formulas or to steer traffic.
+      - Interface speed is taken from `bandwidth` on the interface. On serial links the default is 1544 kbps unless it is changed.
+      - Check with `show ip ospf interface` (Cost:) and `show ip ospf` (Reference bandwidth unit).
+
+      **OSPF accumulates cost.** The cost of a route is the sum of the costs of the outgoing interfaces along the path, plus the cost of the interface on the destination network
+      (a loopback defaults to 1). With reference 10000, R1 to a loopback LAN on R2 across one Gigabit link = 10 + 1 = **11**, which appears in the routing table as `[110/11]`.
+  - heading: Hello and dead timers
+    body: |
+      | Setting | Default (broadcast and point-to-point) | Default (NBMA) |
+      |---|---|---|
+      | Hello interval | 10 s | 30 s |
+      | Dead interval | 40 s (4 × hello) | 120 s |
+
+      Hellos go to **224.0.0.5**. If no hello arrives from a neighbour within the **dead interval**, the neighbour is declared down, removed from the LSDB view
+      and the change is flooded.
+
+      ```
+      R1(config)# interface GigabitEthernet 0/0/0
+      R1(config-if)# ip ospf hello-interval 5
+      R1(config-if)# ip ospf dead-interval 20
+      R1# show ip ospf interface GigabitEthernet 0/0/0
+      ... Timer intervals configured, Hello 5, Dead 20, Wait 20, Retransmit 5
+      R1# show ip ospf neighbor
+      ```
+
+      Rules:
+
+      - **Hello and dead intervals must match** on both ends or no adjacency forms. After changing R1 only, the dead timer expires and the log shows
+        `%OSPF-5-ADJCHG ... FULL to DOWN, Neighbor Down: Dead timer expired`.
+      - If you change the hello interval, IOS **automatically sets dead to 4 × hello**. Setting it by hand documents the intent.
+      - Shorter timers find failures faster but add traffic and CPU. The defaults follow best practice; change them only in rare cases.
+      - The `Dead Time` column in `show ip ospf neighbor` counts down from 40 and is refreshed to 40 whenever a hello arrives.
+      - Reset with `no ip ospf hello-interval` and `no ip ospf dead-interval`.
+      - Passive interfaces send no hellos at all.
+  - heading: Propagating a default route
+    body: |
+      The edge router (the one facing the internet) needs two things:
+
+      ```
+      R2(config)# ip route 0.0.0.0 0.0.0.0 203.0.113.2
+      R2(config)# router ospf 10
+      R2(config-router)# default-information originate
+      ```
+
+      1. A default static route (best practice is the next-hop address; use an exit interface only for simulations such as a loopback).
+      2. `default-information originate`, which makes this router an ASBR that advertises the route into OSPF.
+
+      The other routers learn it as an **external type 2** route:
+
+      ```
+      R1# show ip route | begin Gateway
+      Gateway of last resort is 10.1.1.6 to network 0.0.0.0
+      O*E2  0.0.0.0/0 [110/1] via 10.1.1.6, 00:11:08, GigabitEthernet0/0/0
+      ```
+
+      - `O` = OSPF, `*` = candidate default, `E2` = external type 2 (cost is the one set on the ASBR and is not increased along the path). E1 and E2 are beyond this unit.
+      - Without the static route, `default-information originate` advertises nothing (unless `always` is added).
+      - The default route is distributed only to routers in the same OSPF domain; there is no need for a static default on every router.
+  - heading: Verification and troubleshooting adjacencies
+    body: |
+      | Command | What it tells you |
+      |---|---|
+      | `show ip interface brief` | Interfaces are up/up with the right IP addresses |
+      | `show ip route ospf` | OSPF routes learned with `[110/cost]` |
+      | `show ip ospf neighbor` | Neighbour IDs, priority, state, dead timer, interface |
+      | `show ip protocols` | Process ID, router ID, networks and interfaces enabled, passive interfaces, neighbours, AD 110 |
+      | `show ip ospf` | Process and router ID, areas, reference bandwidth, SPF run count |
+      | `show ip ospf interface [brief]` | Area, network type, cost, state/priority, DR/BDR, hello and dead timers |
+      | `clear ip ospf process` | Restarts OSPF so a new router ID or priority takes effect |
+
+      **Two routers fail to form an adjacency when**
+
+      1. The **subnet masks** do not match, so they are on different subnets.
+      2. The **hello or dead timers** do not match.
+      3. The **network types** do not match.
+      4. A **network command is missing or wrong** (the interface is not in OSPF), or the interface is passive.
+      5. The **area IDs** differ, or authentication does not match.
+      6. A duplicate router ID, an ACL blocking 224.0.0.5 and 224.0.0.6, or an MTU mismatch.
+
+      **Method.** Check Layer 1 and 2 (`show ip interface brief`), then `show ip protocols` (does the router run OSPF on the right interface?), then
+      `show ip ospf interface` (timers, area, network type, cost), then `show ip ospf neighbor` (state).
+  - heading: Sources
+    body: |
+      - RFC 2328, OSPF Version 2: https://www.rfc-editor.org/rfc/rfc2328
+      - RFC 5340, OSPF for IPv6: https://www.rfc-editor.org/rfc/rfc5340
+      - RFC 5709, OSPFv2 HMAC-SHA Cryptographic Authentication: https://www.rfc-editor.org/rfc/rfc5709
+      - Cisco Networking Academy, Enterprise Networking, Security, and Automation: https://www.netacad.com/courses/networking/enterprise-networking-security-automation
+      - Cisco ENSA v7.0 lecture slides, Module 2 (Single-Area OSPFv2 Configuration)
+examples:
+  - title: Which router ID will R1 use?
+    problem: "R1 has Loopback0 10.10.1.1/32, Loopback1 172.16.0.1/32, GigabitEthernet0/0/0 192.168.1.1/24 (up) and GigabitEthernet0/0/1 209.165.200.1/30 (up). No router-id command is configured. What is the router ID? What changes if R1 is configured with router-id 1.1.1.1 afterwards?"
+    steps:
+      - "No explicit router-id exists, so the first rule does not apply."
+      - "Second rule: use the highest IPv4 address on a loopback. The loopbacks are 10.10.1.1 and 172.16.0.1. The numerically highest is 172.16.0.1."
+      - "The physical addresses (192.168.1.1 and 209.165.200.1) are higher still, but physical interfaces are only used if there is no loopback with an address."
+      - "Router ID = 172.16.0.1. OSPF does not have to be enabled on Loopback1 for this to happen."
+      - "If router-id 1.1.1.1 is entered, IOS warns that you must reload or use clear ip ospf process. Until then, R1 keeps 172.16.0.1. After the process is cleared, the router ID becomes 1.1.1.1 because an explicit setting has highest precedence."
+    answer: "172.16.0.1, and 1.1.1.1 only after clear ip ospf process (or a reload)."
+    takeaway: "Explicit router-id, then highest loopback, then highest active physical address. The ID is fixed when the process starts."
+  - title: Writing network commands and wildcard masks
+    problem: "R1 has G0/0/0 10.1.1.5/30, G0/0/1 10.1.1.14/30, G0/0/2 192.168.50.1/26 and Lo0 10.10.1.1/24. Enable OSPF process 10 in area 0 on the first three interfaces using wildcard masks derived from each subnet mask, then show a single command that would enable all the 10.x.x.x interfaces and not G0/0/2."
+    steps:
+      - "/30 mask is 255.255.255.252. Wildcard = 255.255.255.255 − 255.255.255.252 = 0.0.0.3. The subnet of 10.1.1.5/30 is 10.1.1.4 (addresses .4 to .7) and of 10.1.1.14/30 is 10.1.1.12."
+      - "/26 mask is 255.255.255.192. Wildcard = 0.0.0.63. The subnet of 192.168.50.1/26 is 192.168.50.0."
+      - "Commands: router ospf 10, network 10.1.1.4 0.0.0.3 area 0, network 10.1.1.12 0.0.0.3 area 0, network 192.168.50.0 0.0.0.63 area 0."
+      - "Make G0/0/2 passive because it faces hosts: passive-interface GigabitEthernet 0/0/2. The 192.168.50.0/26 network is still advertised."
+      - "One command covering all 10.x.x.x interfaces: network 10.0.0.0 0.255.255.255 area 0. G0/0/0, G0/0/1 and Lo0 (10.10.1.1) match, G0/0/2 (192.168.50.1) does not. The routes advertised are still 10.1.1.4/30, 10.1.1.12/30 and 10.10.1.1/32 (the loopback as a host route), not 10.0.0.0/8."
+    answer: "network 10.1.1.4 0.0.0.3 area 0, network 10.1.1.12 0.0.0.3 area 0 and network 192.168.50.0 0.0.0.63 area 0. network 10.0.0.0 0.255.255.255 area 0 matches the 10.x interfaces only."
+    takeaway: "The network statement picks interfaces; the advertised routes are the interfaces' own subnets."
+  - title: Accumulated cost and failover
+    problem: "With auto-cost reference-bandwidth 10000 on all routers, R1 connects to R2 by a Gigabit link, R2 to R3 by a FastEthernet link, and R1 to R3 directly by a T1 serial link (1544 kbps). R3 has a stub LAN on a Gigabit interface. Find the best route cost from R1 to the LAN and the cost if the R1-R2 link fails."
+    steps:
+      - "Costs with reference 10,000 Mbps: Gigabit = 10,000 / 1,000 = 10. FastEthernet = 10,000 / 100 = 100. T1 = 10,000,000,000 / 1,544,000 = 6476.17, which IOS truncates to 6476. The LAN interface on R3 is Gigabit = 10."
+      - "Path via R2: R1 outgoing Gigabit (10) + R2 outgoing FastEthernet (100) + R3 LAN interface (10) = 120."
+      - "Path via the T1: R1 outgoing T1 (6476) + R3 LAN interface (10) = 6486."
+      - "OSPF chooses the lower cost: the route via R2 with metric 120, shown as [110/120]. The 6486 route is not installed."
+      - "If R1-R2 fails, only the direct T1 path remains and the route cost becomes 6486."
+    answer: "Best cost 120 via R2; after the R1-R2 failure the cost is 6486 via the T1 link."
+    takeaway: "Sum the outgoing interface costs plus the destination interface. A slow link can still carry traffic when it is the only path."
+  - title: Making R1 the DR
+    problem: "Three routers share 192.168.1.0/24 with router IDs 1.1.1.1, 2.2.2.2, 3.3.3.3 and priority 1 on each. R3 is DR and R2 is BDR. The administrator wants R1 to be the DR. Show the configuration and the final roles."
+    steps:
+      - "Set R1's priority above the others on the shared interface: interface GigabitEthernet 0/0/0, ip ospf priority 255."
+      - "Nothing changes yet. The election is non-pre-emptive, so R3 and R2 keep their roles."
+      - "Clear the OSPF process on all three routers with clear ip ospf process (answer y). Adjacencies drop and a new election is held."
+      - "R1 has the highest priority (255), so it becomes DR. R2 and R3 tie on priority 1, so the higher router ID wins the BDR: R3 (3.3.3.3)."
+      - "Verify with show ip ospf neighbor: neighbours see R1 as FULL/DR and R3 as FULL/BDR; show ip ospf interface on R1 shows State DR, Priority 255."
+    answer: "R1 = DR, R3 = BDR, R2 = DROTHER, after ip ospf priority 255 on R1 and a reset of the OSPF process."
+    takeaway: "Priority first, router ID second, and changes only apply when a new election occurs."
+  - title: Timer mismatch between two routers
+    problem: "On the R1-R2 link the administrator enters ip ospf hello-interval 5 on R1 only. Describe what IOS does to the dead interval, what happens to the adjacency and how to fix it."
+    steps:
+      - "IOS automatically sets R1's dead interval to 4 × 5 = 20 s. R2 still uses hello 10 and dead 40."
+      - "R1 now sends hellos every 5 s that carry dead 20, but R2 expects dead 40 in hellos. The hello packet contents do not match, so R2 ignores the hellos."
+      - "R1 stops receiving acceptable hellos from R2, the 20 s dead timer on R1 expires, and the log shows %OSPF-5-ADJCHG ... FULL to DOWN, Neighbor Down: Dead timer expired."
+      - "Fix by matching both ends: ip ospf hello-interval 5 (and dead-interval 20) on R2 as well, or remove the change with no ip ospf hello-interval on R1."
+      - "Verify with show ip ospf interface (Hello 5, Dead 20 on both) and show ip ospf neighbor (state FULL)."
+    answer: "Dead interval becomes 20 s on R1, the timers mismatch and the adjacency drops until R2 is configured with the same hello and dead values."
+    takeaway: "Hello and dead intervals are checked in every hello. Change them on both ends together."
+terms:
+  - term: Process ID
+    definition: A locally significant number (1 to 65535) chosen with router ospf. It need not match between routers.
+  - term: Router ID
+    definition: "A 32-bit identifier. Order of precedence: explicit router-id, highest loopback IPv4 address, highest active physical IPv4 address."
+  - term: clear ip ospf process
+    definition: Restarts the OSPF process so a new router ID or DR priority takes effect. It briefly drops adjacencies.
+  - term: network command
+    definition: "Router config command network address wildcard area id. Enables OSPF on interfaces whose address falls in the range; the actual connected subnets are advertised."
+  - term: Wildcard mask
+    definition: "Inverse of a subnet mask: 0 bits must match and 1 bits are ignored. Calculated as 255.255.255.255 minus the subnet mask (for example /30 gives 0.0.0.3)."
+  - term: Quad-zero wildcard
+    definition: The wildcard 0.0.0.0, used to match one exact interface IP address in a network statement.
+  - term: ip ospf process-id area area-id
+    definition: Interface command that enables OSPF on one interface without using a network statement.
+  - term: Passive interface
+    definition: An interface configured with passive-interface. It sends no OSPF messages and forms no adjacencies, but its network is still advertised.
+  - term: ip ospf network point-to-point
+    definition: Interface command that changes the network type so no DR or BDR is elected on a two-router Ethernet link. Must match on both ends.
+  - term: ip ospf priority
+    definition: Interface value 0 to 255 (default 1) used in the DR and BDR election. 0 makes the interface ineligible.
+  - term: DROTHER
+    definition: A router that is neither DR nor BDR. Two DROTHERs show 2WAY/DROTHER with each other, which is normal.
+  - term: Cost
+    definition: The OSPF metric. Cost = reference bandwidth / interface bandwidth, rounded down to a whole number with a minimum of 1. Lower is better.
+  - term: Reference bandwidth
+    definition: The numerator in the cost formula, 100 Mbps by default. Change it with auto-cost reference-bandwidth Mbps on every router in the OSPF domain.
+  - term: ip ospf cost
+    definition: Interface command that sets the cost manually, overriding the calculated value.
+  - term: Accumulated cost
+    definition: The route metric is the sum of outgoing interface costs along the path plus the destination network's interface cost.
+  - term: Hello interval and dead interval
+    definition: Timers that default to 10 s and 40 s on broadcast and point-to-point links. They must match between neighbours. If hello changes, dead is set to 4 times hello.
+  - term: default-information originate
+    definition: Router OSPF command that advertises a default route (from a static default route) into OSPF, making the router an ASBR.
+  - term: O*E2
+    definition: Routing table code for an OSPF external type 2 candidate default route.
+  - term: show ip ospf neighbor
+    definition: Displays the neighbour ID, priority, state (for example FULL/DR), dead time, address and interface for each neighbour.
+  - term: show ip protocols
+    definition: Displays the OSPF process ID, router ID, interfaces and networks in OSPF, passive interfaces, neighbour sources and the administrative distance of 110.
+quiz:
+  - question: "A router has Loopback0 192.168.10.1, Loopback1 10.1.1.1 and GigabitEthernet0/0/0 209.165.200.1. No router-id command is entered. What router ID does OSPF choose?"
+    options:
+      - 10.1.1.1
+      - 192.168.10.1
+      - 209.165.200.1
+      - 0.0.0.0
+    answer: 1
+    explanation: With no router-id, the highest loopback address (192.168.10.1) is chosen. A physical interface is used only if no loopback address exists.
+  - question: Which wildcard mask matches the 10.1.1.4/30 network?
+    options:
+      - 255.255.255.252
+      - 0.0.0.3
+      - 0.0.0.4
+      - 0.0.0.252
+    answer: 1
+    explanation: 255.255.255.255 minus 255.255.255.252 gives 0.0.0.3.
+  - question: What does the command network 192.168.1.1 0.0.0.0 area 0 do?
+    options:
+      - Advertises the 192.168.1.1/32 host route only
+      - Enables OSPF on the one interface with address 192.168.1.1
+      - Matches every interface on the router
+      - Creates a loopback interface
+    answer: 1
+    explanation: A quad-zero wildcard requires all 32 bits to match, so only the interface with that exact address runs OSPF. The advertised route is that interface's real subnet.
+  - question: What is the effect of passive-interface GigabitEthernet 0/0/1 under router ospf?
+    options:
+      - The network on the interface is no longer advertised
+      - The interface sends no hellos and forms no neighbours but its network is still advertised
+      - The interface becomes the DR
+      - OSPF cost on the interface becomes 0
+    answer: 1
+    explanation: Passive stops OSPF packets on the interface, which suits LANs with only hosts. The connected network is still included in the router's advertisements.
+  - question: Which command stops the DR and BDR election on an Ethernet link between two routers?
+    options:
+      - ip ospf priority 0
+      - passive-interface
+      - ip ospf network point-to-point
+      - router-id 0.0.0.0
+    answer: 2
+    explanation: Setting the network type to point-to-point on both ends removes the election. Priority 0 only makes one router ineligible.
+  - question: Three LAN routers have priority 1 and router IDs 1.1.1.1, 2.2.2.2 and 3.3.3.3, and R3 is DR. You set R1's priority to 255 and make no other change. What happens?
+    options:
+      - R1 immediately becomes the DR
+      - R1 immediately becomes the BDR
+      - Nothing changes until the OSPF process is cleared or the DR fails
+      - R3 and R1 both become DR
+    answer: 2
+    explanation: The election is non-pre-emptive. Use clear ip ospf process (or bounce the interface) to trigger a new election.
+  - question: What is the default OSPF cost of a Gigabit Ethernet interface with the default reference bandwidth?
+    options:
+      - 0
+      - 1
+      - 10
+      - 100
+    answer: 1
+    explanation: 100,000,000 / 1,000,000,000 = 0.1, which becomes the minimum cost of 1. This is why the reference bandwidth should be raised on modern networks.
+  - question: Which command changes the reference bandwidth so Gigabit Ethernet costs 1 and FastEthernet costs 10?
+    options:
+      - auto-cost reference-bandwidth 1000
+      - auto-cost reference-bandwidth 100
+      - ip ospf cost 1000
+      - bandwidth 1000000
+    answer: 0
+    explanation: Reference 1000 Mbps gives 1000/1000 = 1 for Gigabit and 1000/100 = 10 for FastEthernet. It should be configured on every router in the OSPF domain.
+  - question: "With a reference bandwidth of 10000 Mbps, R1 reaches a loopback LAN (cost 1) on R2 across a Gigabit Ethernet link. What is the route cost on R1?"
+    options:
+      - 1
+      - 10
+      - 11
+      - 110
+    answer: 2
+    explanation: Gigabit cost 10000/1000 = 10, plus the loopback's cost of 1, gives 11. OSPF accumulates the costs.
+  - question: R1 has ip ospf hello-interval 5 configured on an interface and no dead-interval command. What is the dead interval?
+    options:
+      - 40 seconds
+      - 20 seconds
+      - 5 seconds
+      - 10 seconds
+    answer: 1
+    explanation: IOS sets the dead interval to 4 times the hello interval when only the hello is changed. The neighbour must be configured with the same values.
+  - question: Which pair of commands makes a router advertise a default route to its OSPF neighbours?
+    options:
+      - ip route 0.0.0.0 0.0.0.0 next-hop and default-information originate
+      - network 0.0.0.0 0.0.0.0 area 0 and passive-interface default
+      - ip default-network and router-id 0.0.0.0
+      - ip ospf cost 0 and auto-cost reference-bandwidth 0
+    answer: 0
+    explanation: The edge router needs a default static route and default-information originate under router ospf. Neighbours see it as O*E2.
+  - question: Which of these would prevent two routers on the same link from forming an OSPF adjacency?
+    options:
+      - Different OSPF process IDs
+      - Different hello intervals
+      - Different DR priorities
+      - Different router IDs
+    answer: 1
+    explanation: Hello and dead timers (as well as subnet, area, network type and authentication) must match. Process IDs are locally significant, priorities only influence the election and router IDs must differ.
+questions:
+  - question: Explain the order of precedence Cisco routers use to choose an OSPF router ID, and how to change an ID on a running router.
+    kind: short
+    marks: 5
+    keywords:
+      - router-id
+      - loopback
+      - highest
+      - physical interface
+      - clear ip ospf process
+      - reload
+    idealAnswer: "First preference is an ID configured explicitly with router-id under router ospf (recommended). Second is the highest IPv4 address on any loopback interface. Third is the highest active IPv4 address on any physical interface. OSPF does not need to be enabled on the interface. A running router keeps its ID until the process is restarted, so after changing it use clear ip ospf process (preferred) or reload."
+  - question: A router has interfaces 10.1.1.5/30, 10.1.1.14/30 and 192.168.1.1/24. Write the OSPF configuration for process 10 in area 0 using wildcard masks, make the LAN interface passive, and explain what a wildcard mask is.
+    kind: short
+    marks: 6
+    keywords:
+      - router ospf 10
+      - network 10.1.1.4 0.0.0.3 area 0
+      - network 10.1.1.12 0.0.0.3 area 0
+      - network 192.168.1.0 0.0.0.255 area 0
+      - passive-interface
+      - wildcard
+    idealAnswer: "router ospf 10; network 10.1.1.4 0.0.0.3 area 0; network 10.1.1.12 0.0.0.3 area 0; network 192.168.1.0 0.0.0.255 area 0; passive-interface GigabitEthernet 0/0/1 (the LAN interface). A wildcard mask is the inverse of the subnet mask, 255.255.255.255 minus the mask. A 0 bit means that bit must match and a 1 bit means it is ignored. Quad-zero wildcards (0.0.0.0) or ip ospf 10 area 0 on each interface are alternatives."
+  - question: Explain how the DR and BDR are elected on a multiaccess network and how an administrator can influence the result. Why must the OSPF process be reset afterwards?
+    kind: long
+    marks: 8
+    keywords:
+      - priority
+      - router ID
+      - 255
+      - 0
+      - non-pre-emptive
+      - ip ospf priority
+      - clear ip ospf process
+      - BDR
+    idealAnswer: "The router with the highest interface priority becomes DR and the second highest becomes BDR. If priorities tie, the highest router ID decides. Priority ranges from 0 to 255, default 1, and 0 means the interface can never be DR or BDR. The election happens when the first router with an OSPF interface comes up; a router that joins later does not force a new election, so the process is non-pre-emptive. The administrator influences it with ip ospf priority on the multiaccess interface (for example 255 on the desired DR). Because the DR stays until it fails, the OSPF process must be cleared (clear ip ospf process) or the interface bounced to trigger a new election. Roles are verified with show ip ospf interface and show ip ospf neighbor."
+  - question: "Describe how OSPF calculates cost on a Cisco router. Explain the problem with the default reference bandwidth and give two ways to fix it. Calculate the cost of a 10 Mbps link and a 1 Gbps link when the reference is 10,000 Mbps."
+    kind: long
+    marks: 10
+    keywords:
+      - reference bandwidth
+      - interface bandwidth
+      - 100 Mbps
+      - auto-cost reference-bandwidth
+      - ip ospf cost
+      - 1000
+      - 10
+      - every router
+    idealAnswer: "Cost = reference bandwidth / interface bandwidth, rounded to a whole number with a minimum of 1; lower is better. The default reference bandwidth is 100 Mbps, so FastEthernet, Gigabit and 10 Gigabit interfaces all cost 1 and OSPF cannot prefer the faster link. Fix 1: auto-cost reference-bandwidth Mbps (for example 1000 or 10000) under router ospf, on every router in the domain. Fix 2: ip ospf cost value on individual interfaces. With a 10,000 Mbps reference: 10 Mbps link = 10,000 / 10 = 1000; 1 Gbps link = 10,000 / 1,000 = 10. The route cost is the accumulated sum of outgoing interface costs along the path."
+  - question: Two routers will not form an OSPF adjacency. List five possible causes and the commands you would use to investigate.
+    kind: long
+    marks: 8
+    keywords:
+      - subnet mask
+      - hello
+      - dead
+      - network type
+      - network command
+      - area
+      - show ip ospf neighbor
+      - show ip ospf interface
+      - show ip protocols
+    idealAnswer: "Causes include mismatched subnet masks, mismatched hello or dead timers, mismatched network types, a missing or incorrect network command (or a passive interface), different area IDs or authentication settings, and ACLs or MTU problems. Investigate with show ip interface brief (interface and IP status), show ip protocols (is the interface in OSPF, passive interfaces, router ID), show ip ospf interface (area, network type, timers, cost, DR/BDR), show ip ospf neighbor (state) and show ip route ospf. Correct the mismatch on one side so both agree."
+  - question: How does an OSPF edge router propagate a default route to the rest of the domain, and how is it shown on another router?
+    kind: short
+    marks: 4
+    keywords:
+      - ip route 0.0.0.0 0.0.0.0
+      - default-information originate
+      - O*E2
+      - external
+      - gateway of last resort
+    idealAnswer: "Configure a default static route (ip route 0.0.0.0 0.0.0.0 next-hop or exit interface) and enter default-information originate under router ospf, which makes the router advertise it into OSPF. Other routers show it as O*E2 0.0.0.0/0 in show ip route (OSPF external type 2, candidate default) and display a gateway of last resort pointing at the edge router."
+lab:
+  title: OSPF cost calculator
+  variations:
+    - title: Serial link cost with the default reference bandwidth
+      question: "A T1 serial interface has bandwidth <b>1544 kbps</b>. The reference bandwidth is the default (100 Mbps). What OSPF cost does IOS assign? Give a whole number."
+      answer: 64
+      tolerance: 0
+      hint: 100,000,000 bps divided by 1,544,000 bps. IOS drops the fraction.
+      explanation: 100,000,000 / 1,544,000 = 64.77, which IOS truncates to a cost of 64.
+    - title: Gigabit cost after changing the reference bandwidth
+      question: "<code>auto-cost reference-bandwidth 10000</code> is configured on every router. What is the cost of a <b>1 Gbps</b> interface?"
+      answer: 10
+      tolerance: 0
+      hint: Reference and interface bandwidth must be in the same units, Mbps here.
+      explanation: 10000 Mbps / 1000 Mbps = 10.
+    - title: Cumulative cost across three links
+      question: "Reference bandwidth is <b>1000 Mbps</b>. R1 reaches a stub loopback network on R4 through outgoing interfaces of <b>1 Gbps</b>, <b>100 Mbps</b> and <b>10 Mbps</b>, and the loopback on R4 has the default cost of 1. What is the total route cost?"
+      answer: 112
+      tolerance: 0
+      hint: Cost per link = 1000 / bandwidth in Mbps. Add the outgoing links and the destination loopback.
+      explanation: 1 (1 Gbps) + 10 (100 Mbps) + 100 (10 Mbps) + 1 (loopback) = 112.
+    - title: Bandwidth from a known cost
+      question: "Reference bandwidth is <b>1000 Mbps</b> and an interface has an OSPF cost of <b>25</b>. What is its bandwidth in Mbps?"
+      answer: 40
+      tolerance: 0
+      unit: Mbps
+      hint: Rearrange cost = reference / bandwidth to bandwidth = reference / cost.
+      explanation: 1000 / 25 = 40 Mbps.
+    - title: Dead interval after changing the hello interval
+      question: "On a point-to-point link the hello interval is changed to <b>5 seconds</b> and no dead interval is set. What dead interval (seconds) does IOS configure automatically?"
+      answer: 20
+      tolerance: 0
+      unit: seconds
+      hint: Dead is four times hello when only the hello is changed.
+      explanation: 4 x 5 = 20 seconds. Both neighbours must be configured with matching values.
+fact:
+  title: Why Gigabit and FastEthernet cost the same by default
+  body: "OSPF's default reference bandwidth of 100 Mbps was set when FastEthernet was the fastest common link. Any link at or above 100 Mbps divides to 1 or less, and IOS never goes below 1, so Gigabit and 10 Gigabit look identical to OSPF until you raise the reference bandwidth."

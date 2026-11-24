@@ -1,0 +1,241 @@
+# Course pack — see content/README.md for the schema.
+# Official unit code not yet known; replace `code` when it is.
+id: ensa
+code: ENSA
+title: Enterprise Networking, Security and Automation
+shortTitle: Networking & Security
+tagline: "How enterprise networks route, defend, translate, connect and run themselves: OSPF, ACLs, NAT, VPNs, QoS, management, design, troubleshooting, SDN and automation."
+accent: "#1971C2"
+persona: |
+  You are an experienced Cisco Networking Academy instructor teaching Enterprise Networking, Security and
+  Automation (ENSA v7.0, the third CCNA course) at Uganda Christian University, examining a written theory
+  paper. You hold students to the course's own wording and numbers: OSPF as a link-state protocol, its five
+  packet types, three databases, SPF, the neighbour states Down to Full, DR/BDR election by priority then
+  router ID, router ID precedence, cost = reference bandwidth / interface bandwidth; threat actors, attack
+  types, defence in depth, AAA, hashing, HMAC, symmetric vs asymmetric encryption and Diffie-Hellman; ACL
+  processing (top-down, first match, implicit deny), wildcard masks, numbered ranges, placement (extended near
+  the source, standard near the destination), the established keyword and VTY access-class; NAT terminology
+  (inside/outside, local/global), static, dynamic and PAT, PAT port groups; WAN topologies, terms and
+  technologies; VPN types, GRE over IPsec, DMVPN, VTI, and the IPsec framework (AH/ESP, DES/3DES/AES/SEAL,
+  MD5/SHA, PSK/RSA, DH groups); QoS delay types, voice/video/data requirements, FIFO/WFQ/CBWFQ/LLQ,
+  best effort/IntServ/DiffServ, CoS, DSCP and AF values, trust boundaries, WRED, shaping vs policing; CDP,
+  LLDP, NTP, SNMP, syslog severity levels and file management; hierarchical design; the seven-step
+  troubleshooting process and layered methods; cloud models, hypervisors, SDN planes and APIs; JSON, YAML,
+  XML, REST and configuration-management tools; and intent-based networking.
+  Reward answers that define the term, explain why it matters, show the IOS command or calculation where
+  relevant, and apply it to an enterprise scenario (an HQ with branch offices, a campus, an ISP link). In
+  calculations expect the formula, the substitution and the result with units. Penalise vague answers such as
+  "it makes the network secure" with no mechanism.
+formulas:
+  - name: OSPF interface cost
+    expr: cost = reference bandwidth / interface bandwidth (default reference 100 Mbps; result rounded down, minimum 1)
+  - name: OSPF path cost
+    expr: path cost = Σ outgoing-interface costs from source router to destination network
+  - name: Change the reference bandwidth (on every router)
+    expr: "auto-cost reference-bandwidth <Mbps>, e.g. 10000 so 10 Gbps = 1, 1 Gbps = 10, 100 Mbps = 100"
+  - name: Wildcard mask from a subnet mask
+    expr: wildcard = 255.255.255.255 − subnet mask  (e.g. /28 → 0.0.0.15)
+  - name: Addresses matched by a wildcard
+    expr: 2^(number of 1 bits in the wildcard)
+  - name: Usable hosts in a subnet
+    expr: 2^(32 − prefix) − 2
+  - name: PAT port groups
+    expr: "if the original source port is taken, PAT uses the next free port in the same group: 0–511, 512–1023, 1024–65535"
+  - name: Assured Forwarding DSCP value
+    expr: AFxy → DSCP = 8x + 2y  (AF11 = 10, AF21 = 18, AF31 = 26, AF32 = 28, AF41 = 34; EF = 46)
+  - name: Class selector / CoS from DSCP
+    expr: CS = first 3 bits of DSCP = ⌊DSCP / 8⌋  (EF 46 → 5)
+  - name: Serialization delay
+    expr: serialization delay = frame size (bits) / link speed (bps)
+  - name: Propagation delay
+    expr: propagation delay ≈ distance / (2 × 10^8 m/s)  (about 5 µs per km of fibre)
+  - name: Voice one-way delay budget
+    expr: code + packetization + queuing + serialization + propagation + de-jitter ≤ 150 ms (jitter < 30 ms, loss < 1%)
+  - name: Leased-line rates
+    expr: T1 = 1.544 Mbps, T3 = 43.7 Mbps, E1 = 2.048 Mbps, E3 = 34.368 Mbps
+  - name: Syslog severity
+    expr: 0 emergencies, 1 alerts, 2 critical, 3 errors, 4 warnings, 5 notifications, 6 informational, 7 debugging (lower = more severe)
+  - name: REST CRUD mapping
+    expr: POST = create, GET = read, PUT/PATCH = update, DELETE = delete
+exam:
+  durationMinutes: 10
+  written:
+    - prompt: Describe how two OSPF routers on an Ethernet segment move from the Down state to the Full state. Name the packet types used at each stage.
+      module: ospf-concepts
+      keywords: [hello, init, two-way, dr, bdr, exstart, exchange, dbd, loading, lsr, lsu, lsack, full]
+      idealAnswer: |
+        R1 sends Hellos to 224.0.0.5 and moves from Down to Init when it receives a Hello from R2. When R1 sees its own
+        router ID in R2's Hello neighbour list, the link is bidirectional: Two-Way. On a multiaccess segment the DR and
+        BDR are elected here (highest priority, then highest router ID). In ExStart the routers decide who sends the
+        first DBD (the higher router ID) and agree the sequence number. In Exchange they swap DBD packets that summarise
+        their LSDBs, each acknowledged with an LSAck. If one router lacks entries it sends LSRs and receives LSUs in
+        Loading, then runs SPF. When the databases match the neighbours are Full. Afterwards LSUs are sent only on
+        change, plus a refresh every 30 minutes.
+      tip: Name the state, then the packet that moves it on.
+    - prompt: Explain why OSPF elects a DR and BDR on multiaccess networks, and how the election is decided. What happens if you want a router never to become DR?
+      module: ospf-concepts
+      keywords: [multiaccess, adjacencies, flooding, lsa, dr, bdr, drother, priority, router id, 0]
+      idealAnswer: |
+        On a multiaccess network every router forming an adjacency with every other would create n(n−1)/2 adjacencies
+        and excessive LSA flooding. A DR is the single collection and distribution point for LSAs; the BDR takes over if
+        the DR fails; the rest are DROTHERs and only form full adjacencies with the DR and BDR (via 224.0.0.6). The
+        highest interface priority (default 1) wins, with the highest router ID breaking ties. Setting `ip ospf priority 0`
+        makes a router ineligible. The election is not pre-emptive: a new higher-priority router does not take over
+        until the DR fails or the OSPF process is reset.
+    - prompt: A router has interfaces 10.1.1.1 (G0/0/0), 192.168.5.1 (G0/0/1) and Loopback0 10.255.255.1, and no router-id command. Which router ID does OSPF choose, and how would you force 1.1.1.1?
+      module: ospf-config
+      keywords: [router-id, loopback, highest, active, clear ip ospf process]
+      idealAnswer: |
+        Precedence: the `router-id` command, then the highest IPv4 address of any loopback, then the highest active
+        physical interface address. With Loopback0 present the router ID is 10.255.255.1, even though 192.168.5.1 is
+        numerically higher. To force 1.1.1.1 use `router ospf 10` then `router-id 1.1.1.1`, then `clear ip ospf process`
+        (or reload), because a router ID only changes when the process restarts.
+    - prompt: With the default reference bandwidth, a path crosses a FastEthernet link and two Gigabit links. Calculate the OSPF cost, explain the problem it reveals, and fix it.
+      module: ospf-config
+      keywords: [reference bandwidth, 100, cost, 1, fastethernet, gigabit, auto-cost]
+      idealAnswer: |
+        Cost = 10^8 / bandwidth. FastEthernet = 100 Mbps / 100 Mbps = 1; Gigabit = 100 / 1000 = 0.1, rounded up to the
+        minimum of 1. The path costs 1 + 1 + 1 = 3, and OSPF cannot tell 100 Mbps from 1 Gbps or 10 Gbps. Fix with
+        `auto-cost reference-bandwidth 10000` on every router: FastEthernet = 100, Gigabit = 10, so the path costs
+        100 + 10 + 10 = 120 and faster links are preferred.
+    - prompt: Compare symmetric and asymmetric encryption, and explain how Diffie-Hellman lets two VPN peers agree a key over the internet.
+      module: security-concepts
+      keywords: [same key, public key, private key, aes, rsa, faster, key exchange, diffie-hellman, shared secret]
+      idealAnswer: |
+        Symmetric algorithms (DES, 3DES, AES, SEAL) use one shared key for encryption and decryption. They are fast and
+        suit bulk data, but the key must reach both ends securely. Asymmetric algorithms (RSA, DH, ECC) use a public and
+        private key pair. They are slower and are used for key exchange, digital signatures and certificates.
+        Diffie-Hellman lets each peer combine its own private value with the other's public value to compute the same
+        shared secret without ever sending it, so an eavesdropper cannot derive the key. IPsec uses DH in IKE and then
+        encrypts traffic with a symmetric cipher such as AES.
+    - prompt: Explain defence in depth for an enterprise network, naming at least four security devices or services and what each defends against.
+      module: security-concepts
+      keywords: [layers, firewall, ips, vpn, esa, wsa, aaa, endpoint]
+      idealAnswer: |
+        Defence in depth layers several independent controls, so one failure does not expose the network. Examples:
+        a firewall at the edge permits only allowed sessions; an IPS inspects traffic and drops known attack signatures;
+        VPN routers encrypt site-to-site and remote access; an Email Security Appliance filters spam, phishing and
+        malware; a Web Security Appliance filters malicious URLs; AAA servers (RADIUS/TACACS+) authenticate admins and
+        users, authorise commands and keep accounting logs; endpoint protection guards hosts. Each layer covers a
+        different attack path.
+    - prompt: Write an extended named ACL that lets 192.168.10.0/24 browse the web (HTTP and HTTPS) but blocks it from Telnet to 192.168.30.0/24, and explain where you would apply it.
+      module: acls
+      keywords: [ip access-list extended, deny, tcp, eq 23, permit, eq 80, eq 443, inbound, close to the source, implicit deny]
+      idealAnswer: |
+        ```
+        ip access-list extended BRANCH-OUT
+         remark Block Telnet to the server LAN
+         deny tcp 192.168.10.0 0.0.0.255 192.168.30.0 0.0.0.255 eq 23
+         permit tcp 192.168.10.0 0.0.0.255 any eq 80
+         permit tcp 192.168.10.0 0.0.0.255 any eq 443
+        interface g0/0/1
+         ip access-group BRANCH-OUT in
+        ```
+        Extended ACLs go as close to the source as possible, so it is applied inbound on the router interface facing
+        192.168.10.0/24, and unwanted traffic never crosses the WAN. The specific deny comes before the general permits,
+        and everything else is dropped by the implicit deny. Add `permit udp ... eq 53` if clients use an outside DNS server.
+    - prompt: Calculate the wildcard mask that matches 172.16.32.0 to 172.16.47.255 and explain how the router uses it.
+      module: acls
+      keywords: [wildcard, 0.0.15.255, /20, 0 match, 1 ignore, 255.255.255.255]
+      idealAnswer: |
+        The range is 16 × 256 addresses = 172.16.32.0/20 (mask 255.255.240.0). The wildcard is
+        255.255.255.255 − 255.255.240.0 = 0.0.15.255. A 0 bit means the address bit must match, a 1 bit means ignore it.
+        The first 20 bits must equal 172.16.32.0 and the last 12 can be anything, so the ACE is
+        `permit 172.16.32.0 0.0.15.255`.
+    - prompt: Define the four NAT address types using an example, and explain how PAT lets 200 inside hosts share one public address.
+      module: nat
+      keywords: [inside local, inside global, outside global, outside local, port, overload, translation table]
+      idealAnswer: |
+        Inside local is the private address of the inside host (192.168.10.10). Inside global is that host's public
+        address after translation (209.165.200.226). Outside global is the destination's real public address
+        (209.165.201.1). Outside local is the destination as seen from inside, normally the same. PAT (`overload`)
+        records address and source port in the translation table, e.g. 209.165.200.226:1444 ↔ 192.168.10.10:1444 and
+        209.165.200.226:1445 ↔ 192.168.11.10:1444. It keeps the original port if free, otherwise the next free port in
+        the same group, so thousands of sessions can share one inside global address.
+    - prompt: Configure dynamic NAT with overload on R2 for 192.168.0.0/16 using the pool 209.165.200.226–209.165.200.240, and list the commands that verify it.
+      module: nat
+      keywords: [ip nat pool, netmask, access-list 1, ip nat inside source list, overload, ip nat inside, ip nat outside, show ip nat translations, show ip nat statistics]
+      idealAnswer: |
+        ```
+        ip nat pool NAT-POOL2 209.165.200.226 209.165.200.240 netmask 255.255.255.224
+        access-list 1 permit 192.168.0.0 0.0.255.255
+        ip nat inside source list 1 pool NAT-POOL2 overload
+        interface s0/1/0
+         ip nat inside
+        interface s0/1/1
+         ip nat outside
+        ```
+        Verify with `show ip nat translations` (address:port pairs), `show ip nat statistics` (pool use, hits/misses,
+        inside/outside interfaces) and `show running-config | include nat`. Clear with `clear ip nat translation *`.
+    - prompt: Explain why GRE over IPsec is used between HQ and a branch that run OSPF, naming the passenger, carrier and transport protocols.
+      module: wan-vpn
+      keywords: [gre, ipsec, multicast, unicast, ospf, passenger, carrier, transport]
+      idealAnswer: |
+        A standard IPsec tunnel carries only unicast traffic, but OSPF uses multicast (224.0.0.5/6). GRE can encapsulate
+        multicast, broadcast and other Layer 3 protocols, but does not encrypt. Putting GRE inside IPsec gives both: the
+        OSPF packet is the passenger protocol, GRE is the carrier protocol, and IPv4 (protected by ESP) is the transport
+        protocol. IPsec VTI is a simpler alternative that carries multicast without GRE.
+    - prompt: Describe the IPsec framework and justify a choice for each building block in a new site-to-site VPN.
+      module: wan-vpn
+      keywords: [esp, ah, aes, sha, hmac, psk, rsa, diffie-hellman, group 14, confidentiality, integrity, authentication]
+      idealAnswer: |
+        IPsec is an open framework with five slots. The protocol is ESP rather than AH, because ESP gives confidentiality
+        as well as integrity and authentication (AH has no encryption). Confidentiality uses AES-256, because DES/3DES are
+        weak or slow. Integrity uses HMAC-SHA rather than MD5. Authentication uses RSA certificates when there are many
+        peers, or a PSK for a single pair (easy to set up, but it does not scale). Key exchange uses DH group 14 or above,
+        or ECC groups 19/20, because groups 1, 2 and 5 are deprecated. Together these form the security association.
+    - prompt: A branch WAN link carries voice, video and bulk file transfers. Design a QoS policy, naming the queuing method, the markings and where each tool is applied.
+      module: qos-management
+      keywords: [classify, mark, dscp, ef, af41, llq, cbwfq, priority queue, wred, trust boundary, shaping]
+      idealAnswer: |
+        Classify and mark as close to the source as possible, at the trust boundary (IP phones or the access switch). Mark
+        voice EF (DSCP 46, CoS 5), video AF41 (34) and bulk data AF11 or best effort. On the WAN edge use LLQ: a strict
+        priority queue for voice only (needs < 150 ms latency, < 30 ms jitter, < 1% loss), plus CBWFQ classes with
+        guaranteed bandwidth for video and data. Apply WRED to TCP data classes, so low-priority packets are dropped
+        early instead of tail-dropping. Shape outbound to the contracted rate so the provider's policer does not drop
+        excess. Configure queuing on every device in the path.
+    - prompt: Compare SNMPv1/v2c and SNMPv3, and explain the get, set and trap operations.
+      module: qos-management
+      keywords: [manager, agent, mib, get, set, trap, community string, plaintext, authentication, encryption, authpriv]
+      idealAnswer: |
+        SNMP has a manager (NMS), agents on devices and the MIB of objects. The manager polls with get requests, changes
+        values with set requests, and agents send unsolicited traps (or informs) when events occur. v1 and v2c
+        authenticate only with plaintext community strings (read-only or read-write), so they are easy to sniff. v3 adds
+        user-based security: noAuthNoPriv, authNoPriv (HMAC authentication) and authPriv (authentication plus
+        encryption, e.g. AES), and it should be used in production.
+    - prompt: Users report they cannot reach a server. Explain the seven-step troubleshooting process and how you would choose between bottom-up, top-down and divide-and-conquer.
+      module: design-troubleshooting
+      keywords: [define, gather, analyze, eliminate, hypothesis, test, solve, document, bottom-up, top-down, divide-and-conquer]
+      idealAnswer: |
+        The steps are: define the problem, gather information (ping, traceroute, show commands, questions to users),
+        analyse it against documentation and baselines, eliminate possible causes, propose a hypothesis, test it (judge
+        urgency, prepare a rollback plan, implement, verify), and solve and document it. Use bottom-up when a physical or
+        cabling fault is suspected. Use top-down for application or software problems. Use divide-and-conquer when there
+        is no obvious lead: start at Layer 3 with a ping, then go up if it works and down if it fails.
+    - prompt: Explain the three-layer hierarchical design model and when a collapsed core is appropriate.
+      module: design-troubleshooting
+      keywords: [access, distribution, core, two-tier, collapsed core, failure domain, redundancy, scalability]
+      idealAnswer: |
+        The access layer connects end devices (PoE, port security, VLANs). The distribution layer aggregates access
+        switches, routes between VLANs, applies ACLs and QoS, and terminates failure and broadcast domains. The core layer
+        is a fast, redundant backbone that does no packet manipulation. A two-tier collapsed core merges core and
+        distribution for a single building or small campus where a separate core would not pay off. Hierarchy gives
+        scalability, redundancy, performance, security, manageability and maintainability.
+    - prompt: Explain how SDN changes the traditional router architecture, naming the planes and the northbound and southbound APIs.
+      module: virtualization-automation
+      keywords: [control plane, data plane, management plane, controller, northbound, southbound, openflow, centralised]
+      idealAnswer: |
+        Traditionally each device holds its own control plane (routing protocols, routing table, ARP, STP), data plane
+        (forwarding by the switch fabric/ASICs, e.g. CEF) and management plane (SSH, SNMP). SDN moves the control plane to
+        a centralised controller with a network-wide view. Applications talk to the controller through northbound APIs
+        (often REST). The controller programs device forwarding tables through southbound APIs such as OpenFlow, so the
+        devices only forward. This makes policy consistent, automation possible and changes faster.
+    - prompt: Compare JSON and YAML for network automation, and explain what makes an API RESTful.
+      module: virtualization-automation
+      keywords: [json, yaml, key value, braces, indentation, rest, http, stateless, client-server, cacheable, get, post, put, delete]
+      idealAnswer: |
+        Both store key/value data. JSON uses braces for objects, square brackets for arrays, double-quoted keys and commas,
+        and ignores whitespace. YAML is a superset of JSON that uses indentation and hyphens for list items, with no
+        brackets or commas, so it is easier for humans to write (Ansible playbooks). A RESTful API runs over HTTP and is
+        client-server, stateless (no session state on the server) and cacheable. It exposes resources by URI and maps
+        CRUD to POST, GET, PUT/PATCH and DELETE, usually returning JSON with status codes such as 200.

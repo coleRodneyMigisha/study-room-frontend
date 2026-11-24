@@ -7,11 +7,12 @@ import { describe, it } from "node:test";
 import { labs as aiLabs } from "../src/courses/ai/labs.ts";
 import { labs as cvLabs } from "../src/courses/cv/labs.tsx";
 import { labs as dsLabs } from "../src/courses/ds/labs.ts";
+import { labs as ensaLabs } from "../src/courses/ensa/labs.ts";
 import { loadAllCourses } from "../src/lib/content/pack.ts";
 import type { Control, Derived, LabDef, Values } from "../src/lib/lab/types.ts";
 import { makePicker, seededRng } from "../src/lib/utils.ts";
 
-const ALL: Record<string, Record<string, LabDef>> = { ai: aiLabs, cv: cvLabs, ds: dsLabs };
+const ALL: Record<string, Record<string, LabDef>> = { ai: aiLabs, cv: cvLabs, ds: dsLabs, ensa: ensaLabs };
 
 // Goals that depend on what a student paints/draws (reported by a Visual) can't be searched.
 const VISUAL_GOALS = new Set(["cv/images-as-data/g-clip", "cv/segmentation/g-80", "cv/segmentation/g-gap"]);

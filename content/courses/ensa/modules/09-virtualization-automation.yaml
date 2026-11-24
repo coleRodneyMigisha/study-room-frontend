@@ -1,0 +1,495 @@
+id: virtualization-automation
+title: Virtualisation, SDN and Automation
+subtitle: Cloud and hypervisors, separating the control plane, APIs and data formats, configuration tools and intent-based networking
+recap: |
+  Cloud computing (NIST SP 800-145) offers SaaS, PaaS and IaaS through public, private, hybrid and community models, and is built on
+  virtualisation: a hypervisor (Type 1 bare metal, Type 2 hosted) runs many VMs on one machine. VM mobility makes East-West traffic
+  heavy. SDN separates the control plane from the data plane and puts the brains in a central controller, reached by northbound APIs
+  (to applications) and southbound APIs such as OpenFlow (to devices). Cisco ACI uses an APIC and a spine-leaf fabric. Automation
+  uses JSON, XML and YAML data and REST APIs over HTTP (CRUD: POST, GET, PUT/PATCH, DELETE). Configuration tools are Ansible,
+  Chef, Puppet and SaltStack. Intent-based networking adds translation, activation and assurance, delivered by Cisco DNA Center
+  on an overlay running over an underlay.
+traps:
+  - "Mixing up cloud service models. SaaS gives you the finished application (webmail), PaaS gives a platform and development tools, IaaS gives virtual servers, storage and network. The slide list is applications, development tools, network equipment/virtual infrastructure."
+  - "Swapping hypervisor types. Type 1 runs directly on hardware (bare metal): efficient, scalable, needs a management console (for example Cisco UCS Manager). Type 2 is hosted and runs on a normal OS such as a desktop VM program. Servers use Type 1."
+  - "Confusing a data centre with the cloud. A data centre is a physical facility. The cloud is an on-demand shared pool of resources, off premises, which itself runs in data centres."
+  - "Wrong direction for the APIs. Northbound APIs connect the controller to applications and business logic. Southbound APIs (OpenFlow, NETCONF) connect the controller to the network devices."
+  - "Confusing the planes. Control plane = decisions (routing tables, ARP, STP, runs on the CPU). Data (forwarding) plane = moving packets (switch fabric, ASICs). Management plane = SSH, SNMP, TFTP, HTTPS access. SDN moves the control plane to a controller."
+  - "Writing JSON with single quotes, trailing commas or YAML-style indentation. JSON keys and strings use double quotes, pairs are separated by commas, objects use braces and arrays use square brackets. YAML uses indentation and hyphens and no braces."
+  - "Linking HTTP methods and CRUD wrongly. POST = create, GET = read, PUT or PATCH = update, DELETE = delete. A 200 status means success."
+  - "Saying Ansible needs an agent. Ansible is agentless (Python, YAML playbooks). Chef is agent-based (Ruby, cookbooks, Chef Master), Puppet supports both (Ruby, manifests, Puppet Master) and SaltStack supports both (Python, pillar, Salt Master)."
+lesson:
+  checkpointStep: 5
+  steps:
+    - "Cloud computing gives access from anywhere, subscription to only the services needed, less on-site equipment, lower cost and rapid scaling. NIST SP 800-145 defines services: SaaS (applications), PaaS (platform and development tools) and IaaS (virtual infrastructure and network equipment). Deployment models: public, private, hybrid and community (for example healthcare with HIPAA)."
+    - "Virtualisation separates the operating system from the hardware and is the foundation of cloud. A hypervisor adds an abstraction layer between firmware and OS to create VMs. It cuts equipment, energy and space, speeds provisioning, increases uptime and helps disaster recovery. Dedicated servers cause single points of failure, server sprawl and idle resources."
+    - "Type 1 hypervisors (bare metal) run on the hardware and need a management console such as Cisco UCS Manager; they are efficient, scalable and robust, with VM consolidation, failover and over-allocation of memory. Type 2 hypervisors are hosted on an operating system and need no console. VM mobility makes East-West (server to server) traffic dominate, versus North-South traffic that leaves the data centre."
+    - "Every network device has three planes. Control plane: the brains (routing protocol tables, routing table, STP, ARP) in the CPU. Data plane: forwarding through the fabric using a special processor (CEF forwards without the control plane). Management plane: SSH, TFTP, SFTP, HTTPS and SNMP access. SDN separates control from data plane and centralises the controller."
+    - "SDN architecture: applications talk to the controller through northbound APIs, the controller talks to devices through southbound APIs (OpenFlow). The controller fills flow tables. Switches hold three tables: flow table (match and action), group table and meter table (rate limiting). Other SDN pieces: OpenStack, I2RS, TRILL, FabricPath and SPB (802.1aq)."
+    - "Checkpoint: explain the three planes of a network device, which one SDN moves, and what the northbound and southbound APIs connect."
+    - "Cisco ACI is a purpose-built hardware SDN solution. Its parts are the Application Network Profile (EPGs plus policies), the APIC controller that translates policy, and Nexus 9000 switches in a spine-leaf topology where leaves never connect to each other and everything is one hop away. APIC does not touch the data path directly. SDN types: device-based, controller-based (OpenDaylight) and policy-based (APIC-EM)."
+    - "Automation gives 24-hour work, uniformity, data collection and analysis, safety and smart behaviour. Data formats are JSON, XML and YAML. JSON uses braces, brackets, double-quoted keys and commas; YAML uses indentation and hyphens; XML uses tags like <key>value</key>. APIs are the rules by which programs talk (the waiter analogy): open, internal or partner."
+    - "Web service APIs: SOAP (XML, 1998), REST (JSON, XML or YAML, 2000, the most widely used), XML-RPC (1998) and JSON-RPC (2005). REST uses HTTP: client-server, stateless, cacheable. Methods map to CRUD (POST, GET, PUT/PATCH, DELETE). A request has an API server, resources and a query with a key. Tools: Ansible, Chef, Puppet and SaltStack automate configuration; IBN adds translation, activation and assurance; Cisco DNA Center delivers it over an overlay on an underlay."
+checkpoint:
+  question: Describe the control plane, data plane and management plane of a network device. Which plane does SDN centralise, and what do northbound and southbound APIs connect?
+  hint: Think of the brain versus the muscle, then of the controller sitting in the middle of applications and devices.
+  keywords:
+    - control plane
+    - data plane
+    - management plane
+    - controller
+    - northbound
+    - southbound
+    - OpenFlow
+  idealAnswer: "The control plane makes decisions: routing protocols, the routing table, ARP and STP run on the CPU. The data (forwarding) plane moves packets through the switch fabric according to those decisions, using special processors (CEF forwards without involving the control plane). The management plane carries administrator access and monitoring such as SSH, TFTP, SFTP, HTTPS and SNMP. SDN separates the control plane from the data plane and centralises the control plane in a controller. Northbound APIs connect the controller to applications and business logic above it; southbound APIs, such as OpenFlow, connect the controller to the network devices below, where the controller populates flow tables."
+notes:
+  - heading: Cloud computing and virtualisation
+    body: |
+      **Benefits of cloud:** access anywhere, subscribe only to needed services, less on-site equipment, lower cost, rapid scaling.
+
+      | NIST SP 800-145 service model | You get | Example |
+      |---|---|---|
+      | SaaS (Software as a Service) | The application | Web mail, Office online |
+      | PaaS (Platform as a Service) | Platform and development tools | Database, runtime |
+      | IaaS (Infrastructure as a Service) | Virtual servers, storage, network equipment | Virtual machines |
+      | ITaaS | IT support as a service (extension) | Managed IT |
+
+      **Deployment models:** **public** (open to all, provider owned), **private** (one organisation), **hybrid** (private plus public), **community** (shared by organisations with common needs, such as healthcare under HIPAA).
+
+      **Data centre versus cloud:** a data centre is the physical facility. The cloud is an off-premise, on-demand, shared pool of resources that runs in data centres.
+
+      **Virtualisation** separates the OS from hardware. Dedicated servers cause a single point of failure, server sprawl and idle resources. A **hypervisor** adds an abstraction layer between firmware and the OS (layers: hardware, firmware, hypervisor, OS, services) to create VMs.
+
+      **Advantages:** less equipment, energy and space; easier prototyping; faster provisioning; higher uptime; better disaster recovery; legacy OS support.
+  - heading: Hypervisor types and traffic
+    body: |
+      | | Type 1 (bare metal) | Type 2 (hosted) |
+      |---|---|---|
+      | Runs on | Hardware directly | A host operating system |
+      | Console | Needed (for example Cisco UCS Manager) | Not needed |
+      | Performance | More efficient, scalable, robust | Lower, shared with host OS |
+      | Features | Consolidation, VM failover, memory over-allocation | Convenient on a PC |
+      | Use | Data centres | Desktops, test, training |
+
+      **Traffic patterns:** North-South leaves or enters the data centre. **East-West** is server to server inside it. VM mobility (moving VMs between hosts) and multi-tier applications make East-West traffic dominate, which a traditional three-tier network handles badly. Network virtualisation tools: subinterfaces, virtual interfaces, VLANs and **VRF** (virtual routing and forwarding).
+  - heading: Planes and SDN
+    body: |
+      | Plane | Function | Examples |
+      |---|---|---|
+      | Control | The brains: decides where traffic goes; CPU | Routing protocol tables, routing table, STP, ARP |
+      | Data (forwarding) | Moves packets; switch fabric, special processor | CEF forwarding, ASIC switching |
+      | Management | Administrator access and monitoring | SSH, TFTP, SFTP, HTTPS, SNMP |
+
+      **SDN** (software-defined networking) separates the control plane from the data plane and centralises it in a **controller**. Devices become simple forwarders. Benefits: central policy, automation, programmability.
+
+      **Components:** OpenFlow (born at Stanford; controller to device protocol), OpenStack (orchestration, IaaS), I2RS, TRILL, FabricPath and SPB (IEEE 802.1aq).
+
+      **APIs:** **northbound** (controller to applications, usually REST) and **southbound** (controller to devices, for example OpenFlow, NETCONF).
+
+      **OpenFlow switch tables:** the controller populates the **flow table** (match fields and actions for each flow), the **group table** (actions applied to groups of flows, such as multicast or load balancing) and the **meter table** (rate limiting per flow).
+  - heading: Cisco ACI, spine-leaf and SDN types
+    body: |
+      **Cisco ACI** (Application Centric Infrastructure) is a purpose-built hardware SDN solution for the data centre.
+
+      | Component | Role |
+      |---|---|
+      | Application Network Profile (ANP) | EPGs (endpoint groups) plus the policies between them |
+      | APIC | Centralised controller that translates policy into network configuration |
+      | Nexus 9000 switches | The fabric hardware |
+
+      **Spine-leaf:** every leaf connects to every spine, **leaves never connect to each other**, and any two endpoints are one spine hop apart. Predictable latency, easy scale-out and good East-West traffic. The APIC does not manipulate the data path directly; policy is pushed to the switches.
+
+      | SDN type | Idea | Example |
+      |---|---|---|
+      | Device-based | Programmable devices with agents and APIs | Cisco IOS XE devices |
+      | Controller-based | Central controller, devices use southbound API | OpenDaylight, Cisco Open SDN Controller |
+      | Policy-based | Controller applies policy intent, GUI, no programming | Cisco APIC-EM |
+
+      **APIC-EM** functions: discovery and inventory, topology, **path trace** (finds conflicting or shadowed ACL entries along a path) and policy.
+  - heading: Automation and data formats
+    body: |
+      **Benefits:** 24-hour operation, uniformity, data collection and analysis, safety, smart behaviour.
+
+      **Data formats** share rules for syntax, object representation and key/value pairs.
+
+      | | JSON | YAML | XML |
+      |---|---|---|---|
+      | Structure | `{}` objects, `[]` arrays | Indentation | Tags |
+      | Key/value | `"key": value` | `key: value` | `<key>value</key>` |
+      | Lists | `[a, b]` | `- a` | Repeated tags |
+      | Quotes | Keys double-quoted | Usually none | None |
+      | Notes | Whitespace insignificant, values: string, number, array, Boolean, null, object | Superset of JSON, minimalist | Like HTML, no predefined tags |
+
+      ```
+      JSON:  {"interface": "G0/0", "ip": "192.168.1.1", "up": true, "vlans": [10, 20]}
+
+      YAML:  interface: G0/0
+             ip: 192.168.1.1
+             up: true
+             vlans:
+               - 10
+               - 20
+
+      XML:   <interface><name>G0/0</name><ip>192.168.1.1</ip>
+             <vlan>10</vlan><vlan>20</vlan></interface>
+      ```
+  - heading: APIs and REST
+    body: |
+      An **API** is a set of rules for one application to use another (the waiter takes your order to the kitchen). Types by audience: **open (public)**, often needs a key; **internal (private)**; **partner** (shared with business partners).
+
+      | Web service API | Year | Format |
+      |---|---|---|
+      | SOAP | 1998 | XML |
+      | REST | 2000 | JSON, XML or YAML; most widely used |
+      | XML-RPC | 1998 | XML |
+      | JSON-RPC | 2005 | JSON |
+
+      **REST** works over HTTP. Constraints: **client-server**, **stateless**, **cacheable**.
+
+      | HTTP method | CRUD | Meaning |
+      |---|---|---|
+      | POST | Create | Make a new resource |
+      | GET | Read | Retrieve |
+      | PUT / PATCH | Update | Replace or modify |
+      | DELETE | Delete | Remove |
+
+      HTTP status 200 means success. **URI** = URN (names the resource) or URL (its location). `https://www.example.com/author/book.html#page155` has scheme `https`, hostname `www.example.com`, path/file `/author/book.html` and fragment `#page155`.
+
+      **Request anatomy (MapQuest style):** `https://www.mapquestapi.com/directions/v2/route?outFormat=json&key=KEY&from=A&to=B` = API server, resource (`/directions/v2/route`), query (format, key, parameters). Keys authenticate, limit users and requests, track data and gather user info.
+
+      **Calling REST:** browser, developer site, Postman, Python (requests) and the network OS (NETCONF, RESTCONF).
+  - heading: Configuration management tools
+    body: |
+      Traditional configuration was per-device CLI. SNMP was rarely used for configuration. **Automation** is a tool doing a task; **orchestration** arranges automated tasks into a workflow.
+
+      | Tool | Language | Agent | Master | Config file |
+      |---|---|---|---|---|
+      | Ansible | Python (YAML files) | Agentless | Any device can be controller | Playbook |
+      | Chef | Ruby | Agent-based | Chef Master | Cookbook |
+      | Puppet | Ruby | Both | Puppet Master | Manifest |
+      | SaltStack | Python | Both | Salt Master | Pillar |
+
+      These tools automate software and version control, device attributes, protocol configuration and ACLs.
+  - heading: Intent-based networking and DNA Center
+    body: |
+      **IBN** builds on SDN: the administrator states a business **intent**, the system turns it into policy using analytics, machine learning and automation.
+
+      | IBN function | Meaning |
+      |---|---|
+      | Translation | Capture intent and turn it into policy |
+      | Activation | Push the policy to devices (orchestration, automation) |
+      | Assurance | Continuously verify the network does what the intent says |
+
+      **Fabric:** the **overlay** is a logical network (virtual topology) carried by encapsulation such as IPsec or CAPWAP; the **underlay** is the physical topology that moves the packets.
+
+      **Cisco DNA solutions:** SD-Access, SD-WAN, DNA Assurance and DNA Security. **DNA Center** has five areas: **Design, Policy, Provision, Assurance and Platform** (open APIs).
+  - heading: Sources
+    body: |
+      - NIST SP 800-145, The NIST Definition of Cloud Computing: https://csrc.nist.gov/pubs/sp/800/145/final
+      - RFC 7426, SDN: Layers and Architecture Terminology: https://www.rfc-editor.org/rfc/rfc7426
+      - RFC 8259, The JSON Data Interchange Format: https://www.rfc-editor.org/rfc/rfc8259
+      - RFC 3986, Uniform Resource Identifier (URI): Generic Syntax: https://www.rfc-editor.org/rfc/rfc3986
+      - RFC 8040, RESTCONF Protocol: https://www.rfc-editor.org/rfc/rfc8040
+      - YAML 1.2.2 specification: https://yaml.org/spec/1.2.2/
+      - Open Networking Foundation, OpenFlow: https://opennetworking.org/sdn-resources/openflow/
+      - Cisco, DNA Center: https://www.cisco.com/c/en/us/products/cloud-systems-management/dna-center/index.html
+      - Cisco ENSA v7.0 lecture slides, Modules 13 and 14
+examples:
+  - title: Classify the cloud service model
+    problem: "(a) A school uses a hosted email and calendar service through a browser. (b) A software team rents a managed runtime and database to deploy its own app. (c) A company rents virtual machines and installs its own OS. Name the model for each."
+    steps:
+      - "(a) The provider runs everything and the user only uses the application: SaaS."
+      - "(b) The team controls the application but not the OS or middleware: PaaS."
+      - "(c) The company controls the OS and up, the provider supplies virtualised hardware: IaaS."
+      - "As you go from IaaS to PaaS to SaaS the customer manages less and the provider more."
+    answer: "(a) SaaS, (b) PaaS, (c) IaaS."
+    takeaway: "Ask what the customer still manages. Application only = SaaS; code and data = PaaS; OS and up = IaaS."
+  - title: Read and write the same data in JSON and YAML
+    problem: "Write this in JSON and YAML: device R1 with interface G0/1 whose address is 10.1.1.1 and state up, and VLAN list 10, 20."
+    steps:
+      - "JSON uses braces, double-quoted keys, commas and brackets for the list: {\"device\": \"R1\", \"interface\": {\"name\": \"G0/1\", \"ip\": \"10.1.1.1\", \"up\": true}, \"vlans\": [10, 20]}."
+      - "The Boolean true and the numbers 10 and 20 are not quoted; strings are."
+      - "YAML uses indentation: `device: R1`, then `interface:` with indented `name: G0/1`, `ip: 10.1.1.1`, `up: true`, then `vlans:` with `- 10` and `- 20`."
+      - "No braces, commas or quotes are needed in YAML, and indentation (spaces, not tabs) defines nesting."
+    answer: "JSON as above; YAML as the same keys indented with hyphens for the list."
+    takeaway: "JSON: syntax characters. YAML: indentation. XML: tags."
+  - title: Map REST operations to HTTP and CRUD
+    problem: "A REST API manages interfaces at https://api.example.com/v1/interfaces. Which HTTP request is used to (a) list all interfaces, (b) add one, (c) change an IP, (d) remove one? Split the URL into parts."
+    steps:
+      - "(a) Read = GET /v1/interfaces."
+      - "(b) Create = POST /v1/interfaces with a JSON body describing the new interface."
+      - "(c) Update = PUT (replace) or PATCH (modify) /v1/interfaces/G0-1."
+      - "(d) Delete = DELETE /v1/interfaces/G0-1."
+      - "URL parts: scheme https, hostname api.example.com (API server), path /v1/interfaces (resource); a query would follow a question mark, for example ?format=json&key=ABC. A successful response has status 200."
+    answer: "GET, POST, PUT or PATCH, DELETE."
+    takeaway: "CRUD maps to POST, GET, PUT/PATCH, DELETE (Create, Read, Update, Delete)."
+  - title: Choosing a configuration tool
+    problem: "A team has 500 routers, no spare servers to host agents, and staff who know Python and YAML. Which tool fits?"
+    steps:
+      - "Agent-based tools (Chef) need software on every device, which network devices often cannot run."
+      - "Ansible is agentless, uses Python and YAML playbooks and any machine can be the controller."
+      - "Puppet and SaltStack support both modes, but the team's skills and the agentless need point to Ansible."
+    answer: "Ansible, with YAML playbooks."
+    takeaway: "Agentless plus Python and YAML means Ansible."
+  - title: Where does an SDN message go
+    problem: "A user changes a bandwidth policy in the controller's GUI. A switch then drops traffic above 100 Mbps for a flow. Trace which API and table are involved."
+    steps:
+      - "The GUI or an orchestration application sends the request to the controller through a northbound API (usually REST)."
+      - "The controller translates the policy and sends flow entries to the switch through the southbound API, for example OpenFlow."
+      - "In the switch the flow table matches the traffic and the meter table applies the 100 Mbps rate limit."
+      - "Forwarding then happens in the data plane; the controller (control plane) is no longer involved for matching packets."
+    answer: "Northbound API to the controller, OpenFlow southbound to the switch, flow table plus meter table."
+    takeaway: "Applications go north, devices go south, tables are flow, group and meter."
+terms:
+  - term: SaaS
+    definition: Software as a Service. The provider delivers a finished application over the network.
+  - term: PaaS
+    definition: Platform as a Service. The provider supplies a platform and development tools to build and run applications.
+  - term: IaaS
+    definition: Infrastructure as a Service. The provider supplies virtualised servers, storage and network equipment.
+  - term: Hypervisor
+    definition: Software that creates and runs virtual machines by adding an abstraction layer between the hardware and the operating systems.
+  - term: Type 1 hypervisor
+    definition: Bare-metal hypervisor that runs directly on hardware; efficient and scalable, needs a management console such as Cisco UCS Manager.
+  - term: Type 2 hypervisor
+    definition: Hosted hypervisor that runs on a host operating system and needs no management console.
+  - term: East-West traffic
+    definition: Server-to-server traffic inside a data centre, as opposed to North-South traffic that enters or leaves it.
+  - term: Control plane
+    definition: The part of a device that makes forwarding decisions (routing tables, ARP, STP).
+  - term: Data plane
+    definition: The forwarding part of a device that moves packets through the fabric.
+  - term: SDN
+    definition: Software-defined networking. Separates the control plane from the data plane and centralises it in a controller.
+  - term: Northbound and southbound API
+    definition: Northbound connects the controller to applications; southbound connects it to network devices, for example OpenFlow.
+  - term: Cisco ACI and APIC
+    definition: ACI is Cisco's hardware SDN data-centre solution; APIC is its centralised controller, used with Nexus 9000 spine-leaf switches.
+  - term: Spine-leaf
+    definition: A two-tier fabric where every leaf connects to every spine and leaves never connect to each other, so everything is one hop away.
+  - term: REST
+    definition: Web API style over HTTP that is client-server, stateless and cacheable, mapping CRUD to HTTP methods.
+  - term: CRUD
+    definition: Create, Read, Update, Delete, mapped to POST, GET, PUT or PATCH, and DELETE.
+  - term: URI, URL and URN
+    definition: A URI is either a URL (location) or a URN (name). A URL has scheme, hostname, path and optional fragment.
+  - term: Ansible, Chef, Puppet, SaltStack
+    definition: Configuration management tools. Ansible is agentless with playbooks; Chef uses cookbooks; Puppet uses manifests; SaltStack uses pillars.
+  - term: Intent-based networking
+    definition: A network that turns business intent into policy and verifies it, through translation, activation and assurance.
+  - term: Overlay and underlay
+    definition: The overlay is the logical network built by encapsulation; the underlay is the physical network that carries it.
+  - term: Cisco DNA Center
+    definition: The IBN controller and management platform with Design, Policy, Provision, Assurance and Platform areas.
+quiz:
+  - question: A company rents virtual machines and installs its own operating system. Which service model is this?
+    options:
+      - SaaS
+      - PaaS
+      - IaaS
+      - ITaaS
+    answer: 2
+    explanation: The provider supplies virtualised infrastructure; the customer manages the OS and above. That is IaaS.
+  - question: Which cloud model is shared by organisations with a common concern such as healthcare regulation?
+    options:
+      - Public
+      - Private
+      - Hybrid
+      - Community
+    answer: 3
+    explanation: A community cloud is shared by organisations with common requirements.
+  - question: Which hypervisor runs directly on the server hardware?
+    options:
+      - Type 1
+      - Type 2
+      - Hosted
+      - Container host only
+    answer: 0
+    explanation: Type 1 is bare metal and needs a management console. Type 2 runs on a host OS.
+  - question: What is East-West traffic?
+    options:
+      - Traffic leaving the data centre
+      - Server-to-server traffic inside the data centre
+      - Traffic between ISPs
+      - Management traffic only
+    answer: 1
+    explanation: East-West is server to server inside the data centre; North-South enters or leaves it.
+  - question: Which plane runs routing protocols and builds the routing table?
+    options:
+      - Data plane
+      - Management plane
+      - Control plane
+      - Forwarding plane
+    answer: 2
+    explanation: The control plane makes the decisions; the data plane forwards.
+  - question: Which API type connects an SDN controller to the network devices?
+    options:
+      - Northbound
+      - Southbound
+      - Eastbound
+      - Partner
+    answer: 1
+    explanation: Southbound APIs such as OpenFlow reach down to devices; northbound reaches up to applications.
+  - question: Which OpenFlow table is used for rate limiting?
+    options:
+      - Flow table
+      - Group table
+      - Meter table
+      - Routing table
+    answer: 2
+    explanation: The meter table applies rate limits. The flow table matches flows and the group table holds group actions.
+  - question: In a spine-leaf design, which connection is NOT present?
+    options:
+      - Leaf to spine
+      - Leaf to leaf
+      - Spine to controller
+      - Endpoint to leaf
+    answer: 1
+    explanation: Leaves never connect to each other; each connects to every spine.
+  - question: Which SDN type uses a GUI and policy with no programming, for example APIC-EM?
+    options:
+      - Device-based
+      - Controller-based
+      - Policy-based
+      - Hardware-based
+    answer: 2
+    explanation: APIC-EM is policy-based. OpenDaylight is controller-based.
+  - question: Which is valid JSON?
+    options:
+      - "{name: R1}"
+      - "{'name': 'R1'}"
+      - "{\"name\": \"R1\"}"
+      - "name = R1"
+    answer: 2
+    explanation: JSON keys and string values use double quotes inside braces.
+  - question: Which HTTP method maps to the CRUD operation Create?
+    options:
+      - GET
+      - POST
+      - PUT only
+      - DELETE
+    answer: 1
+    explanation: POST creates, GET reads, PUT or PATCH updates, DELETE deletes.
+  - question: Which is NOT a RESTful constraint?
+    options:
+      - Client-server
+      - Stateless
+      - Cacheable
+      - Stateful sessions
+    answer: 3
+    explanation: REST is stateless; each request carries what the server needs.
+  - question: Which configuration tool is agentless and uses Python with YAML playbooks?
+    options:
+      - Chef
+      - Puppet
+      - Ansible
+      - SaltStack
+    answer: 2
+    explanation: Ansible is agentless, uses playbooks and YAML. Chef is agent-based with cookbooks.
+  - question: Which are the three functions of intent-based networking?
+    options:
+      - Design, policy, provision
+      - Translation, activation, assurance
+      - Overlay, underlay, fabric
+      - Create, read, update
+    answer: 1
+    explanation: IBN translates intent, activates it and assures it continually.
+questions:
+  - question: Explain the NIST cloud service models (SaaS, PaaS and IaaS) and the four deployment models.
+    kind: long
+    marks: 8
+    keywords:
+      - SaaS
+      - PaaS
+      - IaaS
+      - public
+      - private
+      - hybrid
+      - community
+    idealAnswer: "SaaS delivers a finished application. PaaS delivers a platform and development tools to build and run applications. IaaS delivers virtualised infrastructure such as servers, storage and network equipment. Deployment models: public (open, provider owned), private (one organisation), hybrid (combination of private and public) and community (shared by organisations with common requirements, for example healthcare)."
+  - question: Compare Type 1 and Type 2 hypervisors and list four advantages of virtualisation.
+    kind: long
+    marks: 8
+    keywords:
+      - bare metal
+      - hosted
+      - management console
+      - consolidation
+      - provisioning
+      - disaster recovery
+    idealAnswer: "A Type 1 hypervisor runs directly on the hardware, is more efficient, scalable and robust, and needs a management console such as Cisco UCS Manager; features include consolidation, VM failover and memory over-allocation. A Type 2 hypervisor runs on a host operating system and needs no console. Virtualisation advantages: less equipment, energy and space, faster provisioning, easier prototyping, increased uptime, better disaster recovery and support for legacy systems."
+  - question: Describe the three planes of a network device and explain how SDN changes them.
+    kind: long
+    marks: 8
+    keywords:
+      - control plane
+      - data plane
+      - management plane
+      - controller
+      - centralised
+    idealAnswer: "Control plane: decisions, such as routing protocols, routing table, ARP and STP, in the CPU. Data plane: forwarding of packets through the fabric with special processors (CEF). Management plane: SSH, TFTP, SFTP, HTTPS and SNMP. SDN separates the control plane from the data plane and centralises the control plane in a controller, so devices become simple forwarders programmed via southbound APIs."
+  - question: Distinguish northbound from southbound APIs and name the three OpenFlow switch tables.
+    kind: short
+    marks: 5
+    keywords:
+      - northbound
+      - southbound
+      - OpenFlow
+      - flow table
+      - group table
+      - meter table
+    idealAnswer: "Northbound APIs connect the controller to applications; southbound APIs, such as OpenFlow, connect it to network devices. The tables are the flow table (match and actions), group table and meter table (rate limiting)."
+  - question: Describe Cisco ACI, its components and the spine-leaf topology.
+    kind: short
+    marks: 6
+    keywords:
+      - APIC
+      - Application Network Profile
+      - Nexus 9000
+      - spine
+      - leaf
+      - one hop
+    idealAnswer: "ACI is Cisco's purpose-built hardware SDN solution. Components: the Application Network Profile (endpoint groups and policies), the APIC controller that translates policy into configuration, and Nexus 9000 switches. In a spine-leaf topology every leaf connects to every spine and leaves never connect to each other, so everything is one hop away. APIC does not manipulate the data path directly."
+  - question: Compare JSON, YAML and XML syntax, giving the same small example in each.
+    kind: long
+    marks: 8
+    keywords:
+      - braces
+      - brackets
+      - double quotes
+      - indentation
+      - tags
+      - key/value
+    idealAnswer: "JSON uses braces for objects, brackets for arrays, double-quoted keys, colons between key and value and commas between pairs, e.g. {\"name\": \"R1\", \"vlans\": [10, 20]}. YAML is a superset of JSON that uses indentation and hyphens and no braces or commas: name: R1 then vlans: with - 10 and - 20. XML uses tags like <name>R1</name> and repeated tags for lists."
+  - question: Explain how REST works, including its constraints, the mapping of HTTP methods to CRUD, and the parts of a RESTful request.
+    kind: long
+    marks: 10
+    keywords:
+      - client-server
+      - stateless
+      - cacheable
+      - POST
+      - GET
+      - PUT
+      - DELETE
+      - query
+      - API key
+    idealAnswer: "REST is a web API style over HTTP, constrained to be client-server, stateless and cacheable. CRUD maps to HTTP methods: POST create, GET read, PUT or PATCH update, DELETE delete; status 200 is success. A request consists of the API server, the resource path and a query with format, key and parameters. The key authenticates users, limits requests and tracks usage. It can be called from a browser, Postman, Python or RESTCONF."
+  - question: Compare Ansible, Chef, Puppet and SaltStack, then explain intent-based networking and the role of Cisco DNA Center.
+    kind: long
+    marks: 10
+    keywords:
+      - agentless
+      - playbook
+      - cookbook
+      - manifest
+      - pillar
+      - translation
+      - activation
+      - assurance
+      - overlay
+      - underlay
+    idealAnswer: "Ansible: Python and YAML, agentless, playbooks. Chef: Ruby, agent-based, Chef Master, cookbooks. Puppet: Ruby, agent or agentless, Puppet Master, manifests. SaltStack: Python, both modes, Salt Master, pillar. Intent-based networking builds on SDN: it translates business intent into policy, activates it on devices and gives assurance through analytics. The fabric has a logical overlay (IPsec or CAPWAP encapsulation) running over the physical underlay. Cisco DNA Center delivers this with Design, Policy, Provision, Assurance and Platform areas, supporting SD-Access, SD-WAN, assurance and security."
+fact:
+  title: Spine-leaf and East-West traffic
+  body: Spine-leaf fabrics were adopted in data centres because virtualisation made most traffic East-West. Every server is the same number of hops from every other, so latency is predictable.

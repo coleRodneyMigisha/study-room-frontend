@@ -1,0 +1,489 @@
+id: design-troubleshooting
+title: Network Design and Troubleshooting
+subtitle: Building a scalable hierarchical network, then documenting, baselining and fixing it with a method
+recap: |
+  Good campus design is hierarchical and modular: access (users), distribution (routing, QoS, security, broadcast limits) and core
+  (fast backbone), or a two-tier collapsed core for small sites. Scale it with redundancy (and STP), multiple links (EtherChannel),
+  a scalable routing protocol such as multi-area OSPF, and wireless at the access edge. Failure domains stop at the distribution
+  layer. Choose switches by cost, port density, PoE, speed, forwarding rate, buffers and form factor. For troubleshooting keep
+  documentation and a baseline (7 days minimum, 6 weeks maximum), then follow the seven steps: define, gather, analyse, eliminate,
+  hypothesise, test, solve and document. Pick a method (bottom-up, top-down, divide and conquer and so on), use the tools, and
+  work through the layers end to end.
+traps:
+  - "Putting security, routing or QoS in the wrong tier. Access connects users and edge services (PoE, port security). Distribution aggregates, routes between VLANs, applies QoS and ACLs and limits broadcast domains. Core is a fast backbone with no policy. Failure domains terminate at the distribution layer."
+  - "Believing a collapsed core is a lesser design. It combines core and distribution into one layer for a small campus or single building. It saves cost but offers less scalability, and you still need redundancy."
+  - "Adding redundant links without STP. Redundant Layer 2 paths create loops and broadcast storms unless STP blocks the extras. EtherChannel bundles links into one logical Port Channel, so STP sees one link and all stay active."
+  - "Setting EtherChannel options on the physical ports only. Configure the logical interface with 'interface port-channel' and make every member port match (speed, duplex, VLANs, trunk mode)."
+  - "Taking a baseline that is too short or too long. Minimum 7 days, maximum 6 weeks, 2 to 4 weeks generally adequate, and repeat regularly. Start simple with interface and CPU utilisation."
+  - "Reordering the seven troubleshooting steps. Define the problem, gather information, analyse, eliminate possible causes, propose a hypothesis, test it (with urgency and a rollback plan), then solve and document. Do not test before you eliminate causes."
+  - "Using bottom-up for everything. Bottom-up starts at the physical layer and suits suspected physical faults; top-down suits software problems; divide and conquer starts in the middle (usually Layer 3) and moves up or down depending on the result."
+  - "Forgetting that ACLs end with an implicit deny. Common ACL faults: wrong interface or direction, wrong ACE order (specific before general), wildcard masks, wrong protocol or port, and a missing 'established' for return traffic."
+lesson:
+  checkpointStep: 3
+  steps:
+    - "A scalable network supports converged traffic, critical applications, diverse needs and centralised control. Cisco Borderless Networks are hierarchical, modular, resilient and flexible. Hierarchy splits the design into layers with a clear job each, which makes the network easy to understand, expand and troubleshoot. Three tiers: access (connect users, PoE, edge security), distribution (aggregate wiring closets, inter-VLAN routing, QoS, security policy, limits Layer 2 broadcast domains) and core (high-speed backbone, fault isolation). A two-tier collapsed core merges core and distribution for a small campus or single building."
+    - "Design for scalability with redundancy (multiple devices and links, needs STP to avoid Layer 2 loops), multiple links bundled by EtherChannel, a scalable routing protocol (OSPF areas support hierarchy) and wireless at the access edge. Failure domains terminate at the distribution layer, so a fault in one switch block does not spread."
+    - "Hardware selection. Switch platforms: campus LAN (Catalyst 3850, 9000), cloud-managed (Meraki), data centre (Nexus), service provider. Form factors: fixed, modular, stackable, rack units (1U = 1.75 in). Factors: cost, port density, power (PoE), reliability, port speed, frame buffers, forwarding rate and scalability. Routers: branch (ISR), edge (ASR), service provider (NCS), industrial."
+    - "Checkpoint: explain the difference between the three-tier and collapsed core designs, and give two reasons a distribution layer is where failure domains should stop."
+    - "Troubleshooting needs documentation: physical and logical topology diagrams, device documentation for routers, switches and end systems, and a performance baseline. Store them in one place with a copy elsewhere. A baseline is taken over at least 7 days and at most 6 weeks, repeated regularly, starting with interface and CPU utilisation."
+    - "The seven-step process: 1 define the problem, 2 gather information, 3 analyse, 4 eliminate possible causes, 5 propose a hypothesis, 6 test the hypothesis (consider urgency and a rollback plan), 7 solve the problem and document it, informing users. Ask end users open-ended questions: scope, when it started, constant or intermittent, what changed."
+    - "Methods: bottom-up (physical first), top-down (applications first), divide and conquer (start at Layer 3 and go up or down), follow the path, substitution (swap known good parts), comparison (against a working configuration) and educated guess (experience, risky). Tools: NMS software, knowledge bases, baselining tools, protocol analysers (Wireshark), cable testers and analysers, multimeters, Cisco Prime NAM and a syslog server."
+    - "Symptoms by layer. Layer 1: below-baseline performance, lost connectivity, bottlenecks, high CPU. Causes: power, hardware, cabling, EMI, clock rate, over-use. Layer 2: no Layer 3 connectivity, excessive broadcasts, 'line protocol down'. Causes: encapsulation, address mapping, duplex mismatch, STP loops. Layer 3: look at routing table, neighbours and topology database. ACL and NAT problems come next."
+    - "End-to-end bottom-up: physical, duplex mismatch, local addressing (ARP, VLAN), default gateway, correct path (longest prefix match), transport layer (telnet to the port), ACLs, then DNS (ip host, nslookup). If SLAAC fails, the router may not be in FF02::2 until 'ipv6 unicast-routing' is entered."
+checkpoint:
+  question: Describe the difference between a three-tier hierarchical design and a two-tier collapsed core design. Give two reasons why failure domains should stop at the distribution layer.
+  hint: Think about which layers exist, which size of site suits each, and what the distribution layer separates.
+  keywords:
+    - access
+    - distribution
+    - core
+    - collapsed core
+    - failure domain
+    - switch block
+    - broadcast
+  idealAnswer: "Three-tier design has separate access, distribution and core layers: access connects users, distribution aggregates the access switches, routes between VLANs and applies QoS and security, and core is a high-speed backbone that isolates faults. It scales to large campuses. A collapsed core merges core and distribution into one layer (two tiers), saving cost and equipment in a small campus or single building, with less room to scale. Failure domains stop at the distribution layer because the distribution layer routes (Layer 3), so broadcast domains, spanning-tree problems and faults in one switch block cannot spread to other blocks or the core; each switch block (a pair of routers or multilayer switches) works independently and its redundant pair means the loss of one device does not take down the block."
+notes:
+  - heading: Hierarchical campus design
+    body: |
+      A **scalable network** supports converged traffic, critical applications, diverse requirements and centralised control. The Cisco Borderless Network framework is **hierarchical, modular, resilient and flexible**.
+
+      | Layer | Role | Typical functions |
+      |---|---|---|
+      | Access | Connects users and devices | Port security, PoE for phones and APs, VLAN membership, first-hop QoS marking |
+      | Distribution | Aggregates wiring closets (access switches) | Inter-VLAN routing, ACLs and policy, QoS, route summarisation, limits Layer 2 broadcast domains |
+      | Core | High-speed backbone | Fast, redundant transport between distribution blocks, fault isolation; no complex policy |
+
+      **Collapsed core (two-tier):** core and distribution are one layer. Used in small campuses or single buildings where a separate core would be wasted. The cost is less scalability; adding buildings later means adding a core.
+
+      **Modularity:** each building or function is a **switch block** that can be added without redesigning the rest. Each block is a pair of routers or multilayer switches acting independently, so failures stay inside the block.
+  - heading: Designing for scalability
+    body: |
+      | Technique | What it gives | Catch |
+      |---|---|---|
+      | Redundancy | Multiple devices and paths, no single point of failure | Layer 2 loops need STP (or RSTP) to block the extra paths |
+      | Multiple links (EtherChannel) | More bandwidth and load balancing, fast failover | Members must match; configure on the Port Channel |
+      | Scalable routing protocol | Hierarchy and fast convergence, for example OSPF with areas | Tune: areas, summarisation, timers |
+      | Wireless | Extends the access layer | Consider device types, coverage, interference, security |
+
+      **Failure domains** are the parts of the network affected when a device or link fails. Terminating them at the distribution layer (routed boundary) keeps problems local.
+
+      **EtherChannel** bundles up to eight physical ports into one logical **Port Channel**. STP sees one link, so no member is blocked, and traffic is load-balanced across members (by MAC, IP or port hash).
+      ```
+      S1(config)# interface range gigabitethernet 0/1 - 2
+      S1(config-if-range)# channel-group 1 mode active     ! LACP (802.3ad)
+      S1(config-if-range)# exit
+      S1(config)# interface port-channel 1
+      S1(config-if)# switchport mode trunk
+      S1# show etherchannel summary
+      ```
+      Modes: LACP `active`/`passive`, PAgP (Cisco) `desirable`/`auto`, or `on` (no negotiation). Two `passive` or two `auto` ends will not form a channel.
+  - heading: Switch hardware and selection
+    body: |
+      **Platforms:** campus LAN (Catalyst 3850, 9000 series), cloud-managed (Meraki), data centre (Nexus), service provider, virtual networking.
+
+      **Form factors**
+      | Type | Description |
+      |---|---|
+      | Fixed | Set number of ports, cannot add |
+      | Modular | Chassis with line cards (Catalyst 9400 up to 384 ports) |
+      | Stackable | Several switches joined by special cables and managed as one |
+      | Rack unit | 1U = 1.75 in (44.45 mm) of rack height |
+
+      **Selection factors**
+      - **Cost** against need.
+      - **Port density:** for example the 3850 comes with 12, 24 or 48 ports.
+      - **Power:** PoE for IP phones, APs and cameras. It is expensive, so only where needed.
+      - **Reliability** (redundant power supplies and supervisors).
+      - **Port speed** and uplink speed.
+      - **Frame buffers** for bursts.
+      - **Forwarding rate:** how many packets per second the switch can process. If too low it cannot give full wire speed. Access switches need not be wire speed overall because their uplinks limit the traffic.
+      - **Scalability** for future growth.
+
+      Multilayer switches in distribution and core use **ASICs** to route at hardware speed.
+  - heading: Router hardware
+    body: |
+      Routers choose paths by network prefix, offer alternate paths, provide the default gateway, contain broadcasts, interconnect sites, group users logically and enforce ACL security.
+
+      | Category | Example | Use |
+      |---|---|---|
+      | Branch | ISR 4000 series (900 series form factor) | Remote offices, WAN edge |
+      | Network edge | ASR 9000/1000 | Large enterprise or provider edge |
+      | Service provider | NCS 6000, NCS 5500 | Provider core |
+      | Industrial | 1100 and 800 series | Harsh environments, rugged |
+      Select by throughput, number and type of interfaces, features (VPN, QoS, security) and cost.
+  - heading: Documentation and baselines
+    body: |
+      Keep documentation in one place with a backup copy elsewhere.
+
+      | Document | Contents |
+      |---|---|
+      | Physical topology | Devices, cables, rooms, rack positions, interface labels |
+      | Logical topology | VLANs, IP addressing, protocols, routing, ACL placement |
+      | Device documentation | Router: model, IOS, interfaces; Switch: ports, VLANs; End system: OS, IP, gateway, DNS |
+      | Performance baseline | Normal behaviour measured over time |
+
+      **Baseline steps:** (1) choose the data, start simple with interface and CPU utilisation; (2) choose devices and ports of interest (uplinks, servers, key routers); (3) choose the duration: **minimum 7 days, maximum 6 weeks, 2 to 4 weeks generally adequate**, and repeat regularly (new baselines after changes).
+
+      **Data commands:** `show version`, `show ip interface brief`, `show interfaces`, `show ip route`, `show cdp neighbors detail`, `show arp` or `show ipv6 neighbors`, `show running-config`, `show vlan`, `show port`, `show tech-support`.
+  - heading: The seven-step troubleshooting process
+    body: |
+      1. **Define the problem** (what is wrong versus what is expected).
+      2. **Gather information** (users, logs, commands).
+      3. **Analyse the information** (compare with baseline and documentation).
+      4. **Eliminate possible causes.**
+      5. **Propose a hypothesis.**
+      6. **Test the hypothesis** (consider urgency and always have a rollback plan).
+      7. **Solve the problem** (inform those affected and document the fix).
+
+      **Questioning users:** open-ended questions. Ask about scope (one user or many), when it started, constant or intermittent, and what changed.
+
+      **Gathering commands:** `ping`, `traceroute`, `telnet`, `ssh -l`, `show ip interface brief`, `show ip route`, `show protocols`, `debug` (carefully: it loads the CPU, so use it briefly or after `undebug all`).
+
+      | Method | Start | Use when |
+      |---|---|---|
+      | Bottom-up | Physical layer, move up | Physical fault suspected |
+      | Top-down | Application layer, move down | Software problem, simpler issue |
+      | Divide and conquer | Layer 3 (middle), then up or down | Experienced engineer, quick narrowing |
+      | Follow the path | The traffic path | Path or routing issue |
+      | Substitution | Swap with a known good part | Suspected hardware |
+      | Comparison | Compare with a working device | Config differences |
+      | Educated guess | Experience | Fast but risky |
+  - heading: Tools and syslog
+    body: |
+      **Tools:** NMS software, knowledge bases (vendor sites), baselining tools, **protocol analysers** (Wireshark), **multimeters**, **cable testers** and **cable analysers**, portable network analysers, **Cisco Prime NAM** and a **syslog server**.
+
+      | Level | Name |
+      |---|---|
+      | 0 | Emergencies |
+      | 1 | Alerts |
+      | 2 | Critical |
+      | 3 | Errors |
+      | 4 | Warnings |
+      | 5 | Notifications |
+      | 6 | Informational |
+      | 7 | Debugging |
+
+      Lower number = more severe. `logging trap 3` forwards levels 0 to 3. Syslog messages are formatted `%facility-severity-MNEMONIC`.
+
+      | Layer | Symptoms | Typical causes |
+      |---|---|---|
+      | 1 Physical | Below-baseline performance, lost connectivity, bottlenecks, high CPU, console errors | Power, hardware faults, bad cabling, attenuation, EMI/noise, wrong clock rate, exceeded design limits, CPU overload |
+      | 2 Data link | No Layer 3 connectivity, below baseline, excessive broadcasts, console messages such as "line protocol down" | Encapsulation errors, address mapping errors, framing errors (duplex mismatch), STP failures or loops |
+      | 3 Network | Network failure or sub-optimal performance | Topology changes, routing table or neighbour issues, bad topology database |
+
+      At Layer 3 decide whether it is a total failure or poor performance, then check connectivity, the routing table, neighbours and the topology database (for OSPF `show ip ospf neighbor`, `show ip ospf database`).
+  - heading: ACL, NAT and end-to-end problems
+    body: |
+      **ACL misconfigurations**
+      - Wrong interface or wrong direction (inbound versus outbound).
+      - Wrong order of ACEs: most specific first, most general last.
+      - Implicit deny at the end blocks anything not permitted.
+      - Wrong wildcard mask (it is the inverse of the subnet mask).
+      - Wrong transport protocol or port, TCP versus UDP.
+      - Missing `established` or return-traffic rules.
+      - Uncommon protocols (GRE, ESP, OSPF) denied by accident.
+
+      `show access-lists`, `show ip interface` (shows applied ACL) and `show run | include access` check them.
+
+      **NAT interoperability problems:** DHCP/BOOTP (a client sends from source 0.0.0.0, so it cannot be translated), DNS (addresses inside DNS replies), SNMP (addresses inside the payload), tunnelling and encryption (the inner header cannot be changed, and IPsec detects the change). Check with `show ip nat translations` and `show ip nat statistics`.
+
+      **End-to-end bottom-up checklist**
+      1. Physical: cables, link lights, `show interfaces` for errors.
+      2. Duplex mismatch: `show interfaces` for runts, late collisions, CRC errors; fix with matching settings.
+      3. Local addressing: `show ip arp`, VLAN assignment (`show vlan brief`).
+      4. Default gateway: correct address, reachable.
+      5. Correct path: `show ip route`, longest prefix match, `traceroute`.
+      6. Transport layer: `telnet host 80` to test the port.
+      7. ACLs: block or allow the flow.
+      8. DNS: `nslookup`, `ip host` for a static entry, `ip name-server`.
+
+      **IPv6 SLAAC example:** hosts get no prefix because the router is not a member of FF02::2 (all routers) until `ipv6 unicast-routing` is configured.
+  - heading: Sources
+    body: |
+      - Cisco, Campus Network for High Availability Design Guide: https://www.cisco.com/c/en/us/td/docs/solutions/Enterprise/Campus/campover.html
+      - Cisco, Understanding EtherChannel load balancing and redundancy: https://www.cisco.com/c/en/us/support/docs/lan-switching/etherchannel/12023-4.html
+      - RFC 5424, The Syslog Protocol (severity levels): https://www.rfc-editor.org/rfc/rfc5424
+      - Cisco, DNA Center and Catalyst overview: https://www.cisco.com/c/en/us/products/cloud-systems-management/dna-center/index.html
+      - Cisco ENSA v7.0 lecture slides, Module 11 (Network Design)
+      - Cisco ENSA v7.0 lecture slides, Module 12 (Network Troubleshooting)
+examples:
+  - title: Choosing a design for two campuses
+    problem: "Site A is a single building with 3 wiring closets and 150 users. Site B is a four-building campus with 1,800 users and a data centre. Which hierarchy fits each, and where do routing and QoS live?"
+    steps:
+      - "Site A is small, so a two-tier collapsed core is enough: access switches in the closets and one pair of multilayer switches acting as core plus distribution."
+      - "Site B needs three tiers: access in each building, a distribution pair per building (switch block), and a core connecting the four blocks and the data centre."
+      - "Inter-VLAN routing, ACLs and QoS policy sit in distribution (or the collapsed core at Site A). The core only forwards fast."
+      - "Failure domains: at B each building's distribution pair confines faults to that building; at A the collapsed core is a single large failure domain, so duplicate it."
+    answer: "Site A: collapsed core (two tiers). Site B: three tiers with a switch block per building, policy in distribution."
+    takeaway: "Pick tiers by size and growth, put policy at distribution, keep the core fast and simple."
+  - title: EtherChannel bandwidth and STP
+    problem: "Two switches are joined by four 1 Gbps links. Without EtherChannel what does STP do, and what is the usable bandwidth with an EtherChannel? Give the LACP configuration for ports Gi0/1 to Gi0/4."
+    steps:
+      - "Without EtherChannel, STP sees four parallel paths and blocks three of them, leaving 1 Gbps usable."
+      - "With EtherChannel the four ports form one logical Port Channel, STP sees one link, so no member is blocked: up to 4 Gbps total (per-flow hashing means one flow still uses one member, 1 Gbps)."
+      - "Configure the physical ports with channel-group 1 mode active on both switches."
+      - "Then configure the logical interface with interface port-channel 1 and switchport mode trunk."
+      - "Verify with show etherchannel summary (flag SU means Layer 2, in use)."
+    answer: "1 Gbps usable without; up to 4 Gbps aggregate with. interface range gi0/1 - 4, channel-group 1 mode active, then interface port-channel 1, switchport mode trunk."
+    takeaway: "EtherChannel gives STP one link and load-balances flows across members."
+  - title: Choosing a baseline period
+    problem: "A manager wants a baseline from 2 days of data on core router interface and CPU utilisation, collected once. Is that acceptable?"
+    steps:
+      - "Check the rule: minimum 7 days, maximum 6 weeks, 2 to 4 weeks generally adequate."
+      - "2 days is under the minimum and misses weekly cycles (weekend, month-end)."
+      - "A single baseline also goes stale as the network changes, so it must be repeated regularly and after major changes."
+      - "Recommend 2 to 4 weeks of interface and CPU utilisation, then widen the data as needed."
+    answer: "No. Collect for 2 to 4 weeks (at least 7 days), and repeat regularly."
+    takeaway: "Baseline = long enough to see normal cycles, repeated."
+  - title: Applying the seven steps to an ACL fault
+    problem: "After a change, PC 192.168.10.10 cannot browse to a web server at 172.16.1.5. Other users can. Walk through the process."
+    steps:
+      - "Define: one PC cannot reach the web server on port 80. Gather: ask when it began (after the change), who else is affected (only this PC), ping the server and test telnet 172.16.1.5 80."
+      - "Analyse: ping works but port 80 fails, so Layers 1 to 3 are fine and transport/ACL is suspected."
+      - "Eliminate causes: cables, VLAN and gateway are fine because other hosts share them. Hypothesis: a new ACL entry denies this host."
+      - "Test: show access-lists and show ip interface on R1 show a deny host 192.168.10.10 line placed before a permit, so ACE order is the cause. Plan rollback: copy the ACL first."
+      - "Solve: remove the deny or reorder (sequence numbers), re-test, then document the change and inform the user."
+    answer: "An ACE ordering problem blocks the host; fix by editing the ACL sequence and document it."
+    takeaway: "Each step narrows the layers; ACL faults show as good ping, failed port."
+terms:
+  - term: Hierarchical network design
+    definition: A layered model of access, distribution and core, each with a defined role, that is easy to scale and troubleshoot.
+  - term: Access layer
+    definition: The layer that connects end devices and provides PoE, port security and first-hop marking.
+  - term: Distribution layer
+    definition: The layer that aggregates access switches, routes between VLANs, applies QoS and policy and limits broadcast domains.
+  - term: Core layer
+    definition: The high-speed backbone that connects distribution blocks and isolates faults.
+  - term: Collapsed core
+    definition: A two-tier design in which core and distribution functions share one layer, suited to small campuses.
+  - term: Switch block
+    definition: A module of access switches and its pair of distribution switches or routers that works independently of other blocks.
+  - term: Failure domain
+    definition: The set of devices affected by a single fault. Good designs terminate failure domains at the distribution layer.
+  - term: EtherChannel
+    definition: Bundling of physical links into one logical Port Channel for bandwidth, load balancing and redundancy, negotiated by LACP or PAgP.
+  - term: Forwarding rate
+    definition: The packets per second a switch can process. If too low, it cannot provide full wire speed.
+  - term: Port density
+    definition: Number of ports on a switch, for example 12, 24 or 48 on the Catalyst 3850.
+  - term: PoE
+    definition: Power over Ethernet. Supplies power to phones, access points and cameras over the cable.
+  - term: Modular and stackable switch
+    definition: Modular switches take line cards in a chassis; stackable switches connect with special cables and work as one unit.
+  - term: Baseline
+    definition: A record of normal network performance collected for at least 7 days and no more than 6 weeks, repeated regularly.
+  - term: Topology diagram
+    definition: A physical or logical drawing of the network, kept as part of the documentation.
+  - term: Bottom-up, top-down, divide and conquer
+    definition: Troubleshooting methods. Bottom-up starts at the physical layer, top-down at the application, divide and conquer at Layer 3.
+  - term: Substitution and comparison
+    definition: Troubleshooting methods that swap a suspect part for a known good one, or compare with a working configuration.
+  - term: Protocol analyser
+    definition: A tool such as Wireshark that captures and decodes packets.
+  - term: Syslog severity
+    definition: Levels 0 (emergencies) to 7 (debugging); lower numbers are more severe.
+  - term: Duplex mismatch
+    definition: One end full duplex, the other half duplex. Causes late collisions, CRC errors and poor throughput; a Layer 2 symptom.
+  - term: Rollback plan
+    definition: A prepared way to undo a change if the test of a hypothesis makes things worse.
+quiz:
+  - question: Which layer of the hierarchical model normally provides inter-VLAN routing, QoS and ACL policy?
+    options:
+      - Access
+      - Distribution
+      - Core
+      - Physical
+    answer: 1
+    explanation: The distribution layer aggregates access switches and applies routing, QoS and security policy. The core just forwards fast.
+  - question: When is a collapsed core design appropriate?
+    options:
+      - A large multi-building campus
+      - A small campus or single building
+      - Only in data centres
+      - Only on WAN links
+    answer: 1
+    explanation: A two-tier collapsed core merges core and distribution to save cost where scale is small.
+  - question: Where should failure domains terminate?
+    options:
+      - At the access layer
+      - At the distribution layer
+      - At the core layer
+      - At the ISP
+    answer: 1
+    explanation: Distribution-layer boundaries confine failures and broadcasts to a switch block.
+  - question: Why does redundancy at Layer 2 require STP?
+    options:
+      - To raise link speed
+      - To prevent loops and broadcast storms
+      - To encrypt traffic
+      - To assign VLANs
+    answer: 1
+    explanation: Redundant Layer 2 paths create loops; STP blocks the extra paths.
+  - question: Where is the EtherChannel configuration applied for trunking options?
+    options:
+      - Only on the physical ports
+      - On the logical Port Channel interface
+      - On the VLAN interface
+      - On the console line
+    answer: 1
+    explanation: Settings made on the port-channel interface apply to all members, which must also match each other.
+  - question: Which switch factor describes how many packets per second can be processed?
+    options:
+      - Port density
+      - Forwarding rate
+      - Form factor
+      - Frame buffer
+    answer: 1
+    explanation: Forwarding rate (pps). If too low the switch cannot give wire speed on all ports.
+  - question: What is the recommended minimum baseline period?
+    options:
+      - 1 day
+      - 7 days
+      - 6 weeks
+      - 6 months
+    answer: 1
+    explanation: Minimum 7 days, maximum 6 weeks, with 2 to 4 weeks generally adequate.
+  - question: Which step follows 'Eliminate possible causes' in the seven-step process?
+    options:
+      - Gather information
+      - Propose a hypothesis
+      - Test the hypothesis
+      - Solve the problem
+    answer: 1
+    explanation: Order is define, gather, analyse, eliminate, propose hypothesis, test, solve.
+  - question: A technician starts at Layer 3 and moves up or down depending on the result. Which method is this?
+    options:
+      - Bottom-up
+      - Top-down
+      - Divide and conquer
+      - Substitution
+    answer: 2
+    explanation: Divide and conquer starts in the middle (often Layer 3) and moves toward the faulty layer.
+  - question: Which syslog level is 'warnings'?
+    options:
+      - 2
+      - 3
+      - 4
+      - 5
+    answer: 2
+    explanation: 0 emergencies, 1 alerts, 2 critical, 3 errors, 4 warnings, 5 notifications, 6 informational, 7 debugging.
+  - question: Which is a Layer 2 cause of poor performance?
+    options:
+      - Faulty cable attenuation
+      - Duplex mismatch
+      - Wrong routing table entry
+      - Blocked DNS
+    answer: 1
+    explanation: Duplex mismatch is a framing/Layer 2 issue causing CRC errors and late collisions. Attenuation is Layer 1.
+  - question: Why do DHCP broadcasts often break behind NAT?
+    options:
+      - They use source 0.0.0.0, which cannot be translated
+      - They use TCP
+      - They are encrypted
+      - They use IPv6
+    answer: 0
+    explanation: DHCP/BOOTP clients send from 0.0.0.0, so there is no inside local address to translate.
+  - question: In an end-to-end bottom-up check, what is tested with telnet to a port number?
+    options:
+      - Physical layer
+      - Transport layer
+      - DNS
+      - Duplex
+    answer: 1
+    explanation: Connecting to a TCP port tests the transport layer, and can reveal ACL blocks.
+questions:
+  - question: Describe the three layers of the hierarchical campus design and state what a collapsed core is and when it is used.
+    kind: long
+    marks: 10
+    keywords:
+      - access
+      - distribution
+      - core
+      - collapsed core
+      - broadcast
+      - small campus
+    idealAnswer: "Access connects end devices, gives PoE and edge security. Distribution aggregates wiring closets, performs inter-VLAN routing, applies QoS and security policy and limits Layer 2 broadcast domains. Core is the high-speed backbone with fault isolation. A collapsed core (two-tier) combines core and distribution into one layer, used in small campuses or single buildings to save cost, at the expense of scalability."
+  - question: List four ways to design a network for scalability and explain the role of STP and EtherChannel.
+    kind: long
+    marks: 8
+    keywords:
+      - redundancy
+      - multiple links
+      - OSPF
+      - wireless
+      - STP
+      - EtherChannel
+      - Port Channel
+    idealAnswer: "Redundancy (multiple devices and links), multiple links bundled for bandwidth, a scalable routing protocol such as multi-area OSPF, and wireless to extend the access layer. Redundant Layer 2 links cause loops, so STP blocks the extra paths. EtherChannel bundles links into one logical Port Channel so STP sees one link and none is blocked; traffic is load-balanced and the bundle survives a member failure."
+  - question: State six factors used when choosing a switch.
+    kind: short
+    marks: 6
+    keywords:
+      - cost
+      - port density
+      - PoE
+      - forwarding rate
+      - port speed
+      - buffers
+    idealAnswer: "Cost, port density, power (PoE), reliability, port speed, frame buffers, forwarding rate, scalability, and form factor (fixed, modular, stackable)."
+  - question: What is a network baseline, how is it created and how long should data be collected?
+    kind: short
+    marks: 5
+    keywords:
+      - baseline
+      - interface utilisation
+      - CPU
+      - 7 days
+      - 6 weeks
+    idealAnswer: "A baseline records normal network performance. Choose the data (start with interface and CPU utilisation), choose devices and ports of interest, then collect for a period of at least 7 days and no more than 6 weeks (2 to 4 weeks is generally adequate) and repeat it regularly so it stays current."
+  - question: Write out the seven steps of the troubleshooting process and say what you would do at the test step.
+    kind: long
+    marks: 8
+    keywords:
+      - define
+      - gather
+      - analyse
+      - eliminate
+      - hypothesis
+      - test
+      - rollback
+      - document
+    idealAnswer: "1 Define the problem; 2 gather information; 3 analyse the information; 4 eliminate possible causes; 5 propose a hypothesis; 6 test the hypothesis; 7 solve the problem and document. At the test step, consider urgency and impact, and have a rollback plan ready so the change can be undone if it makes things worse."
+  - question: Compare bottom-up, top-down and divide and conquer troubleshooting and say when each is suited.
+    kind: short
+    marks: 6
+    keywords:
+      - bottom-up
+      - physical
+      - top-down
+      - application
+      - divide and conquer
+      - Layer 3
+    idealAnswer: "Bottom-up starts at the physical layer and works up; best when physical faults are suspected. Top-down starts at the application and works down; suited to software issues or simple problems. Divide and conquer starts at Layer 3 (middle) and moves up or down depending on the result, which narrows the problem quickly."
+  - question: List common ACL and NAT problems and how you would test for them.
+    kind: long
+    marks: 8
+    keywords:
+      - direction
+      - order
+      - implicit deny
+      - wildcard
+      - established
+      - DHCP
+      - show ip nat translations
+    idealAnswer: "ACL problems: wrong interface or direction, ACE order (specific before general), implicit deny, wrong wildcard mask, wrong protocol or port, missing established for return traffic, uncommon protocols denied. Test with show access-lists, show ip interface and by telnetting to the port. NAT problems: DHCP/BOOTP using source 0.0.0.0, DNS, SNMP carrying addresses in payloads, tunnelling and encryption. Test with show ip nat translations, show ip nat statistics and debug ip nat briefly."
+  - question: Outline an end-to-end bottom-up troubleshooting checklist for a host that cannot reach a remote server.
+    kind: long
+    marks: 8
+    keywords:
+      - physical
+      - duplex
+      - ARP
+      - default gateway
+      - longest prefix
+      - ACL
+      - DNS
+    idealAnswer: "Check physical (cables, link lights), duplex mismatch (CRC, late collisions), local addressing (ARP, VLAN assignment), default gateway reachability, the correct path (routing table, longest prefix match, traceroute), the transport layer (telnet to the port), ACLs along the path, and finally DNS (nslookup, ip host)."
+fact:
+  title: One rack unit
+  body: 1U is 1.75 inches (44.45 mm). A 48-port 1U switch and a 42U rack therefore hold up to 42 such switches in theory, which is why port density and form factor drive the cabinet plan.

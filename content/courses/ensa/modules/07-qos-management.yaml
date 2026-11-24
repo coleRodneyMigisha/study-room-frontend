@@ -1,0 +1,566 @@
+id: qos-management
+title: QoS and Network Management
+subtitle: Keeping voice and video usable under congestion, then monitoring, time-stamping, logging and backing up the devices
+recap: |
+  QoS only matters during congestion: when traffic exceeds capacity, packets queue (delay, jitter) and then drop. Voice needs
+  under 150 ms one-way latency, under 30 ms jitter and under 1% loss. The queuing tools are FIFO, WFQ, CBWFQ and LLQ (CBWFQ plus
+  a strict priority queue for voice). The three models are best effort, IntServ (RSVP, per flow) and DiffServ (per class, hop by hop,
+  the scalable choice). DiffServ marks packets with a 6-bit DSCP: EF = 46, and AFxy = 8x + 2y. Mark near the source at the trust
+  boundary, use WRED to drop early, shape outbound, police inbound. Management side: CDP and LLDP discover neighbours, NTP gives
+  every device the same time (stratum 0 to 15, 16 = unsynchronised), SNMP polls on UDP 161 and traps arrive on 162, syslog uses
+  UDP 514 and severity 0 to 7, and configs and IOS images are backed up with TFTP, USB or flash.
+traps:
+  - "Thinking QoS adds bandwidth. It does not. It decides who waits and who is dropped during congestion. On an uncongested link QoS has no effect, and the real fix for permanent overload is more capacity."
+  - "Using the AF formula the wrong way round. AFxy gives DSCP = 8x + 2y, where x is the class (1 to 4, 4 is best) and y is the drop preference (1 low, 3 high). AF32 = 8(3) + 2(2) = 28, not 32. EF is 46 (binary 101110), CS values are 8x."
+  - "Mixing up DSCP and CoS or IP Precedence. CoS (802.1p) is 3 bits in the 802.1Q tag at Layer 2 and is lost when the frame crosses a router. IP Precedence is the top 3 bits of ToS. DSCP is 6 bits (64 values) and travels end to end at Layer 3. Voice is CoS 5 and DSCP EF 46."
+  - "Saying LLQ is a different thing from CBWFQ. LLQ is CBWFQ plus a strict priority queue. Cisco recommends only voice in the priority queue, otherwise it can starve the other classes."
+  - "Confusing shaping and policing. Shaping buffers the excess and sends it later (smooths output, delays, used outbound). Policing drops or re-marks the excess (no buffer, used inbound, used by providers to enforce the CIR)."
+  - "Getting syslog severity backwards. Level 0 emergencies is the MOST severe and 7 debugging the least. Setting 'logging trap 4' sends levels 0 to 4, not 4 to 7."
+  - "Mixing up NTP stratum. Stratum 0 is the clock itself, stratum 1 is directly attached to it, each hop adds 1, the maximum is 15 and stratum 16 means unsynchronised. A client of a stratum 2 server becomes stratum 3."
+  - "Reversing the copy direction or wiping the config. 'copy running-config tftp' backs up; 'copy tftp running-config' restores and MERGES. To restore a saved startup-config safely use 'copy startup-config running-config' and never copy running to startup first, which overwrites the backup."
+lesson:
+  checkpointStep: 5
+  steps:
+    - "Networks carry converged traffic. When the offered load is larger than a link can send (aggregation points, speed mismatches such as a LAN to a slower WAN link, many-to-one flows), packets wait in queues. Waiting is delay, a full queue means drops. QoS is only used during congestion, to decide which traffic waits and which is dropped."
+    - "Delay has components. Fixed: code (encoding), packetisation, serialisation (bits on the wire = frame size / link speed) and de-jitter buffer. Variable: queuing and propagation (per the slides). Jitter is the variation in delay between packets. A playout (de-jitter) buffer smooths jitter, and the DSP can interpolate a single lost voice packet."
+    - "Traffic types differ. Voice is smooth, benign, drop and delay sensitive and uses UDP: latency under 150 ms, jitter under 30 ms, loss under 1%, 30 to 128 kbps, RTP ports 16384 to 32767. Video is bursty and greedy: latency 200 to 400 ms, jitter 30 to 50 ms, loss 0.1 to 1%, 384 kbps to 20 Mbps, RTSP 554. Data tolerates delay and drops because TCP retransmits."
+    - "Queuing algorithms. FIFO: one queue, no priority, the default. WFQ: automatic flow-based fairness, favouring low-volume flows, not supported with tunnelling or encryption. CBWFQ: you define classes (ACLs, protocols, interfaces) and guarantee bandwidth per class, tail drop at the queue limit. LLQ: CBWFQ plus a strict priority queue for voice."
+    - "Three QoS models. Best effort: no QoS, most scalable, no guarantees. IntServ: the application signals with RSVP, each device reserves resources per flow with admission control. Excellent guarantee, but resource hungry and not scalable. DiffServ: traffic is classed and marked, each hop applies a per-hop behaviour. Scalable, no absolute guarantee."
+    - "Checkpoint: a voice packet is marked AF31 on a trusted phone. Convert it to a DSCP decimal, explain which three bits and which two bits mean what, and say where marking should take place."
+    - "Marking: Ethernet 802.1p CoS (3 bits, voice 5), Wi-Fi TID, MPLS EXP and IP Precedence are 3 bits; DSCP is 6 bits in the ToS byte (IPv4) or Traffic Class (IPv6), plus 2 ECN bits. BE = 0, EF = 46 (101110, voice only), AFxy = 8x + 2y, class selector = 8x. Classify and mark on ingress as close to the source as possible, at the trust boundary."
+    - "Congestion tools in order: classify and mark on ingress, allocate resources, then queue and shape on egress. WRED monitors average queue depth: below the minimum threshold nothing is dropped, between minimum and maximum a growing percentage is dropped, above maximum everything is dropped. It avoids tail drop and global TCP synchronisation. Shaping delays excess outbound traffic, policing drops or re-marks it inbound."
+    - "Network management starts with discovery and time. CDP (Cisco proprietary, 60 s advertisements, 180 s holdtime) and LLDP (open standard, 30 s) show neighbours. NTP distributes time by stratum so logs line up. SNMP lets a manager poll agents (UDP 161) and receive traps (UDP 162) using the MIB. Syslog (UDP 514, severity 0 to 7) records events. Protect the configuration and software: back up and restore configs with TFTP (copy running-config tftp), USB (usbflash0:) or flash, and keep IOS images on a central TFTP server: check connectivity, check flash and server space, then copy. SNMPv3 with authPriv, secured TFTP access and NTP authentication keep the management plane trustworthy."
+checkpoint:
+  question: A phone marks voice media as AF31. Give the DSCP decimal value, explain what the first three bits and next two bits mean, and say where on the path the marking should be done and why.
+  hint: AFxy = 8x + 2y. Think of the 6-bit pattern, then of the trust boundary.
+  keywords:
+    - AF31
+    - 26
+    - 011010
+    - class
+    - drop preference
+    - trust boundary
+    - close to the source
+  idealAnswer: "AF31 has class x = 3 and drop preference y = 1, so DSCP = 8(3) + 2(1) = 26 (binary 011010). The first three bits (011) give the class, where 4 is the best treatment and 1 the worst; the next two bits (01) give the drop preference, where a higher value is dropped first under WRED; the last bit is 0. Marking should be done as close to the source as feasible, at the trust boundary: a trusted endpoint such as an IP phone, or otherwise the access switch or first router, so every later hop can apply its per-hop behaviour without reclassifying. Untrusted devices should be re-marked at that boundary."
+notes:
+  - heading: Congestion, delay and jitter
+    body: |
+      **Congestion** happens when offered traffic exceeds link capacity. Typical points: aggregation (many access links into one uplink), speed mismatch (a 1 Gbps LAN into a 100 Mbps WAN link) and LAN-to-WAN edges. A device queues packets; queues add delay; a full queue drops packets. **QoS does nothing on an uncongested link.**
+
+      | Delay type | Fixed or variable | What it is |
+      |---|---|---|
+      | Code delay | Fixed | Time to compress/encode the voice or video sample |
+      | Packetisation delay | Fixed | Time to put the encoded data into a packet |
+      | Queuing delay | Variable | Time spent waiting in a queue for the link |
+      | Serialisation delay | Fixed | Time to put all bits of the frame on the wire |
+      | Propagation delay | Variable (per slide; physically set by distance) | Time for the signal to cross the medium |
+      | De-jitter delay | Fixed | Time held in the playout buffer to even out arrivals |
+
+      **Serialisation delay** = frame size in bits / link speed in bits per second. A 1500-byte frame on a 1.5 Mbps link: 12,000 / 1,500,000 = 8 ms. The same frame at 1 Gbps takes 12 microseconds, which is why slow WAN links need small frames or fragmentation for voice.
+
+      **Jitter** is the variation in delay between consecutive packets. The receiver uses a **playout (de-jitter) buffer** to hold packets briefly and release them evenly. A single lost voice packet can be interpolated by the DSP, but bursts of loss are audible.
+  - heading: Traffic characteristics
+    body: |
+      | | Voice | Video | Data |
+      |---|---|---|---|
+      | Behaviour | Smooth, benign | Bursty, greedy | Smooth or bursty, benign or greedy |
+      | Sensitivity | Drop and delay sensitive | Drop and delay sensitive | Drop and delay insensitive (TCP retransmits) |
+      | One-way latency | Under 150 ms | 200 to 400 ms | Interactive mission-critical: 1 to 2 s response |
+      | Jitter | Under 30 ms | 30 to 50 ms | Not critical |
+      | Loss | Under 1% | 0.1 to 1% | Tolerated |
+      | Bandwidth | 30 to 128 kbps | 384 kbps to 20 Mbps | Varies |
+      | Ports | UDP, Cisco RTP 16384 to 32767 | RTSP 554 | TCP |
+
+      Voice packets are small and constant (often one every 20 ms). Video packets can vary every 33 ms (30 frames per second). Voice gets priority queuing; video gets a guaranteed bandwidth class; data shares what is left. Never put TCP bulk transfers in the priority queue.
+  - heading: Queuing algorithms
+    body: |
+      | Algorithm | How it works | Notes |
+      |---|---|---|
+      | FIFO | One queue, first in first out | No priority, the default on fast interfaces; a bulk flow can starve voice |
+      | WFQ | Automatic classification of flows by addresses, ports, protocol and ToS; fair share, low-volume flows served first | Not supported with tunnelling or encryption |
+      | CBWFQ | You define classes (protocols, ACLs, input interfaces) and give each a guaranteed bandwidth | Tail drop when a class queue limit is reached; WRED can be added |
+      | LLQ | CBWFQ plus a strict **priority queue** that is always served first | Cisco: put voice only in the priority queue; it is policed so it cannot starve other classes |
+
+      ```
+      class-map match-any VOICE
+       match dscp ef
+      class-map match-any VIDEO
+       match dscp af41
+      policy-map WAN-OUT
+       class VOICE
+        priority 256
+       class VIDEO
+        bandwidth percent 30
+       class class-default
+        fair-queue
+      interface Serial0/0/0
+       service-policy output WAN-OUT
+      ```
+      `priority 256` makes the class the LLQ with 256 kbps; `bandwidth percent 30` is a CBWFQ guarantee.
+  - heading: QoS models
+    body: |
+      | Model | Idea | Pros | Cons |
+      |---|---|---|---|
+      | Best effort | No QoS; all packets treated equally | Most scalable, nothing to configure | No guarantees |
+      | IntServ | Application signals (RSVP) and the path reserves resources per flow, with admission control | Explicit end-to-end guarantee | Resource intensive, per-flow state, not scalable |
+      | DiffServ | Packets are classified and marked; each device applies a per-hop behaviour (PHB) to a class | Highly scalable, many levels | No absolute guarantee, needs consistent configuration hop by hop |
+
+      Ways to reduce loss: increase capacity, guarantee bandwidth (WFQ, CBWFQ, LLQ) or drop low-priority traffic early (WRED). The QoS toolset is **classification and marking**, **congestion avoidance** (WRED) and **congestion management** (CBWFQ, LLQ). Order of operation: classify and mark on ingress, allocate resources, queue and shape on egress.
+  - heading: Classification and marking
+    body: |
+      **Classification** picks the traffic (by interface, ACL, class map; NBAR for Layer 4 to 7 application recognition). **Marking** writes a value into the packet or frame.
+
+      | Layer | Marking | Bits |
+      |---|---|---|
+      | L2 Ethernet | 802.1p CoS (in 802.1Q tag) | 3 |
+      | L2 Wi-Fi | TID | 3 |
+      | L2/L3 MPLS | EXP | 3 |
+      | L3 | IP Precedence | 3 |
+      | L3 | DSCP | 6 |
+
+      Layer 3 marks survive routing, so they are carried end to end; CoS is lost at a router.
+
+      **CoS values:** 0 best effort, 1 medium data, 2 high data, 3 call signalling, 4 videoconferencing, 5 voice bearer, 6 and 7 reserved.
+
+      **ToS (IPv4) / Traffic Class (IPv6)** is 8 bits: **DSCP** (6 bits, 64 classes, RFC 2474) plus 2 ECN bits.
+
+      **DSCP values**
+      - **BE** (default) = 0
+      - **EF** = 46 (`101110`), maps to CoS 5, voice only (RFC 3246)
+      - **AFxy** (RFC 2597): first 3 bits = class x (4 best, 1 worst), next 2 bits = drop preference y (1 low, 3 high), last bit 0. **DSCP = 8x + 2y**
+      - **CS** (class selector) = first 3 bits only, so CSx = 8x, backward compatible with IP Precedence
+
+      | AF | Class x | Drop y | DSCP | Binary |
+      |---|---|---|---|---|
+      | AF11 | 1 | 1 | 10 | 001010 |
+      | AF21 | 2 | 1 | 18 | 010010 |
+      | AF31 | 3 | 1 | 26 | 011010 |
+      | AF32 | 3 | 2 | 28 | 011100 |
+      | AF41 | 4 | 1 | 34 | 100010 |
+      | AF43 | 4 | 3 | 38 | 100110 |
+
+      **Trust boundary:** the point where you decide to trust or re-mark incoming markings. Classify and mark as close to the source as feasible: a trusted endpoint (IP phone), the access Layer 2 switch, or the Layer 3 switch or router. Untrusted traffic is re-marked at the boundary.
+  - heading: WRED, shaping and policing
+    body: |
+      **Tail drop** discards everything once a queue is full, and makes many TCP flows back off together (global synchronisation). **WRED** (weighted random early detection) watches the **average queue depth**:
+
+      | Average depth | Action |
+      |---|---|
+      | Below minimum threshold | No drops |
+      | Between minimum and maximum | A growing percentage dropped (higher drop preference first) |
+      | Above maximum | All new packets dropped (tail drop) |
+
+      WRED is meaningful for TCP, not for UDP voice. That is why AF drop preference exists: AFx3 is dropped before AFx1.
+
+      | | Shaping | Policing |
+      |---|---|---|
+      | Excess traffic | Held in a queue and sent later | Dropped or re-marked |
+      | Effect | Smooths bursts, adds delay | No added delay, bursty output |
+      | Direction | Outbound | Inbound (or outbound) |
+      | Typical use | Enterprise to provider to match CIR | Provider enforces CIR |
+
+      **Guidelines:** queue on every device in the path, classify and mark near the source, shape or police near the source.
+  - heading: Network management protocols
+    body: |
+      **CDP** (Cisco proprietary, Layer 2, enabled by default): `show cdp neighbors`, `show cdp neighbors detail` (IP, platform, capabilities, local and remote port, holdtime). Default timers: advertise every 60 s, holdtime 180 s. `no cdp run` disables globally, `no cdp enable` per interface.
+
+      **LLDP** (IEEE 802.1AB, open standard, off by default on Cisco): `lldp run`, `show lldp neighbors detail`, adverts every 30 s.
+
+      **NTP** keeps clocks aligned so logs correlate. The hierarchy is by **stratum** (hop count from the authoritative source). Stratum 0 = high-precision clock, stratum 1 = directly attached, stratum 2 and below = synchronise from the layer above, **maximum 15, stratum 16 = unsynchronised**. Peers on the same stratum can back each other up.
+      ```
+      R1(config)# ntp server 209.165.200.225
+      S1(config)# ntp server 192.168.1.1
+      R1# show ntp status
+      R1# show ntp associations
+      R1(config)# ntp master 3        ! become a source at stratum 3
+      ```
+      If R1 is synchronised at stratum 2, S1 becomes stratum 3.
+
+      **SNMP** has a **manager** (NMS), **agents** on devices and a **MIB** (tree of object IDs, OIDs). The manager polls agents on **UDP 161**; agents send **traps** to the manager on **UDP 162**. Operations: **get** (read a variable), **set** (write a variable), **trap** (unsolicited alert).
+
+      | Version | Security | Notes |
+      |---|---|---|
+      | SNMPv1 | Community string (plaintext) | RFC 1157, legacy, avoid |
+      | SNMPv2c | Community string (plaintext) | RFCs 1901 to 1908, bulk retrieval, better errors |
+      | SNMPv3 | Username, HMAC-MD5/SHA authentication, DES/3DES/AES encryption | RFCs 3410 to 3415 |
+
+      Community strings are plaintext passwords: **ro** (read only) and **rw** (read and write). v3 security levels: **noAuthNoPriv** (username only), **authNoPriv** (authentication, no encryption), **authPriv** (authentication and encryption, the best).
+      ```
+      R1(config)# snmp-server community cisco123 ro
+      R1(config)# snmp-server host 192.168.1.50 version 2c cisco123
+      R1(config)# snmp-server enable traps
+      ```
+      Because of weak security and difficulty, SNMP is rarely used to configure devices.
+  - heading: Syslog
+    body: |
+      Syslog sends event messages to collectors over **UDP 514**. Destinations: console, VTY lines, buffer, a syslog server.
+
+      | Level | Name | Meaning |
+      |---|---|---|
+      | 0 | Emergency | System unusable |
+      | 1 | Alert | Immediate action needed |
+      | 2 | Critical | Critical condition |
+      | 3 | Error | Error condition |
+      | 4 | Warning | Warning condition |
+      | 5 | Notification | Normal but significant |
+      | 6 | Informational | Informational |
+      | 7 | Debugging | Debug messages |
+
+      Lower number means more severe, and setting a level shows that level and all lower numbers. Mnemonic: **E**very **A**wesome **C**isco **E**ngineer **W**ill **N**eed **I**ce-cream **D**aily.
+
+      **Message format:** `%facility-severity-MNEMONIC: description`. Example `%LINK-3-UPDOWN: Interface GigabitEthernet0/1, changed state to down` has facility LINK, severity 3, mnemonic UPDOWN. Facilities identify the source: IP, OSPF, SYS, IPsec, IF. With `service timestamps log datetime msec` and NTP, each message is stamped with accurate time.
+      ```
+      R1(config)# logging host 192.168.1.50
+      R1(config)# logging trap informational     ! levels 0 to 6
+      R1(config)# logging source-interface Loopback0
+      R1(config)# service timestamps log datetime msec
+      R1# show logging
+      ```
+  - heading: Configuration and IOS image management
+    body: |
+      | Task | Command |
+      |---|---|
+      | Back up config to TFTP | `copy running-config tftp` (asks for server IP and file name) |
+      | Restore from TFTP | `copy tftp running-config` (merges into the running config) |
+      | Back up to USB | `copy running-config usbflash0:` (check name with `show file systems`) |
+      | Restore from USB | edit the file, then `copy usbflash0:/R1-Config running-config` |
+      | Save | `copy running-config startup-config` |
+      | Undo changes | `copy startup-config running-config` after reload; never save first |
+
+      **Restore caution:** copying into the running config merges, it does not replace. For a full replacement, copy to startup-config and `reload`.
+
+      **IOS image backup to TFTP:** (1) ping the server, (2) `show flash0:` for the image size and confirm the server has space, (3) `copy flash0: tftp:` giving server IP and file name. **Upgrade:** ping, check flash space, `copy tftp: flash:`, then `reload` (and `boot system` if needed). Keep images on a central TFTP server to control versions across many routers. TFTP is unauthenticated and unencrypted, so use a protected management network or SFTP/SCP where possible.
+  - heading: Sources
+    body: |
+      - RFC 2474, Definition of the Differentiated Services Field: https://www.rfc-editor.org/rfc/rfc2474
+      - RFC 2597, Assured Forwarding PHB Group: https://www.rfc-editor.org/rfc/rfc2597
+      - RFC 3246, An Expedited Forwarding PHB: https://www.rfc-editor.org/rfc/rfc3246
+      - RFC 5905, Network Time Protocol Version 4: https://www.rfc-editor.org/rfc/rfc5905
+      - RFC 5424, The Syslog Protocol: https://www.rfc-editor.org/rfc/rfc5424
+      - RFC 1157, A Simple Network Management Protocol (SNMP): https://www.rfc-editor.org/rfc/rfc1157
+      - Cisco, DSCP and precedence values: https://www.cisco.com/c/en/us/support/docs/quality-of-service-qos/qos-packet-marking/10103-dscpvalues.html
+      - Cisco ENSA v7.0 lecture slides, Modules 9 and 10
+examples:
+  - title: AF to DSCP and back
+    problem: "(a) Convert AF21 and AF43 to DSCP decimal and binary. (b) A packet has DSCP 28. Which AF class is it, and which drop preference?"
+    steps:
+      - "AFxy = 8x + 2y. AF21 has x = 2, y = 1, so 8(2) + 2(1) = 18."
+      - "AF43 has x = 4, y = 3: 8(4) + 2(3) = 38."
+      - "Binary: 18 = 010 01 0 (class 010, drop 01, last bit 0) = 010010. 38 = 100 11 0 = 100110."
+      - "(b) 28 in binary is 011100: class 011 = 3, drop preference 10 = 2, so AF32."
+      - "Check with the formula: 8(3) + 2(2) = 24 + 4 = 28."
+    answer: "AF21 = 18 (010010); AF43 = 38 (100110); DSCP 28 = AF32 (class 3, drop preference 2)."
+    takeaway: "Split the six bits as 3 + 2 + 1. The class is the first three bits read as a number, the drop preference the next two."
+  - title: Serialisation delay on a WAN link
+    problem: "A 1500-byte data frame is ahead of a voice packet on a 1.5 Mbps WAN link. How long does the data frame take to serialise, and what does that do to a 150 ms budget? What if the link were 128 kbps?"
+    steps:
+      - "Convert bytes to bits: 1500 x 8 = 12,000 bits."
+      - "Serialisation delay = bits / rate = 12,000 / 1,500,000 = 0.008 s = 8 ms."
+      - "At 128 kbps: 12,000 / 128,000 = 0.09375 s, about 94 ms."
+      - "A voice packet that waits behind this frame suffers up to 94 ms of extra delay and large jitter, which is most of the 150 ms budget and far more than the 30 ms jitter limit."
+    answer: "8 ms at 1.5 Mbps; about 94 ms at 128 kbps. On slow links use LLQ so voice jumps the queue, and fragment large frames."
+    takeaway: "Serialisation delay is fixed per link speed and frame size. Queuing is the variable part you control with QoS."
+  - title: One-way voice delay budget
+    problem: "Voice must stay under 150 ms one way. Coding 20 ms, packetisation 20 ms, serialisation 5 ms, propagation 30 ms and de-jitter buffer 40 ms are fixed or known. How much queuing delay can the network add?"
+    steps:
+      - "Add the known components: 20 + 20 + 5 + 30 + 40 = 115 ms."
+      - "Remaining budget = 150 - 115 = 35 ms."
+      - "So the total queuing delay across all hops must be 35 ms or less."
+      - "If four hops each queue for 10 ms the total is 40 ms and the call breaks the budget, so LLQ is needed."
+    answer: "35 ms of queuing delay across the whole path."
+    takeaway: "Budget questions are subtraction: 150 ms minus the fixed delays is what queues may use."
+  - title: Choosing and building a QoS design
+    problem: "A branch has IP phones, a video room and file servers on a 10 Mbps WAN link that is congested. Choose a model, queuing tool, markings and where to mark."
+    steps:
+      - "Model: DiffServ, because it scales and works hop by hop. IntServ per-flow reservations would not scale."
+      - "Marking: voice EF (46, CoS 5), video AF41 (34, CoS 4), call signalling CS3 (24), data default or AF11 (10) for bulk."
+      - "Where: the phone is trusted for voice, the access switch re-marks everything else (trust boundary), nearest the source."
+      - "Queuing on the WAN egress: LLQ for EF with a priority limit, CBWFQ bandwidth for video and signalling, fair-queue on class-default. WRED on data classes."
+      - "If the provider enforces a CIR, shape outbound to the CIR to avoid provider policing drops."
+    answer: "DiffServ; EF 46 in LLQ, AF41 34 with a bandwidth guarantee, CS3 24 for signalling, default/AF11 with WRED; mark at the phone or access switch; shape to CIR."
+    takeaway: "Classify and mark once near the source, queue everywhere, shape at the edge."
+  - title: Reading a syslog line and a TFTP backup
+    problem: "Interpret %OSPF-5-ADJCHG: Process 1, Nbr 2.2.2.2 on Serial0/0/0 changed from FULL to DOWN. Then give the commands to back up R1's configuration to a TFTP server at 192.168.1.50."
+    steps:
+      - "Facility is OSPF, severity is 5 (notification), mnemonic ADJCHG. It means an OSPF adjacency dropped."
+      - "A 'logging trap 4' setting would not forward this message, because 5 is less severe than 4. 'logging trap 5' or higher would."
+      - "Check reachability: ping 192.168.1.50."
+      - "Back up: copy running-config tftp, then enter the server address 192.168.1.50 and file name R1-confg."
+      - "Restore later with copy tftp running-config, remembering it merges."
+    answer: "OSPF adjacency change, severity 5; backup with ping then copy running-config tftp."
+    takeaway: "Read syslog left to right: facility, severity number, mnemonic, text."
+terms:
+  - term: Congestion
+    definition: A condition where traffic exceeds a link's capacity, so packets queue and may be dropped.
+  - term: Serialisation delay
+    definition: Time to place all bits of a frame on the wire, equal to frame size in bits divided by link speed.
+  - term: Jitter
+    definition: Variation in delay between packets of the same flow. Smoothed with a playout (de-jitter) buffer.
+  - term: Queuing delay
+    definition: Variable time a packet waits in an egress queue before transmission.
+  - term: FIFO
+    definition: First in, first out. A single queue with no priority; the default.
+  - term: WFQ
+    definition: Weighted fair queuing. Automatic flow-based fair scheduling; not supported with tunnelling or encryption.
+  - term: CBWFQ
+    definition: Class-based WFQ. User-defined classes each with a guaranteed bandwidth and tail drop at the limit.
+  - term: LLQ
+    definition: Low latency queuing. CBWFQ plus a strict priority queue, normally used for voice only.
+  - term: Best effort, IntServ, DiffServ
+    definition: The three QoS models. Best effort has no QoS, IntServ reserves per flow with RSVP, DiffServ treats traffic by marked class hop by hop.
+  - term: DSCP
+    definition: Differentiated Services Code Point, the 6-bit field in the IP ToS byte that defines 64 traffic classes (RFC 2474).
+  - term: AF (Assured Forwarding)
+    definition: DSCP class AFxy where x is the class (1 to 4) and y the drop preference (1 to 3). DSCP = 8x + 2y.
+  - term: EF (Expedited Forwarding)
+    definition: DSCP 46 (101110), used for voice, mapped to CoS 5 and served by the priority queue.
+  - term: CoS (802.1p)
+    definition: A 3-bit Layer 2 priority in the 802.1Q tag. Values 0 to 7; voice is 5.
+  - term: Trust boundary
+    definition: The point in the network where markings are trusted or re-marked. Mark as close to the source as feasible.
+  - term: WRED
+    definition: Weighted random early detection. Drops packets with growing probability as average queue depth rises, to avoid tail drop and TCP synchronisation.
+  - term: Shaping and policing
+    definition: Shaping buffers excess traffic and sends it later (outbound). Policing drops or re-marks excess traffic (inbound), used to enforce a CIR.
+  - term: NTP stratum
+    definition: Number of hops from the authoritative time source. Stratum 0 is the clock, maximum 15, and 16 means unsynchronised.
+  - term: SNMP, MIB and OID
+    definition: SNMP lets a manager get, set and receive traps from agents (UDP 161 and 162). The MIB is the tree of managed objects identified by OIDs.
+  - term: Syslog severity and facility
+    definition: Severity is 0 (emergency) to 7 (debugging); facility is the source type such as OSPF or LINK. Format %facility-severity-MNEMONIC.
+  - term: CDP and LLDP
+    definition: Layer 2 neighbour discovery protocols. CDP is Cisco proprietary; LLDP is the IEEE 802.1AB open standard.
+quiz:
+  - question: Which DSCP decimal value is AF31?
+    options:
+      - "24"
+      - "26"
+      - "31"
+      - "34"
+    answer: 1
+    explanation: AFxy = 8x + 2y = 8(3) + 2(1) = 26.
+  - question: Which DSCP value and traffic class are normally used for voice media?
+    options:
+      - AF41 (34)
+      - CS3 (24)
+      - EF (46)
+      - BE (0)
+    answer: 2
+    explanation: EF = 46 (101110), mapped to CoS 5, is for voice bearer traffic only.
+  - question: Which queuing method adds a strict priority queue to class-based queuing?
+    options:
+      - FIFO
+      - WFQ
+      - CBWFQ
+      - LLQ
+    answer: 3
+    explanation: LLQ is CBWFQ with a priority queue that is served first, normally for voice.
+  - question: Which model uses RSVP to reserve resources for each flow but does not scale well?
+    options:
+      - Best effort
+      - IntServ
+      - DiffServ
+      - CBWFQ
+    answer: 1
+    explanation: IntServ signals with RSVP and keeps per-flow state with admission control. DiffServ is the scalable model.
+  - question: What is the recommended maximum one-way latency for voice according to the course?
+    options:
+      - 30 ms
+      - 150 ms
+      - 400 ms
+      - 1 second
+    answer: 1
+    explanation: Voice needs under 150 ms latency, under 30 ms jitter and under 1% loss.
+  - question: Which statement about policing and shaping is correct?
+    options:
+      - Shaping drops excess traffic and policing buffers it
+      - Policing drops or re-marks excess traffic; shaping queues it
+      - Both only apply to inbound traffic
+      - Both add bandwidth to the link
+    answer: 1
+    explanation: Policing drops or re-marks the excess (typically inbound, used by providers); shaping holds it in a queue (outbound).
+  - question: A 1500-byte frame is sent on a 1.5 Mbps link. What is the serialisation delay?
+    options:
+      - 1 ms
+      - 8 ms
+      - 12 ms
+      - 80 ms
+    answer: 1
+    explanation: 1500 x 8 = 12,000 bits / 1,500,000 bps = 0.008 s = 8 ms.
+  - question: What does WRED do between its minimum and maximum thresholds?
+    options:
+      - Drops nothing
+      - Drops a growing percentage of packets
+      - Drops all packets
+      - Re-marks packets to EF
+    answer: 1
+    explanation: Below the minimum nothing is dropped, between thresholds a rising percentage is dropped, above the maximum all packets are dropped.
+  - question: An NTP client synchronises with a stratum 2 server. What stratum is the client?
+    options:
+      - 1
+      - 2
+      - 3
+      - 16
+    answer: 2
+    explanation: Each hop from the source adds 1. A client of a stratum 2 server is stratum 3. Stratum 16 means unsynchronised.
+  - question: On which UDP port does an SNMP agent send traps to the manager?
+    options:
+      - 161
+      - 162
+      - 514
+      - 69
+    answer: 1
+    explanation: Managers poll agents on UDP 161, agents send traps to UDP 162. Syslog is 514 and TFTP is 69.
+  - question: Which SNMPv3 security level provides both authentication and encryption?
+    options:
+      - noAuthNoPriv
+      - authNoPriv
+      - authPriv
+      - community
+    answer: 2
+    explanation: authPriv authenticates with HMAC and encrypts with DES, 3DES or AES.
+  - question: What are the facility, severity and mnemonic in %LINK-3-UPDOWN?
+    options:
+      - Facility 3, severity LINK, mnemonic UPDOWN
+      - Facility LINK, severity 3, mnemonic UPDOWN
+      - Facility UPDOWN, severity LINK, mnemonic 3
+      - Facility LINK, severity UPDOWN, mnemonic 3
+    answer: 1
+    explanation: Format is %facility-severity-MNEMONIC. Severity 3 is error.
+  - question: Which command restores a configuration from a TFTP server?
+    options:
+      - copy running-config tftp
+      - copy tftp running-config
+      - copy startup-config tftp
+      - erase startup-config
+    answer: 1
+    explanation: copy tftp running-config pulls the file and merges it into the running configuration.
+questions:
+  - question: Explain why QoS is needed on a converged network and list the three QoS models with one advantage and one disadvantage of each.
+    kind: long
+    marks: 10
+    keywords:
+      - congestion
+      - queue
+      - best effort
+      - IntServ
+      - RSVP
+      - DiffServ
+      - scalable
+    idealAnswer: "When traffic exceeds link capacity (aggregation, speed mismatch, LAN to WAN) packets queue, causing delay and jitter, and are dropped when queues fill. Voice and video are sensitive to this while data is not, so QoS decides who waits and who is dropped during congestion. Best effort: most scalable, nothing to configure, but no guarantees. IntServ: the application signals with RSVP and every device reserves resources per flow with admission control, giving strong guarantees but it is resource intensive and does not scale. DiffServ: traffic is classified and marked and each hop applies a per-hop behaviour; it is scalable and flexible but gives no absolute guarantee and needs consistent configuration."
+  - question: State the DSCP value of EF and AF32 and show how AF32 is calculated.
+    kind: short
+    marks: 4
+    keywords:
+      - EF
+      - 46
+      - AF32
+      - 28
+      - 8x
+    idealAnswer: "EF = 46 (101110). AF32 has class x = 3 and drop preference y = 2, so DSCP = 8x + 2y = 24 + 4 = 28 (011100)."
+  - question: Compare shaping and policing, and say where each is normally applied.
+    kind: short
+    marks: 5
+    keywords:
+      - shaping
+      - policing
+      - buffer
+      - drop
+      - re-mark
+      - CIR
+    idealAnswer: "Shaping stores excess traffic in a queue and releases it later, smoothing bursts at the cost of delay; it is applied outbound, for example to match the provider's CIR. Policing does not buffer: it drops or re-marks traffic above the rate, giving no added delay but bursty output; it is applied inbound and used by service providers to enforce the CIR."
+  - question: Describe how LLQ works and why only voice should be placed in the priority queue.
+    kind: short
+    marks: 5
+    keywords:
+      - CBWFQ
+      - priority queue
+      - strict
+      - voice
+      - starve
+    idealAnswer: "LLQ is CBWFQ plus a strict priority queue that is always served before the other class queues. Voice is small, constant, delay and jitter sensitive so it gets minimum latency there. The priority queue is policed to its configured rate. If other traffic such as video or bulk data were placed in it, it could consume the link and starve the CBWFQ classes, so Cisco recommends voice only."
+  - question: Describe the delay components of a voice call and calculate the queuing budget if the fixed delays total 115 ms and the one-way limit is 150 ms. Explain jitter and how the receiver copes with it.
+    kind: long
+    marks: 8
+    keywords:
+      - code
+      - packetisation
+      - serialisation
+      - propagation
+      - de-jitter
+      - 35 ms
+      - playout buffer
+    idealAnswer: "Components: code delay, packetisation delay, serialisation delay, de-jitter delay (fixed), queuing and propagation delay (variable in the slides). Budget = 150 - 115 = 35 ms for queuing across all hops. Jitter is variation in delay between successive packets. The receiver holds packets in a playout (de-jitter) buffer and plays them at an even pace, trading a little fixed delay for smooth sound; the DSP can interpolate a single lost packet."
+  - question: Explain how SNMP works, naming the manager, agent and MIB, the three operations, the ports used and the differences between v1, v2c and v3.
+    kind: long
+    marks: 10
+    keywords:
+      - manager
+      - agent
+      - MIB
+      - get
+      - set
+      - trap
+      - 161
+      - 162
+      - community
+      - authPriv
+    idealAnswer: "The SNMP manager (NMS) polls agents running on network devices. Each agent exposes variables in the MIB, a tree of object IDs. Get reads a variable, set writes one, and a trap is an unsolicited alert from agent to manager. The manager polls on UDP 161 and traps go to UDP 162. SNMPv1 and v2c authenticate with plaintext community strings (ro or rw); v2c adds bulk retrieval and better errors. SNMPv3 uses usernames with HMAC-MD5/SHA authentication and DES/3DES/AES encryption, with security levels noAuthNoPriv, authNoPriv and authPriv. v1 should not be used."
+  - question: List the syslog severity levels from 0 to 7 and interpret the message %SYS-5-CONFIG_I. What does 'logging trap 4' send?
+    kind: short
+    marks: 6
+    keywords:
+      - emergencies
+      - debugging
+      - facility
+      - severity
+      - 0 to 4
+    idealAnswer: "0 emergencies, 1 alerts, 2 critical, 3 errors, 4 warnings, 5 notifications, 6 informational, 7 debugging. In %SYS-5-CONFIG_I the facility is SYS, severity 5 (notification) and mnemonic CONFIG_I (configured from console). 'logging trap 4' sends messages of severity 0 to 4 only, so this level-5 message would not be forwarded."
+  - question: Outline how to back up and restore a router configuration and an IOS image using TFTP.
+    kind: short
+    marks: 6
+    keywords:
+      - copy running-config tftp
+      - copy tftp running-config
+      - ping
+      - flash
+      - merge
+    idealAnswer: "Ping the TFTP server first. To back up use copy running-config tftp and give the server IP and file name; to restore use copy tftp running-config, which merges into the running config. For the IOS image check the image size with show flash0: and server free space, then copy flash0: tftp: to back up, or copy tftp: flash: to upgrade, and reload. Never run copy running-config startup-config before checking a rollback is needed because it overwrites the saved config."
+fact:
+  title: Why the 150 ms limit
+  body: Round-trip delay people notice in conversation starts to hurt when one-way delay passes about 150 ms, a figure widely used in ITU-T G.114 guidance, which is why voice budgets are built around it.
+lab:
+  title: QoS arithmetic drills
+  variations:
+    - title: AF class to DSCP decimal
+      question: "A packet is marked <b>AF31</b>. What is its DSCP decimal value? (DSCP = 8x + 2y)"
+      answer: 26
+      tolerance: 0
+      hint: Class x = 3, drop preference y = 1.
+      explanation: 8(3) + 2(1) = 24 + 2 = 26 (binary 011010).
+    - title: AF to DSCP, higher drop preference
+      question: "What is the DSCP decimal value of <b>AF43</b>?"
+      answer: 38
+      tolerance: 0
+      hint: x = 4, y = 3.
+      explanation: 8(4) + 2(3) = 32 + 6 = 38 (binary 100110).
+    - title: DSCP back to drop preference
+      question: "A packet has DSCP <b>28</b> (AF3y). What is its drop preference y?"
+      answer: 2
+      tolerance: 0
+      hint: 28 = 24 + 2y, so subtract 8x with x = 3.
+      explanation: 28 = 011100. Class 011 = 3, drop 10 = 2, so AF32. Check 8(3) + 2(2) = 28.
+    - title: Serialisation delay
+      question: "How long does a <b>1500-byte</b> frame take to serialise on a <b>1.5 Mbps</b> link, in milliseconds?"
+      answer: 8
+      tolerance: 0.05
+      hint: Bits = bytes x 8; delay = bits / link rate.
+      explanation: 12,000 bits / 1,500,000 bps = 0.008 s = 8 ms.
+      unit: ms
+    - title: One-way delay budget
+      question: "The voice one-way limit is <b>150 ms</b>. Fixed delays are coding 20, packetisation 20, serialisation 5, propagation 30 and de-jitter 40 ms. How many ms of queuing delay remain?"
+      answer: 35
+      tolerance: 0
+      hint: Add the fixed delays and subtract from 150.
+      explanation: 20 + 20 + 5 + 30 + 40 = 115. 150 - 115 = 35 ms.
+      unit: ms

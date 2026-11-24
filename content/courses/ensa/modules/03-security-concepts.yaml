@@ -1,0 +1,630 @@
+id: security-concepts
+title: Network Security Concepts
+subtitle: Threat actors, malware, attacks on IP, TCP, UDP and network services, layered defences, AAA and cryptography
+recap: |
+  Security is about protecting assets from threats that exploit vulnerabilities, and the CIA triad (confidentiality, integrity,
+  availability) states the goals. Threat actors range from script kiddies to state-sponsored groups and use scanners, sniffers,
+  password crackers and exploit kits to deliver malware (virus, worm, Trojan, ransomware, rootkit, spyware). Network attacks fall
+  into reconnaissance, access (including social engineering) and DoS/DDoS. IP, ICMP, TCP, UDP, ARP, DNS and DHCP all have weaknesses
+  that attackers abuse (spoofing, SYN floods, cache poisoning, rogue DHCP). Defence in depth layers firewalls, IPS, ESA and WSA, AAA and hardened devices.
+  Cryptography supplies integrity (hashes), origin authentication (HMAC), confidentiality (symmetric for bulk, asymmetric for keys and signatures)
+  and Diffie-Hellman to agree a key without sending it.
+traps:
+  - "Mixing the security terms. A vulnerability is a weakness, a threat is a potential danger, an exploit takes advantage of a vulnerability, mitigation reduces the likelihood or severity, and risk is the likelihood of a threat exploiting a vulnerability. Do not use threat and vulnerability as synonyms."
+  - "Treating all hackers as criminals. White hats are ethical and legal, gray hats are in between (they may disclose after compromising), black hats act for personal gain. Know script kiddie, vulnerability broker, hacktivist, cyber criminal and state-sponsored as the modern types."
+  - "Confusing virus, worm and Trojan. A virus needs a human action to spread and attaches to files. A worm replicates itself across the network by exploiting vulnerabilities with no user action. A Trojan pretends to be useful software and carries hidden malicious code."
+  - "Calling a plain hash 'authentication'. A hash gives integrity only, and anyone can recompute it, so a man-in-the-middle can change the message and the hash. HMAC adds a secret key and so gives integrity and origin authentication."
+  - "Swapping symmetric and asymmetric. Symmetric uses one shared key, is fast and used for bulk data (AES, 3DES). Asymmetric uses a public and private key pair, is slow, and is used for key exchange, signatures and small data (RSA, Diffie-Hellman). The usual design is asymmetric to set up a key, then symmetric for the traffic."
+  - "Saying Diffie-Hellman encrypts data or sends the key. DH lets two parties compute the same shared secret without ever transmitting it. It does not authenticate the parties by itself, so it is vulnerable to man-in-the-middle unless authentication is added."
+  - "Mixing IDS and IPS. An IDS only detects and alerts (usually out of band on a copy of traffic). An IPS sits in the traffic path and can drop packets. Both rely on signatures; atomic is a single-packet signature and composite is multi-packet."
+  - "Forgetting AAA stands for three separate things. Authentication is who you are, authorisation is what you may do, accounting is what you did. RADIUS combines authentication and authorisation, TACACS+ separates all three and encrypts the whole payload."
+lesson:
+  checkpointStep: 6
+  steps:
+    - "Core terms. An asset is anything of value. A vulnerability is a weakness. A threat is a potential danger. An exploit takes advantage of a vulnerability. Mitigation reduces likelihood or severity. Risk is the likelihood that a threat exploits a vulnerability. The CIA triad is confidentiality (encryption, such as AES), integrity (hashing, such as SHA) and availability (redundancy). Internal threats can do more damage than external ones, and data loss (exfiltration) has many vectors such as email, USB drives, cloud storage and weak passwords."
+    - "Threat actors. White hat hackers are ethical. Gray hats cross lines but not for gain. Black hats commit crime for gain. Modern types are script kiddies (use existing tools), vulnerability brokers (sell or report exploits), hacktivists (protest), cyber criminals (profit) and state-sponsored actors (customised attacks, zero-days, Stuxnet). Their tools include password crackers, wireless hacking tools, scanners such as Nmap, packet crafters, sniffers such as Wireshark, fuzzers, forensic tools and Kali Linux."
+    - "Malware. A virus needs a user to run an infected file. A worm replicates across the network by itself. A Trojan horse looks useful but hides malicious code. Others are adware, spyware, ransomware (encrypts files for a fee) and rootkits (privileged access that is hard to detect). Network attacks follow three categories: reconnaissance, access and DoS."
+    - "Reconnaissance is information gathering: information query (whois), ping sweep, port scan, vulnerability scan and exploitation tools. Access attacks include password attacks, spoofing, trust exploitation, port redirection, man-in-the-middle and buffer overflows. Social engineering includes pretexting, phishing, spear phishing, baiting, tailgating, shoulder surfing and dumpster diving. DoS floods a target or sends malformed packets; DDoS does it from many sources (a botnet of zombies)."
+    - "Protocol weaknesses. IP does not validate the source address, so addresses are spoofed, and ICMP is used to map networks, redirect traffic or flood (a Smurf attack uses amplification and reflection). TCP is attacked by SYN floods (half-open connections), reset attacks and session hijacking. UDP has no encryption or handshake, so it suffers floods. ARP accepts gratuitous replies, which allows cache poisoning. DNS is attacked by cache poisoning, amplification, tunnelling and domain shadowing. DHCP is attacked by rogue servers and starvation."
+    - "Checkpoint: explain how a TCP SYN flood works and name two defences, then give the difference between a hash and an HMAC and say what a man-in-the-middle can and cannot do against each."
+    - "Defence in depth layers several controls. A firewall enforces an access control policy between networks. An IPS sits inline, matches signatures (atomic or composite), logs and drops malicious packets, while an IDS only alerts. The Cisco ESA protects email (SMTP) and the Cisco WSA protects web access with URL filtering and malware scanning. AAA controls who logs in, what they may do and records what they did. Devices are hardened and VPNs protect data in transit."
+    - "Cryptography gives four things. Integrity: hash functions (MD5 128-bit and SHA-1 160-bit are legacy, use SHA-2). Origin authentication: HMAC, a hash combined with a secret key. Confidentiality: symmetric encryption (AES, 3DES) with one shared key, fast and used for bulk data, and asymmetric encryption (RSA) with a public and private key, slow and used for key exchange and signatures. Non-repudiation: digital signatures."
+    - "Diffie-Hellman lets two parties build the same shared secret over an insecure channel without sending it. Each side combines public values with its own private number, they exchange the results and each combines the other's result with its private number. DH is used in IPsec, TLS and SSH, normally to create the keys for a fast symmetric cipher such as AES. Keep keys long: at least 128 bits for symmetric algorithms and 1024 bits or more for asymmetric (modern guidance is 2048 or more)."
+checkpoint:
+  question: Explain how a TCP SYN flood works and name two defences. Then explain the difference between a hash and an HMAC, and say what a man-in-the-middle can and cannot do against each.
+  hint: Think about the three-way handshake and half-open connections. For the hash, who can compute it? For the HMAC, who holds the secret key?
+  keywords:
+    - SYN
+    - half-open
+    - SYN-ACK
+    - three-way handshake
+    - hash
+    - HMAC
+    - secret key
+    - man-in-the-middle
+    - integrity
+    - authentication
+  idealAnswer: "In a SYN flood the attacker sends many SYN requests, usually from spoofed addresses. The server replies with SYN-ACK and holds a half-open connection waiting for the final ACK, which never arrives, so the connection table fills and legitimate users cannot connect. Defences include SYN cookies, shorter half-open timeouts and connection limits, firewall or IPS rate limiting and anti-spoofing filters. A hash gives integrity only, and anyone who knows the algorithm can compute it, so a man-in-the-middle can change the message and recompute a matching hash without detection. An HMAC mixes in a secret key shared only by sender and receiver, so the man-in-the-middle cannot produce a valid digest. HMAC therefore gives integrity and origin authentication, although it does not hide the message (that needs encryption)."
+notes:
+  - heading: Security terms, CIA and who the attackers are
+    body: |
+      | Term | Meaning |
+      |---|---|
+      | **Asset** | Anything of value: people, equipment, resources, data |
+      | **Vulnerability** | A weakness in a system or its design |
+      | **Threat** | A potential danger to assets, data or network function |
+      | **Exploit** | A mechanism that takes advantage of a vulnerability |
+      | **Mitigation** | A countermeasure that reduces likelihood or severity |
+      | **Risk** | Likelihood that a threat exploits a vulnerability to harm the organisation (probability and consequence) |
+
+      An **attack vector** is the path used to reach a target. **Internal threats** often cause more damage than external ones because users already have access.
+      **Data loss (exfiltration)** vectors are email and social networking, unencrypted devices, cloud storage, removable media (USB), hard copy and improper access control.
+
+      **The CIA triad**
+
+      | Goal | Meaning | Typical mechanism |
+      |---|---|---|
+      | **Confidentiality** | Only authorised parties can read data | Encryption (AES) |
+      | **Integrity** | Data is not altered | Hashing (SHA) |
+      | **Availability** | Authorised users have uninterrupted access | Redundant services, gateways and links |
+
+      **Threat actors**
+
+      | Actor | Description |
+      |---|---|
+      | White hat | Ethical, legal; reports vulnerabilities so they can be fixed |
+      | Gray hat | Crosses ethical lines, but not for gain or damage; may disclose after compromising |
+      | Black hat | Criminal; personal gain or malicious purpose |
+      | Script kiddie | Inexperienced; runs existing tools, rarely for profit |
+      | Vulnerability broker | Usually gray hat; finds exploits and reports them for rewards |
+      | Hacktivist | Protests publicly (leaks, attacks) for political or social causes |
+      | Cyber criminal | Black hat working alone or for organised crime; sells toolkits, zero-days and botnet services in an underground economy |
+      | State-sponsored | Advanced, customised attacks using zero-day vulnerabilities; for example Stuxnet |
+  - heading: Attacker tools and attack types
+    body: |
+      Many tools are used by both attackers and defenders (penetration testers). Know the category and an example of each.
+
+      | Category | Purpose | Examples |
+      |---|---|---|
+      | Password crackers | Guess or recover passwords | John the Ripper, Ophcrack |
+      | Wireless hacking | Find weaknesses in Wi-Fi | Aircrack-ng, Kismet |
+      | Network scanners | Probe hosts for open TCP and UDP ports | Nmap, SuperScan |
+      | Packet crafting | Test firewalls with forged packets | Hping, Scapy, Netcat |
+      | Packet sniffers | Capture and analyse traffic | Wireshark, tcpdump |
+      | Rootkit detectors | Integrity checkers | AIDE |
+      | Fuzzers | Find vulnerabilities by sending malformed input | Skipfish, Wapiti |
+      | Forensic tools | Find evidence on a computer | Sleuth Kit, Maltego |
+      | Debuggers | Reverse engineer binaries | GDB, IDA Pro |
+      | Hacking OS | Distribution preloaded with tools | Kali Linux |
+      | Exploitation tools | Check whether a remote host is vulnerable | Metasploit, Sqlmap |
+      | Vulnerability scanners | Find open ports and known flaws | Nessus, OpenVAS |
+      | Encryption tools | Protect data | VeraCrypt, OpenSSH, OpenVPN |
+
+      **Generic attack types**
+
+      | Attack | What happens |
+      |---|---|
+      | Eavesdropping / sniffing | Capturing and reading traffic |
+      | Data modification | Altering captured data without the sender or receiver knowing |
+      | IP address spoofing | A packet with a forged source address that appears to come from inside |
+      | Password-based | A valid account gives the attacker that user's rights |
+      | DoS | Denies normal use by flooding or blocking |
+      | Man-in-the-middle | Attacker sits between source and destination, monitoring and controlling the exchange |
+      | Compromised-key | A stolen secret key unlocks protected traffic |
+  - heading: Malware
+    body: |
+      | Type | Key behaviour |
+      |---|---|
+      | **Virus** | Attaches to code or documents and needs **human action** to run and spread. Types: boot sector, firmware, macro, program and script viruses |
+      | **Worm** | **Self-replicating**; spreads over the network by exploiting vulnerabilities with **no user action**; usually slows or disrupts networks |
+      | **Trojan horse** | Looks useful but carries malicious code. Types: remote-access, data-sending, destructive, proxy, FTP, security software disabler, DoS and keylogger |
+      | **Adware** | Shows unwanted adverts, toolbars and redirects |
+      | **Spyware** | Gathers user information and sends it to the attacker |
+      | **Ransomware** | Encrypts files and demands payment for the key; backups are the defence |
+      | **Rootkit** | Gives administrator-level access and hides by altering OS commands, firewall and antivirus; may need a reinstall |
+
+      Viruses and worms differ mainly in how they spread: a virus needs a **host file and a user**, a worm exploits a vulnerability and moves **by itself**.
+      Malware delivers the payload that enables later network attacks.
+  - heading: Network attacks - reconnaissance, access and denial of service
+    body: |
+      **1. Reconnaissance (information gathering)**
+
+      Typical sequence: information query (search engines, website, `whois`), **ping sweep** to find live hosts, **port scan** to find open services,
+      **vulnerability scan** to learn software versions, then exploitation tools. Recon precedes access and DoS attacks.
+
+      **2. Access attacks**
+
+      These exploit weaknesses in authentication, FTP and web services to read data, gain entry or escalate privileges.
+
+      - Password attacks (guessing, brute force, dictionary).
+      - **Spoofing**: IP, MAC and DHCP spoofing.
+      - Trust exploitation, port redirection, man-in-the-middle, buffer overflow.
+
+      **Social engineering** manipulates people rather than software:
+
+      | Technique | Description |
+      |---|---|
+      | Pretexting | Invents a story to obtain personal or financial data |
+      | Phishing | Fake email from a trusted source |
+      | Spear phishing | Phishing tailored to a person or organisation |
+      | Spam | Unsolicited bulk email with harmful links |
+      | Something for something (quid pro quo) | Offers a gift in return for information |
+      | Baiting | Leaves an infected flash drive for a victim to find |
+      | Impersonation | Pretends to be someone trusted |
+      | Tailgating | Follows an authorised person into a secure area |
+      | Shoulder surfing | Watches someone enter a password |
+      | Dumpster diving | Searches the rubbish for documents |
+
+      The defence is user education, verification procedures and clear policy.
+
+      **3. Denial of Service**
+
+      | Type | Description |
+      |---|---|
+      | **DoS** | Interrupts service by an **overwhelming quantity of traffic** or **maliciously formatted packets** that crash the target |
+      | **DDoS** | The same attack from **many coordinated sources**, typically a botnet of compromised hosts (zombies) controlled by a command and control server |
+
+      DoS is simple to launch, even for unskilled attackers, and causes large losses of time and money.
+  - heading: IP, ICMP, TCP and UDP vulnerabilities
+    body: |
+      **IP.** IP does not check that a packet's source address is genuine, which allows **spoofing**.
+
+      | Attack | Idea |
+      |---|---|
+      | ICMP attacks | Echo (ping) to find hosts and flood; unreachable for scanning; mask reply to map the network; **redirects** to draw traffic through an attacker (MITM); router discovery to inject bogus routes |
+      | Amplification and reflection | A small request sent with the victim's spoofed source address triggers large replies to the victim; the **Smurf** attack uses directed broadcast pings; DNS and NTP amplification are modern forms |
+      | Address spoofing | **Non-blind**: attacker sees the traffic (session hijack, firewall state, sequence prediction). **Blind**: attacker cannot see it (used in DoS) |
+      | MITM and session hijacking | Attacker sits in the path to eavesdrop, alter or take over a session |
+
+      Defence: ICMP filtering with ACLs at the network edge, anti-spoofing filters (RFC 2827), IPS and firewalls.
+
+      **TCP.** TCP provides reliability, flow control and stateful communication using the **three-way handshake** (SYN, SYN-ACK, ACK). The six control bits are URG, ACK, PSH, RST, SYN and FIN.
+
+      - **SYN flood**: many SYNs (often spoofed) get SYN-ACK replies but no final ACK. The server fills with **half-open connections** and refuses real users. Defences: SYN cookies, shorter timeouts, rate limits.
+      - **TCP reset attack**: a spoofed RST packet terminates a connection.
+      - **Session hijacking**: spoof one host's address, predict the next sequence number and take over an authenticated session. Difficult but possible.
+
+      **UDP.** Connectionless, low overhead, used by DNS, TFTP, NFS, SNMP and real-time voice and video. It has **no built-in encryption, handshake or reliability**, so traffic can be seen, changed or spoofed.
+      **UDP flood** tools send many packets, often from spoofed addresses, to sweep ports and make the server answer with ICMP unreachables, exhausting resources.
+  - heading: IP services under attack - ARP, DNS and DHCP
+    body: |
+      **ARP.** A host broadcasts an ARP request and the owner replies. Any host may also send an unsolicited **gratuitous ARP**, and others will update their ARP caches with it.
+      An attacker sends gratuitous replies binding **its own MAC to the gateway's IP** (and the victim's IP to its MAC), becoming a **man-in-the-middle**. This is **ARP cache poisoning (spoofing)**.
+      It can be passive (steal data) or active (modify or inject data).
+      Mitigation: **Dynamic ARP Inspection (DAI)** on switches, which validates ARP packets against the DHCP snooping binding table.
+
+      **DNS.** DNS maps names to addresses and is often overlooked.
+
+      | Attack | Description |
+      |---|---|
+      | Open resolver abuse | Cache poisoning (false records redirect users), amplification and reflection, resource exhaustion |
+      | Stealth techniques | **Fast flux**, **double IP flux**, **domain generation algorithms** hide malicious servers and C&C |
+      | Domain shadowing | Stolen domain credentials used to add malicious sub-domains silently |
+      | DNS tunnelling | Hides other traffic (commands or stolen data) inside DNS queries and responses to bypass controls |
+
+      Defence: close open resolvers, use DNSSEC, and inspect DNS traffic for unusually long or odd queries.
+
+      **DHCP.** The normal exchange is **Discover (broadcast), Offer (unicast), Request (broadcast), Acknowledge (unicast)**.
+
+      - **DHCP spoofing**: a rogue server offers false gateway (MITM), false DNS (malicious sites) or a bad address (DoS). If its Offer arrives first, the client accepts it.
+      - **DHCP starvation**: the attacker requests every address in the pool with fake MACs so legitimate clients get nothing (often a prelude to a rogue server).
+
+      ```
+      Switch(config)# ip dhcp snooping
+      Switch(config)# ip dhcp snooping vlan 10
+      Switch(config)# interface GigabitEthernet 0/1
+      Switch(config-if)# ip dhcp snooping trust          ! uplink to the real DHCP server
+      Switch(config)# ip arp inspection vlan 10
+      Switch(config)# interface GigabitEthernet 0/1
+      Switch(config-if)# ip arp inspection trust
+      ```
+
+      DHCP snooping allows DHCP server messages only from **trusted** ports and builds the binding table that DAI uses. Port security limits MAC addresses per port against starvation.
+  - heading: Defence in depth - firewalls, IPS, ESA and WSA
+    body: |
+      **Defence in depth** uses several layers so a failure of one control does not expose the network: a VPN, a firewall, an IPS, content security (ESA and WSA), an AAA server and
+      hardened routers and switches, plus protection for data as it crosses links.
+
+      | Device | Role |
+      |---|---|
+      | **Firewall** | Enforces an access control policy between networks (stateful inspection, ACLs, NAT, application inspection) |
+      | **IPS** | Inline sensor that inspects traffic against **signatures** and policy, logs to the management console and **drops** malicious packets |
+      | **IDS** | Passive sensor on a copy of traffic; **detects and alerts** but does not block |
+      | **Cisco ESA** | Monitors **SMTP**; filters spam, phishing and malware in email using threat intelligence from Cisco Talos, refreshed every 3 to 5 minutes |
+      | **Cisco WSA** | Controls web access: URL filtering and blacklisting, malware scanning, URL categorisation, web application control, decryption of web traffic |
+
+      **IPS signatures.** *Atomic* signatures match a single packet. *Composite* signatures match a pattern across several packets.
+      An IPS can be a router running IOS IPS, a dedicated appliance, or a module in an ASA, switch or router.
+
+      **IDS versus IPS.** IDS is out of band, so it adds no latency and cannot stop the first malicious packet. IPS is inline, so it can drop traffic but could become a bottleneck or point of failure.
+
+      Good practice also includes patching, strong passwords, backups, least privilege, device hardening and logging.
+  - heading: AAA - authentication, authorisation and accounting
+    body: |
+      | Function | Question | Example |
+      |---|---|---|
+      | **Authentication** | Who are you? | Username and password, token, certificate |
+      | **Authorisation** | What are you allowed to do? | Privilege level 15, allowed commands |
+      | **Accounting** | What did you do? | Logs of logins, commands and session time, used for audit and billing |
+
+      **Local versus server-based AAA**
+
+      | | Local database | Server-based (RADIUS or TACACS+) |
+      |---|---|---|
+      | Where | Usernames on each device | Central AAA server |
+      | Scales | Poorly | Well |
+      | Use | Small networks, fallback | Enterprise |
+
+      | | RADIUS | TACACS+ |
+      |---|---|---|
+      | Standard | Open (RFC 2865) | Cisco originated, documented in RFC 8907 |
+      | Transport | UDP (1812 and 1813) | TCP 49 |
+      | Encryption | Password only | Entire body |
+      | AAA | Authentication and authorisation combined, accounting separate | All three separated |
+
+      ```
+      R1(config)# username Admin secret Str0ngPass!
+      R1(config)# aaa new-model
+      R1(config)# aaa authentication login default local
+      R1(config)# aaa authorization exec default local
+      R1(config)# aaa accounting exec default start-stop group tacacs+
+      ```
+
+      Use a fallback to the local database so a failed AAA server does not lock you out.
+  - heading: Cryptography - integrity, authentication, confidentiality and Diffie-Hellman
+    body: |
+      **Four elements of secure communications**
+
+      | Element | Provided by |
+      |---|---|
+      | Data integrity | Hash functions (MD5, SHA) |
+      | Origin authentication | HMAC |
+      | Data confidentiality | Symmetric and asymmetric encryption |
+      | Non-repudiation | Digital signatures (sender cannot deny sending) |
+
+      **Integrity: hashing.** A hash function turns any message into a **fixed-length digest**; it is one-way. The sender attaches the hash and the receiver recomputes it. If they differ, the message changed.
+
+      | Hash | Digest | Status |
+      |---|---|---|
+      | MD5 | 128 bits | Legacy; use only if nothing better |
+      | SHA-1 | 160 bits | Known flaws, legacy |
+      | SHA-2 (SHA-256, 384, 512) | 256 to 512 bits | Recommended |
+
+      A hash detects accidental change but **not deliberate change**: an attacker can alter the message and recompute the hash.
+
+      **Authentication: HMAC.** A **keyed-hash** message authentication code combines the hash function with a **secret key**. Only holders of the key can produce the correct digest, so it defeats the man-in-the-middle and proves where the message came from (RFC 2104).
+
+      **Confidentiality**
+
+      | | Symmetric | Asymmetric |
+      |---|---|---|
+      | Keys | One shared secret key | Public and private key pair |
+      | Speed | Fast, low CPU | Slow, 100 to 1000 times slower |
+      | Used for | Bulk data, VPN traffic | Key exchange, digital signatures, small data |
+      | Examples | DES (legacy), 3DES, **AES** (128, 192, 256 bit), SEAL, RC4 | RSA, Diffie-Hellman, DSA, ElGamal, ECC |
+      | Key length | At least 128 bits | 1024 bits or longer (2048 or more is current guidance) |
+      | Problem | How to share the key safely | Slow |
+
+      Data encrypted with the **public key** is decrypted with the **private key**. For a signature, the sender signs with the **private key** and anyone verifies with the **public key**.
+      Protocols using asymmetric keys include IKE (IPsec), TLS (the standard successor to SSL), SSH and PGP.
+
+      **Diffie-Hellman.** Two parties produce an identical shared secret over an insecure channel without ever sending it. The security rests on the fact that raising a number to a power modulo a prime is easy but reversing it (the discrete logarithm) is very hard.
+      It is used with IPsec VPNs, TLS and SSH, normally to make the key for a symmetric cipher like AES. Without authentication, DH is vulnerable to a man-in-the-middle.
+      Larger DH groups give stronger keys: groups 1, 2 and 5 should no longer be used; 14, 15 and 16 use 2048, 3072 and 4096 bit moduli; 19, 20, 21 and 24 use elliptic curves.
+  - heading: Sources
+    body: |
+      - RFC 2104, HMAC: Keyed-Hashing for Message Authentication: https://www.rfc-editor.org/rfc/rfc2104
+      - RFC 4987, TCP SYN Flooding Attacks and Common Mitigations: https://www.rfc-editor.org/rfc/rfc4987
+      - RFC 826, An Ethernet Address Resolution Protocol: https://www.rfc-editor.org/rfc/rfc826
+      - RFC 2827, Network Ingress Filtering (BCP 38): https://www.rfc-editor.org/rfc/rfc2827
+      - NIST FIPS 180-4, Secure Hash Standard: https://csrc.nist.gov/pubs/fips/180-4/upd1/final
+      - NIST FIPS 197, Advanced Encryption Standard: https://csrc.nist.gov/pubs/fips/197/final
+      - NIST SP 800-41 Rev. 1, Guidelines on Firewalls and Firewall Policy: https://csrc.nist.gov/pubs/sp/800/41/r1/final
+      - Cisco ENSA v7.0 lecture slides, Module 3 (Network Security Concepts)
+examples:
+  - title: Classify the attack
+    problem: "Name the category (reconnaissance, access or DoS) and the specific attack for each. (a) An attacker runs a ping sweep and then Nmap on 192.168.10.0/24. (b) A caller says they are from IT and asks an employee to read out a password. (c) A botnet of 20,000 hosts floods a web server with requests. (d) A host sends gratuitous ARP replies claiming to be the default gateway. (e) A rogue server answers DHCP discovers with itself as the default gateway."
+    steps:
+      - "(a) Information gathering to find live hosts and open ports: a reconnaissance attack (ping sweep, port scan)."
+      - "(b) Manipulating a person to disclose a password: an access attack by social engineering (pretexting or impersonation)."
+      - "(c) Many coordinated sources denying service: a DDoS attack."
+      - "(d) Redirects hosts' traffic to the attacker: an access attack, ARP cache poisoning, producing a man-in-the-middle. Mitigate with Dynamic ARP Inspection."
+      - "(e) False configuration to place the attacker in the path: an access attack, DHCP spoofing, giving a man-in-the-middle. Mitigate with DHCP snooping."
+    answer: "(a) Reconnaissance, ping sweep and port scan. (b) Access, social engineering. (c) DoS, specifically DDoS. (d) Access, ARP poisoning. (e) Access, DHCP spoofing."
+    takeaway: Decide the goal first. Gathering information is recon, entering or controlling is access, denying service is DoS.
+  - title: Walk through a TCP SYN flood
+    problem: A web server allows 1,024 half-open connections and times each one out after 30 seconds. An attacker sends 100 SYNs per second from spoofed addresses. Explain what happens and calculate how quickly the table fills.
+    steps:
+      - "For every SYN the server sends a SYN-ACK and holds a half-open entry while it waits for the final ACK."
+      - "The spoofed addresses never reply with an ACK, so entries stay until the 30 second timeout."
+      - "Rate of entries created = 100 per second. Table size 1,024. Time to fill = 1,024 / 100 = about 10.2 seconds."
+      - "In steady state entries last 30 s, so up to 100 × 30 = 3,000 would be held, which is far more than 1,024. The table stays full and new SYNs, including real users', are dropped."
+      - "Defences: SYN cookies (no state until the ACK), shorter timeouts, per-source rate limits, ingress filtering against spoofing (RFC 2827) and an IPS or upstream DDoS scrubbing."
+    answer: "The table is full after about 10 seconds and stays full, so legitimate clients cannot connect."
+    takeaway: SYN floods exhaust state, not bandwidth. Half-open connections are the resource being attacked.
+  - title: Hash versus HMAC against a man-in-the-middle
+    problem: "A bank sends 'Pay Alex 100' with a SHA-256 hash. A man-in-the-middle wants to change the message to 'Pay Mallory 100000'. Show whether a plain hash or an HMAC stops this."
+    steps:
+      - "With a plain hash the sender computes H('Pay Alex 100') and sends both in the clear. The attacker intercepts them."
+      - "The attacker alters the message and computes H('Pay Mallory 100000') using the same public algorithm, then forwards the new message and new hash."
+      - "The receiver recomputes the hash of the received message, gets a match and accepts. The plain hash detected nothing, because it only protects against accidental change."
+      - "With HMAC the sender computes HMAC(K, message), where K is a secret key shared only with the receiver."
+      - "The attacker does not know K, so cannot compute a valid digest for the altered message. The receiver's recomputed HMAC will not match and the message is rejected."
+      - "HMAC proves integrity and origin authentication, but not confidentiality: the message is still readable unless it is encrypted."
+    answer: "A plain hash does not stop the attack. HMAC does, because the attacker lacks the secret key."
+    takeaway: Hash = integrity against accidents. HMAC = integrity plus authentication against attackers.
+  - title: Diffie-Hellman with small numbers
+    problem: "Alice and Bob agree publicly on the prime p = 23 and base g = 5. Alice's private number is a = 6 and Bob's is b = 15. Calculate the shared secret."
+    steps:
+      - "Alice computes A = g^a mod p = 5^6 mod 23. 5^6 = 15,625. 15,625 mod 23 = 8 (23 × 679 = 15,617, remainder 8). Alice sends 8."
+      - "Bob computes B = 5^15 mod 23. Using squares: 5^2 = 2, 5^4 = 4, 5^8 = 16 (all mod 23). 5^15 = 5^8 × 5^4 × 5^2 × 5 = 16 × 4 × 2 × 5 = 640, and 640 mod 23 = 19. Bob sends 19."
+      - "An eavesdropper sees p = 23, g = 5, A = 8 and B = 19 but not a or b."
+      - "Alice computes B^a mod p = 19^6 mod 23. 19^2 = 361 mod 23 = 16, 19^4 = 256 mod 23 = 3, 19^6 = 16 × 3 = 48 mod 23 = 2."
+      - "Bob computes A^b mod p = 8^15 mod 23. 8^2 = 18, 8^4 = 2, 8^8 = 4 (mod 23). 8^15 = 4 × 2 × 18 × 8 = 1,152, and 1,152 mod 23 = 2."
+      - "Both obtain 2. The shared secret was never transmitted. Real systems use primes thousands of bits long, so the discrete logarithm cannot be found."
+    answer: "The shared secret is 2 for both parties."
+    takeaway: DH makes both sides compute the same value from public information plus a private number. It is then used to derive a symmetric key.
+  - title: How many keys are needed?
+    problem: A company of 20 employees wants every pair to communicate privately. Compare the number of keys under symmetric and asymmetric encryption, and explain what a practical system does.
+    steps:
+      - "Symmetric: each pair needs its own shared secret. Pairs = n(n − 1)/2 = 20 × 19 / 2 = 190 keys, and each must be distributed safely."
+      - "Asymmetric: each person has one key pair, so 20 × 2 = 40 keys, with the 20 public keys freely shared."
+      - "But asymmetric operations are slow, so encrypting all traffic with them wastes CPU."
+      - "Practical design (TLS, IPsec, SSH): use asymmetric cryptography or Diffie-Hellman to authenticate and agree a session key, then use a fast symmetric cipher such as AES for the data, with HMAC for integrity."
+    answer: "190 keys for symmetric against 40 for asymmetric. In practice, use asymmetric or DH to agree a symmetric session key."
+    takeaway: Symmetric is fast but has a key-distribution problem. Asymmetric solves distribution but is slow. Combine them.
+terms:
+  - term: Vulnerability, threat, exploit
+    definition: A vulnerability is a weakness, a threat is a potential danger, and an exploit is a mechanism that takes advantage of a vulnerability.
+  - term: Risk and mitigation
+    definition: Risk is the likelihood that a threat exploits a vulnerability, measured by probability and consequence. Mitigation is the countermeasure that reduces likelihood or severity.
+  - term: CIA triad
+    definition: Confidentiality (only authorised access, encryption), integrity (no unauthorised change, hashing) and availability (uninterrupted access, redundancy).
+  - term: Data exfiltration
+    definition: Data intentionally or unintentionally lost, stolen or leaked outside the organisation, for example via email, USB drives or cloud storage.
+  - term: Script kiddie, hacktivist, state-sponsored
+    definition: Script kiddies run existing tools. Hacktivists protest. State-sponsored actors use advanced customised attacks and zero-day vulnerabilities, for example Stuxnet.
+  - term: Virus, worm, Trojan horse
+    definition: A virus needs user action to run, a worm spreads by itself over the network, and a Trojan horse hides malicious code in apparently useful software.
+  - term: Reconnaissance attack
+    definition: Information gathering such as an information query, ping sweep, port scan and vulnerability scan.
+  - term: Access attack
+    definition: An attack to gain entry or privileges, including password attacks, spoofing, trust exploitation, man-in-the-middle, buffer overflow and social engineering.
+  - term: DoS and DDoS
+    definition: Denial of service by overwhelming traffic or malformed packets. DDoS uses many coordinated sources, usually a botnet of zombies.
+  - term: Amplification and reflection
+    definition: A spoofed request makes third parties send larger replies to the victim. A Smurf attack is the classic example; DNS and NTP are modern ones.
+  - term: SYN flood
+    definition: A TCP attack that sends many SYNs and never completes the handshake, leaving the server with half-open connections.
+  - term: ARP cache poisoning
+    definition: Sending gratuitous ARP replies that bind the attacker's MAC to another host's IP so traffic is redirected, creating a man-in-the-middle.
+  - term: DHCP spoofing
+    definition: A rogue DHCP server gives clients false gateway, DNS or address settings. Countered by DHCP snooping.
+  - term: Defence in depth
+    definition: Layering multiple controls (firewall, IPS, ESA, WSA, AAA, VPN, hardened devices) so no single failure exposes the network.
+  - term: IPS and IDS
+    definition: Both use signatures (atomic or composite). An IPS sits inline and can drop packets; an IDS detects and alerts only.
+  - term: ESA and WSA
+    definition: Cisco Email Security Appliance filters SMTP email threats. Cisco Web Security Appliance controls web access with URL filtering and malware scanning.
+  - term: AAA
+    definition: Authentication (who you are), authorisation (what you may do) and accounting (what you did). Implemented locally or with RADIUS or TACACS+.
+  - term: Hash and HMAC
+    definition: A hash gives a fixed-length one-way digest for integrity. An HMAC combines a hash with a secret key to add origin authentication.
+  - term: Symmetric versus asymmetric encryption
+    definition: Symmetric uses one shared key and is fast (AES, 3DES). Asymmetric uses a public and private key pair and is slow (RSA, DH), used for key exchange and signatures.
+  - term: Diffie-Hellman
+    definition: A key agreement algorithm by which two parties derive the same shared secret over an insecure channel without sending it. It is used in IPsec, TLS and SSH.
+quiz:
+  - question: A weakness in a system that could be used by an attacker is called a
+    options:
+      - Threat
+      - Exploit
+      - Vulnerability
+      - Mitigation
+    answer: 2
+    explanation: A vulnerability is the weakness. The threat is the potential danger, the exploit is the mechanism that uses the weakness, and mitigation is the countermeasure.
+  - question: Which hacker type typically publicly protests an organisation or government by leaking information and performing attacks?
+    options:
+      - Script kiddie
+      - Vulnerability broker
+      - Hacktivist
+      - Cyber criminal
+    answer: 2
+    explanation: Hacktivists are gray hat attackers motivated by political or social causes. Cyber criminals are motivated by profit.
+  - question: Which malware spreads automatically over the network by exploiting vulnerabilities with no user action?
+    options:
+      - Virus
+      - Worm
+      - Trojan horse
+      - Spyware
+    answer: 1
+    explanation: A worm is self-replicating. A virus needs a user to run an infected file and a Trojan horse relies on the user installing apparently useful software.
+  - question: An attacker performs a ping sweep followed by a port scan of a company's address range. What type of attack is this?
+    options:
+      - Access
+      - Reconnaissance
+      - Denial of service
+      - Man-in-the-middle
+    answer: 1
+    explanation: Ping sweeps and port scans gather information about live hosts and services, which is reconnaissance.
+  - question: Which social engineering attack involves following an authorised person through a secured door?
+    options:
+      - Baiting
+      - Pretexting
+      - Tailgating
+      - Phishing
+    answer: 2
+    explanation: Tailgating means quickly following an authorised person into a secure area. Baiting leaves infected media, and pretexting invents a story.
+  - question: In a TCP SYN flood attack, what resource is the attacker trying to exhaust?
+    options:
+      - Disk space on the server
+      - The table of half-open connections
+      - The ARP cache
+      - The DHCP address pool
+    answer: 1
+    explanation: The server answers each SYN with a SYN-ACK and waits for an ACK that never arrives. The half-open connection entries fill the table so real clients cannot connect.
+  - question: An attacker sends gratuitous ARP replies so hosts associate the default gateway's IP with the attacker's MAC. What is this attack?
+    options:
+      - DNS cache poisoning
+      - ARP cache poisoning
+      - DHCP starvation
+      - MAC flooding
+    answer: 1
+    explanation: Forged ARP replies poison the ARP cache and place the attacker in the path as a man-in-the-middle. Dynamic ARP Inspection counters it.
+  - question: Which switch feature prevents a rogue DHCP server from answering clients on untrusted ports?
+    options:
+      - Port security
+      - DHCP snooping
+      - Spanning tree PortFast
+      - VLAN trunking
+    answer: 1
+    explanation: DHCP snooping only permits DHCP server messages from trusted ports and builds a binding table.
+  - question: What is the main difference between an IPS and an IDS?
+    options:
+      - An IPS uses signatures and an IDS does not
+      - An IPS is inline and can drop malicious packets, an IDS only detects and alerts
+      - An IDS is only for email and an IPS is only for web
+      - An IPS needs no updates
+    answer: 1
+    explanation: Both use signatures. The IPS sits in the traffic path and can block, while the IDS monitors a copy of traffic and alerts.
+  - question: Which Cisco device monitors SMTP and protects against email-borne threats such as spam and phishing?
+    options:
+      - Cisco WSA
+      - Cisco ESA
+      - Cisco ASA
+      - Cisco ISE
+    answer: 1
+    explanation: The Email Security Appliance (ESA) handles SMTP email. The Web Security Appliance (WSA) handles web access.
+  - question: In AAA, which function records what a user did, for example commands entered and session duration?
+    options:
+      - Authentication
+      - Authorisation
+      - Accounting
+      - Availability
+    answer: 2
+    explanation: Accounting keeps the audit trail. Authentication verifies identity and authorisation determines permitted actions.
+  - question: Which statement best describes an HMAC?
+    options:
+      - A hash that anyone can compute for any message
+      - A hash combined with a secret key to provide integrity and origin authentication
+      - An asymmetric encryption algorithm
+      - A method to encrypt a message so that it cannot be read
+    answer: 1
+    explanation: HMAC uses a keyed hash. Only holders of the secret key can produce the digest, which defeats a man-in-the-middle but does not encrypt the message.
+  - question: Which pairing correctly describes symmetric and asymmetric algorithms?
+    options:
+      - Symmetric uses two keys and is slow; asymmetric uses one key and is fast
+      - Symmetric uses one shared key and is fast; asymmetric uses a key pair and is slow
+      - Both use a public key but differ in key length
+      - Asymmetric is used for bulk VPN data; symmetric is used for key exchange
+    answer: 1
+    explanation: AES is symmetric and fast, so it protects bulk data. RSA and Diffie-Hellman are asymmetric and slow, so they handle key exchange and signatures.
+  - question: What does the Diffie-Hellman algorithm provide?
+    options:
+      - Encryption of bulk data with a public key
+      - A way for two parties to derive the same shared secret without sending it
+      - A digital certificate authority
+      - Integrity protection for email
+    answer: 1
+    explanation: DH is a key agreement method. It does not encrypt data or authenticate the parties by itself; the shared secret is then used to derive a symmetric key.
+questions:
+  - question: Define vulnerability, threat, exploit, mitigation and risk, and explain how they relate to each other.
+    kind: short
+    marks: 5
+    keywords:
+      - vulnerability
+      - weakness
+      - threat
+      - exploit
+      - mitigation
+      - risk
+      - likelihood
+    idealAnswer: "A vulnerability is a weakness in a system or its design. A threat is a potential danger to assets, data or network functionality. An exploit is a mechanism that takes advantage of a vulnerability. Mitigation is a countermeasure that reduces the likelihood or severity of a threat. Risk is the likelihood that a threat exploits a vulnerability with negative effect on the organisation, measured by the probability of the event and its consequences."
+  - question: Describe the three categories of network attack, giving two examples of each.
+    kind: long
+    marks: 9
+    keywords:
+      - reconnaissance
+      - ping sweep
+      - port scan
+      - access
+      - password
+      - spoofing
+      - man-in-the-middle
+      - social engineering
+      - DoS
+      - DDoS
+    idealAnswer: "Reconnaissance is information gathering that precedes other attacks, for example an information query with whois, a ping sweep to find live hosts, port scans and vulnerability scans. Access attacks exploit weaknesses to gain entry or privileges, for example password attacks, IP, MAC or DHCP spoofing, trust exploitation, man-in-the-middle, buffer overflow and social engineering such as phishing, pretexting and tailgating. Denial of service attacks deny legitimate use by overwhelming traffic or maliciously formatted packets; a DDoS comes from many coordinated sources such as a botnet of zombies."
+  - question: Distinguish between a virus, a worm and a Trojan horse, and name two other types of malware with a brief description.
+    kind: short
+    marks: 6
+    keywords:
+      - virus
+      - user action
+      - worm
+      - self-replicating
+      - Trojan
+      - ransomware
+      - rootkit
+      - spyware
+    idealAnswer: "A virus attaches itself to files or code and needs human action to run and spread. A worm is self-replicating and spreads over the network by exploiting vulnerabilities without user action. A Trojan horse looks like useful software but carries malicious code. Ransomware encrypts the victim's files and demands payment for the key. A rootkit gives administrator-level access and hides itself by altering operating system components, so it is difficult to detect. Spyware gathers user information and sends it to the attacker; adware shows unwanted adverts."
+  - question: Explain how ARP cache poisoning and DHCP spoofing work and describe a mitigation for each.
+    kind: long
+    marks: 8
+    keywords:
+      - gratuitous ARP
+      - MAC address
+      - man-in-the-middle
+      - rogue DHCP server
+      - default gateway
+      - DAI
+      - DHCP snooping
+      - trusted port
+    idealAnswer: "ARP accepts unsolicited (gratuitous) replies, so an attacker sends forged ARP replies that bind the attacker's MAC address to the default gateway's IP address, and the gateway's cache to the victim's IP. Traffic then passes through the attacker, creating a man-in-the-middle that can be passive or active. Mitigation is Dynamic ARP Inspection, which validates ARP packets against the DHCP snooping binding table. In DHCP spoofing a rogue DHCP server answers clients first and provides a false default gateway, DNS server or address, causing MITM, redirection to malicious sites or DoS. Mitigation is DHCP snooping, which only permits DHCP server messages on trusted ports, and port security."
+  - question: Explain the principle of defence in depth and describe the role of a firewall, an IPS, the Cisco ESA and the Cisco WSA.
+    kind: long
+    marks: 8
+    keywords:
+      - layers
+      - firewall
+      - access control policy
+      - IPS
+      - signatures
+      - ESA
+      - SMTP
+      - WSA
+      - URL filtering
+    idealAnswer: "Defence in depth layers several security devices and services so that if one fails another still protects the network. A firewall enforces an access control policy between networks. An IPS is an inline sensor that matches traffic to atomic or composite signatures, logs the event and drops malicious packets, whereas an IDS only alerts. The Cisco Email Security Appliance monitors SMTP and filters spam, phishing and malware using live Talos threat intelligence. The Cisco Web Security Appliance controls web access with URL filtering and blacklisting, malware scanning, application control and decryption of web traffic. Further layers include AAA, VPNs and hardened routers and switches."
+  - question: "Explain how cryptography provides integrity, authentication and confidentiality. Compare symmetric and asymmetric encryption and describe the purpose of Diffie-Hellman."
+    kind: long
+    marks: 12
+    keywords:
+      - hash
+      - SHA
+      - HMAC
+      - secret key
+      - symmetric
+      - AES
+      - asymmetric
+      - RSA
+      - public key
+      - private key
+      - Diffie-Hellman
+      - shared secret
+    idealAnswer: "Integrity uses hash functions such as SHA-2 (MD5 and SHA-1 are legacy): the receiver recomputes the digest and compares it, but a hash alone cannot stop deliberate changes because anyone can recompute it. Origin authentication uses HMAC, a hash combined with a secret key, so only key holders can produce a valid digest. Confidentiality uses encryption. Symmetric algorithms such as AES use a single shared key, are fast and suit bulk data and VPN traffic, but the key must be shared securely (at least 128 bits). Asymmetric algorithms such as RSA use a public and private key pair, are much slower and suit key exchange and digital signatures, with long keys (1024 bits or more). Diffie-Hellman allows two parties to derive the same shared secret over an insecure channel without transmitting it, so they can then create a symmetric key for bulk encryption in IPsec, TLS or SSH. It does not authenticate the parties, so it needs authentication to resist a man-in-the-middle."
+  - question: Describe the AAA framework and compare RADIUS with TACACS+.
+    kind: short
+    marks: 6
+    keywords:
+      - authentication
+      - authorisation
+      - accounting
+      - RADIUS
+      - UDP
+      - TACACS+
+      - TCP
+      - encrypts
+    idealAnswer: "AAA controls access to network resources. Authentication verifies who the user is, authorisation determines what they are allowed to do, and accounting records what they did for audit and billing. AAA can use a local database or a central server. RADIUS is an open standard using UDP, combines authentication and authorisation and encrypts only the password. TACACS+ is Cisco-originated, uses TCP port 49, separates all three AAA functions and encrypts the whole body of the packet."
+fact:
+  title: Stuxnet and zero-days
+  body: "Stuxnet, mentioned in the lecture slides as a state-sponsored attack, used several previously unknown zero-day vulnerabilities to reach and damage industrial control systems. That is why state-sponsored actors are described as having advanced, customised attack code that ordinary signature-based defences rarely detect."

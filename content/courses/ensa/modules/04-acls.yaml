@@ -1,0 +1,563 @@
+id: acls
+title: Access Control Lists
+subtitle: Packet filtering with standard and extended ACLs, wildcard masks, placement and IOS configuration
+recap: |
+  An ACL is an ordered list of permit and deny entries (ACEs) that a router checks top-down; the first match wins and
+  every ACL ends with a hidden implicit deny any. A wildcard mask uses 0 for "must match" and 1 for "ignore", and you
+  get it by subtracting the subnet mask from 255.255.255.255. Standard ACLs (1–99, 1300–1999) filter on source address
+  only and go close to the destination; extended ACLs (100–199, 2000–2699) filter on protocol, addresses and ports and
+  go close to the source. Apply with ip access-group in or out, edit with sequence numbers, protect VTY lines with
+  access-class, and verify with show access-lists, which shows the match counters.
+traps:
+  - "Forgetting the implicit deny any at the end. A list containing only deny statements blocks everything. Every ACL needs at least one permit, and the implicit deny shows no counters, so add an explicit deny any if you want to count it."
+  - "Reversing the wildcard mask. In a wildcard, 0 means the bit must match and 1 means ignore it. 0.0.0.255 matches a whole /24; it is not the subnet mask 255.255.255.0."
+  - "Putting entries in the wrong order. First match wins, so a broad permit above a specific deny hides the deny. Put specific entries first and the general ones last."
+  - "Getting placement backwards. Extended ACLs go close to the source (stop unwanted traffic early). Standard ACLs go close to the destination (they only see the source, so placing them early would block that source from everything beyond)."
+  - "Mixing up in and out. Inbound is checked before the routing lookup, as the packet arrives. Outbound is checked after the routing decision, as it leaves. Direction is from the router's point of view."
+  - "Thinking ACLs filter the router's own traffic. They do not filter packets that the router itself originates, such as pings or routing updates sent from that router."
+  - "Trying to overwrite or insert into an existing numbered line without editing correctly. You cannot overwrite a sequence number; delete it with no N and re-enter it. A new ACE added without a number goes at the bottom, after the entries already there."
+  - "Using the wrong number ranges or limits. Standard 1–99 and 1300–1999, extended 100–199 and 2000–2699. Each interface takes one IPv4 ACL per direction (and one IPv6 ACL per direction), so at most four on a dual-stack interface."
+lesson:
+  checkpointStep: 5
+  steps:
+    - "An ACL is a list of permit and deny statements (ACEs). The router compares each packet with the entries in order; this is packet filtering. There are no ACLs by default. Uses include limiting traffic, basic security, filtering by traffic type, screening hosts, and classifying traffic for QoS or NAT."
+    - "How an ACL is processed. Top-down, first match wins, and the remaining entries are not checked. If nothing matches, the hidden implicit deny any at the end drops the packet. An ACL therefore needs at least one permit. Inbound ACLs are checked before routing (a discarded packet saves a routing lookup); outbound ACLs after routing. The router's own traffic is not filtered."
+    - "Wildcard masks. 0 means match this bit, 1 means ignore it. 0.0.0.0 is one host (keyword host), 255.255.255.255 is anything (keyword any), 0.0.0.255 matches a /24. Shortcut: wildcard = 255.255.255.255 minus the subnet mask. A /28 is 255.255.255.240, so the wildcard is 0.0.0.15. A /23 is 255.255.254.0, so the wildcard is 0.0.1.255."
+    - "Types and numbers. Standard ACLs look at the source IPv4 address only: numbers 1–99 and 1300–1999. Extended ACLs look at protocol, source, destination and TCP/UDP ports: 100–199 and 2000–2699. Named ACLs (ip access-list standard|extended NAME) can be edited more easily and are preferred. One IPv4 ACL per interface per direction."
+    - "Checkpoint: write the wildcard mask for 192.168.16.0/20 and say what range of addresses it matches. Then say where you would place an extended ACL and where a standard ACL, and why."
+    - "Placement. Extended close to the source, so unwanted traffic is dropped before it crosses the network. Standard close to the destination, because it can only see the source. In the slide example, a standard ACL to stop 192.168.10.0/24 reaching 192.168.30.0/24 goes outbound on R3 G0/0/0. Inbound on R3 S0/1/1 would also block 192.168.10.0/24 from 192.168.31.0/24."
+    - "Placement factors: how much of the network you control, the bandwidth saved, and ease of configuration. If Company A does not control R3 (it belongs to Company B), an extended ACL blocking Telnet and FTP from 192.168.11.0/24 to 192.168.30.0/24 goes inbound on R1 G0/0/1, at Company A's own edge."
+    - "Configure. Standard numbered: access-list 10 permit 192.168.10.0 0.0.0.255. Named: ip access-list standard NAME, then entries. Extended: permit tcp 192.168.10.0 0.0.0.255 any eq 80. Apply with ip access-group NAME in or out under the interface. Add remarks to document the intent. Remove with no ip access-group, then no access-list."
+    - "Edit with sequence numbers: ip access-list standard NAME, then no 20 to delete, and 15 deny host 192.168.10.99 to insert between lines 10 and 20. You cannot overwrite a number. Secure the VTY lines with a standard ACL of admin hosts and access-class NAME in under line vty 0 4. The established keyword matches returning TCP segments with ACK or RST set. Verify with show access-lists and show ip interface."
+checkpoint:
+  question: Write the wildcard mask for 192.168.16.0/20 and the range of addresses it matches. Where would you place an extended ACL and where a standard ACL, and why?
+  hint: A /20 mask is 255.255.240.0. Subtract it from 255.255.255.255. For placement think about what each type can see.
+  keywords:
+    - wildcard
+    - 0.0.15.255
+    - 192.168.31.255
+    - extended
+    - close to the source
+    - standard
+    - close to the destination
+  idealAnswer: "Subnet mask /20 = 255.255.240.0, so the wildcard = 255.255.255.255 − 255.255.240.0 = 0.0.15.255. In the third octet the ignored bits cover 0–15 above 16, so it matches 192.168.16.0 to 192.168.31.255. Extended ACLs go close to the source because they can specify source, destination, protocol and port, so unwanted traffic is dropped early and bandwidth is saved. Standard ACLs go close to the destination because they only match the source address; placed near the source they would block that source from every destination beyond the filter."
+notes:
+  - heading: What an ACL does and how it is processed
+    body: |
+      An **access control list (ACL)** is a sequential list of **permit** and **deny** statements called **access control entries (ACEs)**. The router compares each packet, in order, against the ACEs. This is **packet filtering**. No ACLs exist by default, so every packet is routed.
+
+      **Common uses**
+
+      - Limit network traffic and flow control.
+      - Basic security: allow one host to reach a network and block another.
+      - Filter by traffic type (permit email, deny Telnet).
+      - Screen hosts so they can or cannot reach a service.
+      - Classify traffic for QoS or NAT (an ACL selects which addresses are translated).
+
+      **Processing rules**
+
+      1. Entries are checked **top-down**.
+      2. The **first match wins**. The rest are not checked.
+      3. If no entry matches, the hidden **implicit deny any** drops the packet.
+      4. An ACL with no permit statement blocks everything.
+
+      **Inbound vs outbound**
+
+      | | Inbound | Outbound |
+      |---|---|---|
+      | When checked | Before the routing lookup | After the routing decision |
+      | Benefit | Discarded packets save routing work | Filters traffic just before it leaves |
+      | Typical use | Filtering as traffic arrives from a network | Controlling what a network receives |
+
+      Direction is always from the **router's** point of view. ACLs do **not** filter traffic that the router itself generates (its own pings, routing updates, Telnet from the router).
+
+      **Limits.** One IPv4 ACL per interface per direction, and one IPv6 ACL per interface per direction, so at most four on a dual-stack interface.
+  - heading: Wildcard masks
+    body: |
+      A wildcard mask tells the router which bits of the address to compare.
+
+      - **0** = the bit **must match**.
+      - **1** = the bit is **ignored**.
+
+      It is the subnet mask with every bit flipped, which is why the subtraction shortcut works.
+
+      | Wildcard | Meaning |
+      |---|---|
+      | 0.0.0.0 | All four octets must match: one host (keyword `host`) |
+      | 0.0.0.255 | First three octets match, last is free: a /24 |
+      | 0.0.15.255 | Third octet: only the top 4 bits match, so 192.168.16.0 to 192.168.31.255 |
+      | 255.255.255.255 | Ignore everything: any address (keyword `any`) |
+      | 0.0.0.248 | Unusual: top five bits of the last octet ignored, only the low three bits must match |
+
+      **The shortcut: wildcard = 255.255.255.255 − subnet mask.**
+
+      | Prefix | Subnet mask | Wildcard |
+      |---|---|---|
+      | /24 | 255.255.255.0 | 0.0.0.255 |
+      | /28 | 255.255.255.240 | 0.0.0.15 |
+      | /27 | 255.255.255.224 | 0.0.0.31 |
+      | /23 | 255.255.254.0 | 0.0.1.255 |
+      | /20 | 255.255.240.0 | 0.0.15.255 |
+      | /18 | 255.255.192.0 | 0.0.63.255 |
+
+      **Number of addresses matched** = 2^(number of 1 bits in the wildcard). A wildcard of 0.0.0.63 has six 1 bits so it matches 64 addresses.
+
+      **Keywords:** `host 192.168.10.5` equals `192.168.10.5 0.0.0.0`. `any` equals `0.0.0.0 255.255.255.255`.
+
+      **Summarising two subnets.** 192.168.10.0/24 and 192.168.11.0/24 differ only in the last bit of the third octet, so one entry `192.168.10.0 0.0.1.255` covers both.
+
+      **Unusual wildcards.** 0.0.0.248 is 11111000 in the last octet. Five bits are ignored and three bits must match, so the entry matches 32 addresses spread across the octet. Such masks are legal but rarely wanted.
+  - heading: Standard, extended and named ACLs
+    body: |
+      | | Standard | Extended |
+      |---|---|---|
+      | Filters on | Source IPv4 address only | Protocol, source and destination address, TCP/UDP ports |
+      | Numbers | 1–99, 1300–1999 | 100–199, 2000–2699 |
+      | Placement | Close to the **destination** | Close to the **source** |
+      | Layer | 3 | 3 and 4 |
+
+      **Named ACLs** use a descriptive name (alphanumeric, case-sensitive, unique, capitals recommended) in place of a number. They are preferred because the name explains the purpose and you can edit entries by sequence number.
+
+      ```
+      ip access-list standard ADMIN-HOSTS
+      ip access-list extended FTP-FILTER
+      ```
+
+      **Best practices:** base ACLs on the security policy, write the plan out first, build it in a text editor, document with `remark`, and test on a development network before production.
+
+      **Ranges of numbers.** 1300–1999 and 2000–2699 were added (the "expanded" ranges) because 1–99 and 100–199 were limited. All four ranges behave the same.
+  - heading: Placement rules and the R1/R3 examples
+    body: |
+      **Rule of thumb:** extended ACLs close to the **source**, standard ACLs close to the **destination**.
+
+      Factors that can override the rule: how much of the network the administrator **controls**, the **bandwidth** you want to save, and the **ease of configuration**.
+
+      **Standard ACL example.** Goal: block 192.168.10.0/24 (behind R1) from reaching 192.168.30.0/24 (behind R3). A standard ACL sees only the source, so it must sit where it blocks only the intended destination.
+
+      - Correct: **outbound on R3 G0/0/0** (the interface towards 192.168.30.0/24). 192.168.10.0/24 can still reach 192.168.31.0/24.
+      - Wrong: inbound on R3 S0/1/1. That blocks 192.168.10.0/24 from 192.168.30.0/24 **and** from 192.168.31.0/24.
+
+      **Extended ACL example.** Company A blocks Telnet and FTP from 192.168.11.0/24 to Company B's 192.168.30.0/24, but allows everything else. Company A does not control R3. The extended ACL goes **inbound on R1 G0/0/1**, the interface nearest the source, so the unwanted traffic never enters the network.
+  - heading: Configuring numbered and named ACLs
+    body: |
+      **Standard numbered syntax**
+
+      ```
+      Router(config)# access-list 10 remark ACL to permit only the admin PC
+      Router(config)# access-list 10 permit host 192.168.10.10
+      Router(config)# access-list 10 deny 192.168.10.0 0.0.0.255
+      Router(config)# access-list 10 permit any
+      ```
+
+      General form: `access-list {1-99|1300-1999} {deny|permit|remark text} source [wildcard] [log]`. Remove the whole list with `no access-list 10`.
+
+      **Named standard**
+
+      ```
+      Router(config)# ip access-list standard NO-ACCESS
+      Router(config-std-nacl)# remark Block PC3 from the server LAN
+      Router(config-std-nacl)# deny host 192.168.11.10
+      Router(config-std-nacl)# permit any
+      ```
+
+      **Apply to an interface**
+
+      ```
+      Router(config)# interface GigabitEthernet0/0/0
+      Router(config-if)# ip access-group NO-ACCESS out
+      ```
+
+      Remove with `no ip access-group NO-ACCESS out`.
+
+      **Extended numbered and named**
+
+      ```
+      Router(config)# access-list 110 permit tcp 192.168.10.0 0.0.0.255 any eq 80
+      Router(config)# access-list 110 permit tcp 192.168.10.0 0.0.0.255 any eq 443
+      Router(config)# interface GigabitEthernet0/0/0
+      Router(config-if)# ip access-group 110 in
+
+      Router(config)# ip access-list extended FTP-FILTER
+      Router(config-ext-nacl)# permit tcp 192.168.20.0 0.0.0.255 any eq ftp
+      Router(config-ext-nacl)# permit tcp 192.168.20.0 0.0.0.255 any eq ftp-data
+      ```
+
+      Extended syntax is `{permit|deny} protocol source-addr [source-port] destination-addr [destination-port]`. The protocol can be `ip`, `tcp`, `udp` or `icmp`. Port operators: `eq`, `gt`, `lt`, `neq`, `range`. `eq www` equals `eq 80`; some IOS versions need numbers for ssh (22) and https (443).
+
+      Because the first match wins and the implicit deny is at the end, the first example permits only web traffic from 192.168.10.0/24 and drops everything else it carries.
+  - heading: Editing ACLs, VTY security, established
+    body: |
+      **Two ways to edit**
+
+      1. **Text editor method:** copy the ACL to an editor, change it, remove the old ACL with `no access-list`, paste the new one. Always remove the ACL from the interface first or you may lock yourself out.
+      2. **Sequence numbers:** IOS numbers entries 10, 20, 30 and so on. Enter the ACL, delete with `no`, insert with a number.
+
+      ```
+      Router(config)# ip access-list standard 1
+      Router(config-std-nacl)# no 10
+      Router(config-std-nacl)# 10 deny host 192.168.10.99
+      Router(config-std-nacl)# 15 permit host 192.168.10.5
+      ```
+
+      You cannot overwrite an existing sequence number; delete first. An entry added without a number goes at the **bottom** (sequence 10 higher than the last).
+
+      **Securing the VTY lines.** `ip access-group` filters traffic passing through. To restrict who may log in to the router, use a standard ACL with `access-class`:
+
+      ```
+      Router(config)# ip access-list standard ADMIN-HOST
+      Router(config-std-nacl)# permit host 192.168.10.10
+      Router(config)# line vty 0 4
+      Router(config-line)# login local
+      Router(config-line)# transport input ssh
+      Router(config-line)# access-class ADMIN-HOST in
+      ```
+
+      **The `established` keyword** (extended TCP only) matches returning segments with the **ACK or RST** flag set. It gives basic stateful-like filtering: inside hosts may open connections, but TCP connections started from outside are denied, because the opening SYN has no ACK.
+
+      ```
+      access-list 120 permit tcp any 192.168.10.0 0.0.0.255 established
+      interface GigabitEthernet0/0/0
+       ip access-group 120 out
+      ```
+
+      Named example: **SURFING** (inbound) permits inside HTTP and HTTPS going out; **BROWSING** (outbound) permits only established return web traffic.
+  - heading: Verification and troubleshooting
+    body: |
+      | Command | What it shows |
+      |---|---|
+      | `show running-config` | The ACLs and where they are applied |
+      | `show access-lists` | Every ACL, with sequence numbers and **match counters** |
+      | `show ip interface G0/0/0` | Which ACL is applied inbound and outbound |
+      | `clear access-list counters` | Resets the match counters |
+
+      ```
+      Router# show access-lists
+      Standard IP access list NO-ACCESS
+          10 deny   192.168.11.10 (4 matches)
+          20 permit any (12 matches)
+      ```
+
+      The implicit deny has no counters. Add `deny any` (or `deny ip any any` for extended) as a last line if you want to see how many packets it drops.
+
+      **Common faults:** ACL on the wrong interface or direction; entries in the wrong order; wrong wildcard; applied outbound where inbound was meant; forgetting a permit for return traffic or routing updates; extended ACL placed too far from the source.
+  - heading: Sources
+    body: |
+      - Cisco ENSA v7.0 lecture slides, Module 4 (ACL Concepts) and Module 5 (ACLs for IPv4 Configuration)
+      - RFC 1918, Address Allocation for Private Internets (the address blocks used in the examples): https://www.rfc-editor.org/rfc/rfc1918
+      - RFC 9293, Transmission Control Protocol (SYN, ACK and RST flags behind the established keyword): https://www.rfc-editor.org/rfc/rfc9293
+      - RFC 2827 (BCP 38), Network Ingress Filtering, the standard case for source-address filtering: https://www.rfc-editor.org/rfc/rfc2827
+      - NIST SP 800-41 Rev. 1, Guidelines on Firewalls and Firewall Policy: https://csrc.nist.gov/pubs/sp/800/41/r1/final
+examples:
+  - title: Wildcard mask from a prefix length
+    problem: Write the wildcard mask for 10.1.64.0/18, say how many addresses it matches and give the ACE that permits it.
+    steps:
+      - "A /18 subnet mask is 255.255.192.0."
+      - "Subtract from 255.255.255.255: 255−255 = 0, 255−255 = 0, 255−192 = 63, 255−0 = 255. The wildcard is 0.0.63.255."
+      - "Addresses matched = 2^(number of 1 bits). The third octet 63 has six 1 bits and the last octet has eight, so 2^14 = 16,384 addresses, from 10.1.64.0 to 10.1.127.255."
+      - "ACE: permit 10.1.64.0 0.0.63.255"
+    answer: Wildcard 0.0.63.255, 16,384 addresses (10.1.64.0 to 10.1.127.255).
+    takeaway: Subtract the subnet mask octet by octet from 255. The count of addresses is two to the power of the number of ignored bits.
+  - title: Summarising a range with one entry
+    problem: Match all of 192.168.16.0 to 192.168.31.255 with a single ACE.
+    steps:
+      - "The range spans 16 values in the third octet (16 to 31), so a block of 16 is needed. 16 = 2^4, so four bits are ignored in that octet: 15 (binary 00001111)."
+      - "The third octet must still match its top four bits (0001), which holds for 16–31 only when the start is 16."
+      - "The last octet is free, so 255. Wildcard = 0.0.15.255."
+      - "Check with the shortcut: the equivalent prefix is /20, mask 255.255.240.0, and 255.255.255.255 − 255.255.240.0 = 0.0.15.255. They agree."
+      - "ACE: permit 192.168.16.0 0.0.15.255"
+    answer: permit 192.168.16.0 0.0.15.255
+    takeaway: A range summarises into one ACE only when it starts at a multiple of its own block size and the block size is a power of two.
+  - title: Which ACE matches, and what happens
+    problem: |
+      Standard ACL on an interface:
+      10 deny 172.16.0.0 0.0.15.255
+      20 permit 172.16.0.0 0.0.255.255
+      30 deny 172.16.40.7
+      A packet arrives from 172.16.20.9 and another from 172.16.9.9. What happens to each, and which ACE matches?
+    steps:
+      - "Entry 10 matches 172.16.0.0 through 172.16.15.255 (third octet 0–15, since 15 = 00001111 is ignored)."
+      - "172.16.20.9: third octet 20 is outside 0–15, so entry 10 does not match. Entry 20 matches the whole 172.16.0.0/16. The packet is permitted by ACE 20."
+      - "172.16.9.9: third octet 9 is within 0–15, so entry 10 matches first and the packet is denied by ACE 10. Entry 20 is never reached."
+      - "Entry 30 can never match, because every 172.16.x.x packet has already matched 10 or 20. It is a dead entry; move it above entry 20 to make it work."
+    answer: 172.16.20.9 is permitted (ACE 20). 172.16.9.9 is denied (ACE 10). ACE 30 is unreachable.
+    takeaway: Order decides the result. Specific entries must come before general ones, and an entry hidden behind a broader one never counts.
+  - title: Placement and configuration for the R1/R3 topology
+    problem: Stop hosts in 192.168.10.0/24 reaching 192.168.30.0/24 only. Hosts in 192.168.10.0/24 must still reach 192.168.31.0/24. Write the ACL and say where it goes.
+    steps:
+      - "Only the source network is named in the requirement, but the blocked destination is one specific LAN, so a standard ACL placed near the destination is suitable."
+      - "Write the ACL: ip access-list standard NO-10-TO-30, deny 192.168.10.0 0.0.0.255, permit any (the permit any stops the implicit deny from dropping everything else)."
+      - "Apply it outbound on R3 G0/0/0, the interface facing 192.168.30.0/24: ip access-group NO-10-TO-30 out."
+      - "Why not inbound on R3 S0/1/1? That would also block 192.168.10.0/24 from 192.168.31.0/24, which breaks the requirement."
+      - "Verify: ping from 192.168.10.x to 192.168.30.x fails, ping to 192.168.31.x works, and show access-lists shows the deny counter rising."
+    answer: "Standard ACL NO-10-TO-30 (deny 192.168.10.0 0.0.0.255, permit any), applied outbound on R3 G0/0/0."
+    takeaway: A standard ACL sees only the source address, so it has to sit on the last hop before the protected network.
+  - title: Securing VTY access
+    problem: Only the admin PC 192.168.10.10 may open SSH sessions to R1.
+    steps:
+      - "Create a standard ACL: ip access-list standard ADMIN-HOST, permit host 192.168.10.10."
+      - "No explicit deny is needed; the implicit deny any drops every other source."
+      - "Apply it with access-class, not access-group: line vty 0 4, access-class ADMIN-HOST in."
+      - "Also set login local and transport input ssh so only SSH with local accounts is allowed."
+      - "Verify by trying SSH from another PC (refused) and show access-lists (counter on the permit entry rises for the admin PC)."
+    answer: "ip access-list standard ADMIN-HOST / permit host 192.168.10.10, then under line vty 0 4: access-class ADMIN-HOST in."
+    takeaway: access-class filters sessions to the router; access-group filters traffic through an interface.
+terms:
+  - term: ACL
+    definition: Access control list. An ordered list of permit and deny statements the router uses to filter packets.
+  - term: ACE
+    definition: Access control entry. A single permit or deny line in an ACL, identified by a sequence number.
+  - term: Implicit deny any
+    definition: The hidden final rule of every ACL that drops anything not matched earlier. It shows no match counters.
+  - term: Wildcard mask
+    definition: A 32-bit mask where 0 means the bit must match and 1 means ignore it. Equal to 255.255.255.255 minus the subnet mask.
+  - term: host
+    definition: Keyword for a wildcard of 0.0.0.0, so the address must match exactly.
+  - term: any
+    definition: Keyword for 0.0.0.0 255.255.255.255, matching every address.
+  - term: Standard ACL
+    definition: An ACL that filters on the source IPv4 address only. Numbers 1–99 and 1300–1999. Placed close to the destination.
+  - term: Extended ACL
+    definition: An ACL that filters on protocol, source and destination address and TCP/UDP ports. Numbers 100–199 and 2000–2699. Placed close to the source.
+  - term: Named ACL
+    definition: An ACL identified by a name (ip access-list standard|extended NAME). Easier to edit and document than a numbered one.
+  - term: Sequence number
+    definition: The number given to each ACE (10, 20, 30 by default). Used to delete or insert entries without rewriting the ACL.
+  - term: Inbound / outbound ACL
+    definition: Inbound is checked as the packet arrives, before the routing lookup. Outbound is checked after routing, as the packet leaves.
+  - term: ip access-group
+    definition: Interface command that applies an ACL to an interface in a direction, for example ip access-group 110 in.
+  - term: access-class
+    definition: Line command that applies a standard ACL to VTY lines to restrict who may open management sessions.
+  - term: established
+    definition: Extended TCP keyword that matches segments with the ACK or RST flag set, which means returning traffic of a connection opened from inside.
+  - term: remark
+    definition: A comment line in an ACL used to document its purpose.
+  - term: Packet filtering
+    definition: Allowing or denying packets by comparing header fields (addresses, protocol, ports) with ACL rules.
+quiz:
+  - question: What does the router do when a packet matches the third ACE of an ACL?
+    options:
+      - It checks the remaining ACEs for a better match
+      - It applies the action of the third ACE and stops checking
+      - It applies the action of the last matching ACE
+      - It always forwards the packet
+    answer: 1
+    explanation: First match wins. Once an ACE matches, its permit or deny applies and the rest of the list is not examined.
+  - question: An ACL contains only the entry deny host 192.168.10.5. What is the effect on the interface it is applied to?
+    options:
+      - Only 192.168.10.5 is blocked
+      - All traffic is blocked
+      - Nothing is blocked
+      - Only TCP traffic is blocked
+    answer: 1
+    explanation: The implicit deny any at the end blocks everything not explicitly permitted. An ACL needs at least one permit.
+  - question: What is the wildcard mask for the subnet 192.168.10.0/28?
+    options:
+      - 0.0.0.7
+      - 0.0.0.15
+      - 0.0.0.31
+      - 0.0.0.240
+    answer: 1
+    explanation: 255.255.255.255 − 255.255.255.240 = 0.0.0.15.
+  - question: Which entry permits 192.168.16.0 through 192.168.31.255?
+    options:
+      - permit 192.168.16.0 0.0.0.255
+      - permit 192.168.16.0 0.0.15.255
+      - permit 192.168.16.0 0.0.31.255
+      - permit 192.168.16.0 255.255.240.0
+    answer: 1
+    explanation: A /20 mask is 255.255.240.0, so the wildcard is 0.0.15.255, which covers third octet values 16–31.
+  - question: How many addresses does the entry permit 10.0.0.0 0.0.7.255 match?
+    options:
+      - 256
+      - 1,024
+      - 2,048
+      - 8,192
+    answer: 2
+    explanation: 7 has three 1 bits and 255 has eight, so 11 ignored bits gives 2^11 = 2,048 addresses.
+  - question: Where should an extended ACL normally be placed?
+    options:
+      - Close to the destination
+      - Close to the source
+      - On the core router only
+      - On the router with the most interfaces
+    answer: 1
+    explanation: Extended ACLs can identify traffic precisely, so they are placed near the source to drop unwanted traffic early and save bandwidth.
+  - question: Which number identifies an extended ACL?
+    options:
+      - 10
+      - 99
+      - 150
+      - 1350
+    answer: 2
+    explanation: Extended ACLs use 100–199 and 2000–2699. 10 and 99 and 1350 are standard.
+  - question: Which command applies an ACL named ADMIN to the VTY lines so that only listed hosts may connect?
+    options:
+      - ip access-group ADMIN in
+      - access-class ADMIN in
+      - ip access-list ADMIN vty
+      - login access ADMIN
+    answer: 1
+    explanation: access-class under line vty 0 4 restricts management sessions. ip access-group is for interfaces.
+  - question: "You must insert a new entry between lines 10 and 20 of an existing named ACL. What do you do?"
+    options:
+      - Retype the whole ACL
+      - Enter the ACL and add the new entry with sequence number 15
+      - Add the entry with no sequence number
+      - Use the command insert 15
+    answer: 1
+    explanation: In ACL configuration mode, begin the line with a number such as 15 to place it between 10 and 20. An entry with no number goes at the bottom.
+  - question: What does the established keyword match?
+    options:
+      - Any UDP reply
+      - TCP segments with ACK or RST set
+      - TCP segments with SYN set
+      - ICMP echo replies
+    answer: 1
+    explanation: It matches return TCP traffic of connections that were already started. A new connection opens with SYN and no ACK, so it is not matched.
+  - question: Which command shows ACL match counters?
+    options:
+      - show ip interface brief
+      - show access-lists
+      - show ip route
+      - show protocols
+    answer: 1
+    explanation: show access-lists lists each ACE with a count of matches. show ip interface shows only which ACL is applied.
+  - question: Which statement about the 255.255.255.255 wildcard keyword is correct?
+    options:
+      - It is written host
+      - It is written any, as 0.0.0.0 255.255.255.255
+      - It matches only broadcast packets
+      - It cannot be used in a standard ACL
+    answer: 1
+    explanation: any means every address. In the long form, the address is 0.0.0.0 and the wildcard is 255.255.255.255.
+  - question: Why does an ACL applied inbound save router resources compared with outbound?
+    options:
+      - It uses less memory
+      - Discarded packets are dropped before the routing lookup
+      - It filters twice as fast
+      - It also filters router-originated traffic
+    answer: 1
+    explanation: Inbound ACLs are applied before routing, so denied packets never reach the routing table lookup.
+questions:
+  - question: "Explain how a router processes an ACL, including the effect of order and the implicit deny. [4 marks]"
+    kind: short
+    marks: 4
+    keywords:
+      - top-down
+      - first match
+      - implicit deny
+      - order
+      - permit
+    idealAnswer: "The router compares the packet with each ACE in order from the top (1). The first ACE that matches decides permit or deny and no further ACEs are checked (1). Order therefore matters: specific entries must come before general ones or they are never reached (1). If nothing matches, the hidden implicit deny any at the end drops the packet, so an ACL must contain at least one permit (1)."
+  - question: "Calculate the wildcard mask for 172.20.32.0/19 and state the range of addresses matched. Write the ACE. [4 marks]"
+    kind: short
+    marks: 4
+    keywords:
+      - 255.255.224.0
+      - 0.0.31.255
+      - 172.20.63.255
+      - wildcard
+    idealAnswer: "/19 mask = 255.255.224.0 (1). Wildcard = 255.255.255.255 − 255.255.224.0 = 0.0.31.255 (1). The third octet block is 32 values, 32 to 63, so the range is 172.20.32.0 to 172.20.63.255 (1). ACE: permit 172.20.32.0 0.0.31.255 (1)."
+  - question: "Compare standard and extended ACLs and explain the placement rule for each. [6 marks]"
+    kind: short
+    marks: 6
+    keywords:
+      - standard
+      - extended
+      - source
+      - destination
+      - protocol
+      - port
+      - close to the source
+      - close to the destination
+    idealAnswer: "Standard ACLs (1–99, 1300–1999) filter on the source IPv4 address only (1). Extended ACLs (100–199, 2000–2699) filter on protocol, source and destination address and TCP/UDP port (2). Extended ACLs go close to the source so unwanted traffic is dropped early and bandwidth is saved (1). Standard ACLs go close to the destination because they cannot see the destination; near the source they would block that source from all networks beyond (2). Network control and bandwidth can override the rule (bonus)."
+  - question: "Distinguish inbound and outbound ACLs. Give one advantage of inbound filtering and say what ACLs do not filter. [4 marks]"
+    kind: short
+    marks: 4
+    keywords:
+      - inbound
+      - outbound
+      - routing lookup
+      - router-originated
+    idealAnswer: "An inbound ACL filters packets as they arrive, before the routing decision (1). An outbound ACL filters after the routing decision, as the packet leaves the interface (1). Inbound filtering saves processing because denied packets never reach the routing lookup (1). ACLs do not filter traffic originated by the router itself (1)."
+  - question: "Company A must stop Telnet and FTP from 192.168.11.0/24 to 192.168.30.0/24 (Company B) while allowing all other traffic. R1 is Company A's router; R3 belongs to Company B. Write the ACL, say where it is applied, and explain the choice. [8 marks]"
+    kind: long
+    marks: 8
+    keywords:
+      - extended
+      - inbound
+      - R1
+      - G0/0/1
+      - tcp
+      - eq 23
+      - eq 21
+      - permit ip any any
+      - source
+    idealAnswer: "An extended ACL is needed because it must match protocol, port and destination (1). ip access-list extended STOP-TELNET-FTP; deny tcp 192.168.11.0 0.0.0.255 192.168.30.0 0.0.0.255 eq 23; deny tcp 192.168.11.0 0.0.0.255 192.168.30.0 0.0.0.255 eq ftp (and eq ftp-data 20 for FTP data) (3); permit ip any any, because without it the implicit deny would block everything (2). Apply inbound on R1 G0/0/1, the interface nearest the source (1), because Company A does not control R3 and extended ACLs go close to the source so the traffic is dropped before it crosses the WAN (1)."
+  - question: "Describe two methods of editing an existing ACL and give the commands to insert a deny for host 192.168.10.99 between lines 10 and 20 of ACL 1. [6 marks]"
+    kind: short
+    marks: 6
+    keywords:
+      - text editor
+      - sequence number
+      - ip access-list standard 1
+      - 15 deny host 192.168.10.99
+      - no 10
+    idealAnswer: "Method 1: copy the ACL into a text editor, edit it, remove the old ACL with no access-list, and paste the new one (2). Method 2: use sequence numbers. Enter ip access-list standard 1 (1), then 15 deny host 192.168.10.99 to place the entry between lines 10 and 20 (2). Existing numbers cannot be overwritten, so delete with no 10 first if a line must be replaced (1). Verify with show access-lists."
+  - question: "Explain the established keyword and show how it can protect an inside network. State its limitation. [5 marks]"
+    kind: short
+    marks: 5
+    keywords:
+      - established
+      - ACK
+      - RST
+      - TCP
+      - outbound
+      - stateless
+    idealAnswer: "established matches returning TCP segments with the ACK or RST flag set (1). Example: access-list 120 permit tcp any 192.168.10.0 0.0.0.255 established, applied outbound on the inside interface (1). Replies to connections opened from inside are permitted, while connections started from outside begin with SYN and no ACK, so they are denied (2). Limitation: it is not truly stateful. It checks flags only, so crafted packets with ACK set can pass, and it works only for TCP (1)."
+  - question: "Describe how to secure remote management of a router with an ACL, including the commands and how you would verify it. [6 marks]"
+    kind: short
+    marks: 6
+    keywords:
+      - standard ACL
+      - access-class
+      - line vty 0 4
+      - transport input ssh
+      - show access-lists
+    idealAnswer: "Create a standard ACL listing the admin hosts, for example ip access-list standard ADMIN-HOST then permit host 192.168.10.10 (2). Apply it under the VTY lines with access-class ADMIN-HOST in (not ip access-group) (2). Combine with login local and transport input ssh so only SSH is allowed (1). Verify by connecting from a permitted and a non-permitted host and checking the match counters with show access-lists (1)."
+lab:
+  title: ACL arithmetic
+  variations:
+    - title: Wildcard octet for a /27
+      question: "Host addresses 192.168.5.64/27 must be matched in an ACE. What is the value of the <b>last octet</b> of the wildcard mask?"
+      answer: 31
+      tolerance: 0
+      hint: Subtract the subnet mask from 255.255.255.255. A /27 mask ends in 224.
+      explanation: 255 − 224 = 31, so the wildcard is 0.0.0.31 and matches 32 addresses.
+    - title: Wildcard third octet for a range
+      question: "An ACE must match <code>192.168.48.0</code> through <code>192.168.63.255</code>. What is the <b>third octet</b> of the wildcard mask?"
+      answer: 15
+      tolerance: 0
+      hint: The range covers 16 values in the third octet.
+      explanation: The block is 16 wide, so the ignored bits give 15. The wildcard is 0.0.15.255, equivalent to a /20 (255.255.240.0).
+    - title: Addresses matched by a wildcard
+      question: "How many addresses does <code>10.4.0.0 0.0.7.255</code> match?"
+      answer: 2048
+      tolerance: 0
+      hint: Count the 1 bits in the wildcard. Addresses = 2^(that count).
+      explanation: 7 has three 1 bits and 255 has eight, giving 11 ignored bits. 2^11 = 2,048.
+      unit: addresses
+    - title: Unusual wildcard
+      question: "How many addresses does <code>192.168.1.0 0.0.0.248</code> match? (248 = 11111000 in binary.)"
+      answer: 32
+      tolerance: 0
+      hint: Count the 1 bits in 248. Each ignored bit doubles the number of matches.
+      explanation: 248 has five 1 bits, so five ignored bits give 2^5 = 32 addresses spread across the last octet.
+      unit: addresses
+    - title: Which ACE matches
+      question: "ACL entries: <code>10 deny 172.16.0.0 0.0.15.255</code>, <code>20 permit 172.16.0.0 0.0.255.255</code>, <code>30 deny any</code>. A packet arrives from <code>172.16.20.9</code>. Which sequence number matches first?"
+      answer: 20
+      tolerance: 0
+      hint: Work out the range of entry 10 first. Third octet 0–15 only.
+      explanation: 20 is outside 0–15, so ACE 10 does not match. ACE 20 covers all of 172.16.0.0/16 and matches first, so the packet is permitted.

@@ -1,0 +1,526 @@
+id: nat
+title: NAT for IPv4
+subtitle: Private addressing, the four NAT address terms, static, dynamic and PAT translation, IOS configuration and NAT64
+recap: |
+  RFC 1918 reserves 10.0.0.0/8, 172.16.0.0/12 and 192.168.0.0/16 for private use; they are not routable on the internet,
+  so a NAT router at the border of the stub network translates them to public addresses and conserves IPv4. From the
+  viewpoint of the inside host the four terms are inside local, inside global, outside global and outside local. Static
+  NAT is one-to-one and permanent (for servers), dynamic NAT hands out addresses from a pool first come first served,
+  and PAT (overload) shares one or a few addresses using source port numbers, keeping the original port if free and
+  otherwise taking the next available port in the same group (0–511, 512–1023, 1024–65535). NAT64 is a migration aid
+  between IPv6-only and IPv4-only networks.
+traps:
+  - "Mixing up inside local and inside global. Both describe the inside host. Inside local is its private address (192.168.10.10); inside global is the public address the outside world sees (209.165.200.226)."
+  - "Thinking the outside local address is always different. For a normal internet destination, outside local and outside global are usually the same address."
+  - "Saying NAT gives security. Hiding internal addresses is a side effect, not a security feature. NAT is not a firewall."
+  - "Forgetting to mark interfaces. Without ip nat inside and ip nat outside on the right interfaces nothing is translated, even if the rest of the configuration is correct."
+  - "Confusing dynamic NAT with PAT. Dynamic NAT is one inside address to one pool address, so a 15-address pool supports 15 simultaneous hosts. PAT adds the port number so many hosts share one address."
+  - "Writing the pool netmask as a wildcard, or the ACL with a subnet mask. ip nat pool takes a netmask (or prefix-length); the ACL that selects inside addresses takes a wildcard mask."
+  - "Forgetting that PAT modifies the port as well as the address, and that ICMP, which has no ports, uses the Query ID. NAT alone changes only the IPv4 address."
+  - "Treating NAT64 as private to public IPv6. NAT64 translates between IPv6-only and IPv4-only hosts. IPv6 uses unique local addresses (ULAs) as its private equivalent, and they are for local use only."
+lesson:
+  checkpointStep: 5
+  steps:
+    - "IPv4 has about 4.3 billion addresses and they ran out. RFC 1918 reserves three private blocks that anyone may use inside their own network: 10.0.0.0/8, 172.16.0.0/12 and 192.168.0.0/16. They are not routable on the internet, so they cannot be used to reach it directly."
+    - "NAT lets private hosts reach the internet. A NAT-enabled router sits at the border of a stub network (one exit) and translates inside addresses to public ones. Its main purpose is to conserve public IPv4 addresses. It modifies the IPv4 address; PAT modifies the address and the port."
+    - "Four terms, from the perspective of the translated device. Inside local: the private address of the inside host (192.168.10.10). Inside global: the public address representing it (209.165.200.226). Outside global: the real address of the outside destination (209.165.201.1). Outside local: how the destination appears from inside, usually the same as outside global."
+    - "Three types. Static NAT: one-to-one permanent mapping, used for servers that must be reachable from the internet. Dynamic NAT: a pool of public addresses assigned first come first served, so you need enough addresses for the simultaneous sessions. PAT (NAT overload): many inside hosts share one or a few public addresses, told apart by source port."
+    - "Checkpoint: a pool runs from 209.165.200.226 to 209.165.200.240. How many addresses is that, and how many inside hosts can use the internet at the same time under dynamic NAT? What if PAT is used on one of the addresses?"
+    - "PAT port handling. The router tries to keep the original source port. If it is taken, it assigns the next available port from the same group: 0–511, 512–1023 or 1024–65535. When a group is exhausted on an address, it moves to the next pool address. Two hosts both using 1444 therefore appear as 209.165.200.225:1444 and 209.165.200.225:1445."
+    - "Advantages: conserves addresses, multiplexes at port level, gives flexibility, keeps internal addressing consistent, makes readdressing easy, and hides internal addresses. Disadvantages: forwarding delay, loss of end-to-end addressing and traceability, complications for IPsec tunnelling, and trouble for outside-initiated or stateless UDP services."
+    - "Static NAT config: ip nat inside source static 192.168.10.254 209.165.201.5, then ip nat inside on the LAN interface and ip nat outside on the WAN interface. Dynamic: ip nat pool, access-list permit the inside range, ip nat inside source list N pool NAME, mark inside and outside. PAT: add overload, or overload on an interface."
+    - "Verify with show ip nat translations and show ip nat statistics; reset with clear ip nat translation * and clear ip nat statistics. Dynamic translations time out after 24 hours by default. NAT64 translates between IPv6-only and IPv4-only networks as a temporary migration tool; ULAs are IPv6's local-only counterpart of RFC 1918."
+checkpoint:
+  question: A dynamic NAT pool runs from 209.165.200.226 to 209.165.200.240. How many addresses is that, and how many inside hosts can be translated at the same time with dynamic NAT? How does PAT change this?
+  hint: Count inclusively, last minus first plus one. Dynamic NAT is one-to-one while a translation lasts. PAT uses the port number.
+  keywords:
+    - 15
+    - one-to-one
+    - simultaneous
+    - overload
+    - port
+    - 16th host
+  idealAnswer: "240 − 226 + 1 = 15 addresses. Dynamic NAT maps each inside host to one pool address for as long as the translation exists, so only 15 inside hosts can be translated at the same time; the 16th is not translated and its packets are dropped until an entry times out or is cleared. With PAT (overload) many hosts share a single address, differentiated by the source port, so one address can carry up to about 64,000 simultaneous translations in the 1024–65535 range."
+notes:
+  - heading: Private addressing and why NAT exists
+    body: |
+      IPv4 offers 2^32 (about 4.3 billion) addresses, and the pool is exhausted. NAT and private addressing slowed the problem while IPv6 adoption continues.
+
+      **RFC 1918 private blocks**
+
+      | Block | Range | Addresses |
+      |---|---|---|
+      | 10.0.0.0/8 | 10.0.0.0 – 10.255.255.255 | 16,777,216 |
+      | 172.16.0.0/12 | 172.16.0.0 – 172.31.255.255 | 1,048,576 |
+      | 192.168.0.0/16 | 192.168.0.0 – 192.168.255.255 | 65,536 |
+
+      Private addresses are **not routable on the internet**. Internet routers discard packets to or from them, so a **NAT** router must translate them.
+
+      **NAT's primary purpose** is to conserve public IPv4 addresses. A NAT router usually sits at the border of a **stub network** (a network with a single connection to its neighbour), and translates between inside and outside.
+
+      **Operation.** A host sends a packet to the internet. The border router replaces the private source address with a public one, records the mapping in the NAT table, and reverses the substitution on the reply.
+
+      NAT modifies the **IPv4 address only**. **PAT** modifies the address **and** the Layer 4 port (TCP/UDP). ICMP has no ports, so PAT uses the **Query ID**.
+  - heading: The four NAT address terms
+    body: |
+      The terms are always described from the perspective of the **device being translated**. "Inside" is the network under the NAT router's control; "outside" is everything else. "Local" is how an address looks on the inside; "global" is how it looks on the outside.
+
+      | Term | Meaning | Example |
+      |---|---|---|
+      | **Inside local** | Private address of the inside host | 192.168.10.10 |
+      | **Inside global** | Public address representing the inside host on the internet | 209.165.200.226 |
+      | **Outside global** | Real address of the outside destination | 209.165.201.1 |
+      | **Outside local** | Address of the destination as seen from inside | 209.165.201.1 (usually the same) |
+
+      A quick memory aid: **inside local** is the address you configured on the PC; **inside global** is what the world sees; the outside pair are normally identical unless the outside is also translated.
+
+      The `show ip nat translations` output lists them in the order inside global, inside local, outside local, outside global.
+  - heading: Static NAT, dynamic NAT and PAT
+    body: |
+      | | Static NAT | Dynamic NAT | PAT (overload) |
+      |---|---|---|---|
+      | Mapping | One-to-one, **permanent** | One-to-one from a **pool**, temporary | **Many-to-one** (or few), by port |
+      | Allocation | Manually configured | First come, first served | Source port makes each entry unique |
+      | Typical use | Servers reachable from the internet | Small count of hosts with enough addresses | Almost all home and enterprise internet access |
+      | Public addresses needed | One per inside host | At least one per simultaneous session | One |
+      | Outside-initiated traffic | Allowed (the mapping always exists) | Only while mapped | Not normally possible |
+
+      **Dynamic NAT** needs enough public addresses to cover the simultaneous sessions. When the pool is empty the next host's packets are dropped until a translation expires or is cleared.
+
+      **Port address translation (PAT)**, also called **NAT overload**, maps many inside local addresses to one inside global address, using unique source port numbers to track each conversation.
+
+      **How PAT chooses ports**
+
+      1. It tries to **keep the original source port**.
+      2. If that port is in use, it assigns the **next available port** from the same group, which has three ranges: **0–511**, **512–1023** and **1024–65535**.
+      3. When the group is exhausted on the current address, it moves to the **next IP address** in the pool.
+
+      Example: PC1 and PC2 both use source port 1444. The table shows 209.165.200.225:1444 for PC1 and 209.165.200.225:1445 for PC2.
+
+      Group capacity: 512 + 512 + 64,512 = 65,536 ports, so a single address provides about 64,512 simultaneous translations in the top group.
+  - heading: Advantages and disadvantages
+    body: |
+      | Advantages | Disadvantages |
+      |---|---|
+      | Conserves public IPv4 addresses | Adds **forwarding delay** (headers are modified) |
+      | PAT multiplexes at the port level | Loss of **end-to-end addressing** and traceability |
+      | Flexibility in connections to the internet | Complicates **tunnelling** such as IPsec (headers change) |
+      | Consistent internal addressing, easy readdressing when changing ISP | **Outside-initiated** connections and some UDP services are disrupted |
+      | Hides internal addresses from the outside (a side effect, not real security) | Makes troubleshooting and logging harder, because several hosts share one address |
+
+      **Is NAT a security feature?** No. It hides internal addresses, but stateful firewalls and ACLs provide security. NAT with PAT only blocks unsolicited inbound traffic as a consequence of having no mapping.
+  - heading: Configuring static NAT
+    body: |
+      Static NAT maps one inside local address to one inside global address permanently.
+
+      ```
+      R2(config)# ip nat inside source static 192.168.10.254 209.165.201.5
+      R2(config)# interface GigabitEthernet0/0/0
+      R2(config-if)# ip address 192.168.10.1 255.255.255.0
+      R2(config-if)# ip nat inside
+      R2(config)# interface Serial0/1/1
+      R2(config-if)# ip address 209.165.200.1 255.255.255.252
+      R2(config-if)# ip nat outside
+      ```
+
+      **Verify**
+
+      ```
+      R2# show ip nat translations
+      Pro Inside global     Inside local       Outside local      Outside global
+      --- 209.165.201.5     192.168.10.254     ---                ---
+
+      R2# show ip nat statistics
+      R2# clear ip nat statistics
+      ```
+
+      A static entry appears in the table before any traffic flows, because it is permanent.
+  - heading: Configuring dynamic NAT
+    body: |
+      **Five steps**
+
+      1. Define the pool of public (inside global) addresses.
+      2. Create a standard ACL permitting the inside addresses to translate (wildcard mask, not subnet mask).
+      3. Bind the ACL to the pool.
+      4. Mark the inside interface.
+      5. Mark the outside interface.
+
+      ```
+      R2(config)# ip nat pool NAT-POOL1 209.165.200.226 209.165.200.240 netmask 255.255.255.224
+      R2(config)# access-list 1 permit 192.168.0.0 0.0.255.255
+      R2(config)# ip nat inside source list 1 pool NAT-POOL1
+      R2(config)# interface GigabitEthernet0/0/0
+      R2(config-if)# ip nat inside
+      R2(config)# interface Serial0/1/1
+      R2(config-if)# ip nat outside
+      ```
+
+      The ACL selects **which inside addresses are eligible**, it does not filter traffic. The pool above holds 15 addresses (226 to 240), so a sixteenth simultaneous host is not translated.
+
+      **Timers and housekeeping**
+
+      - The default translation timeout is **24 hours**. Change it with `ip nat translation timeout seconds`.
+      - Remove dynamic entries with `clear ip nat translation *`.
+      - `show ip nat translation verbose` adds ages and flags.
+  - heading: Configuring and verifying PAT
+    body: |
+      **PAT with a single address (the interface's address)**
+
+      ```
+      R2(config)# access-list 1 permit 192.168.0.0 0.0.255.255
+      R2(config)# ip nat inside source list 1 interface serial 0/1/1 overload
+      R2(config)# interface GigabitEthernet0/0/0
+      R2(config-if)# ip nat inside
+      R2(config)# interface Serial0/1/1
+      R2(config-if)# ip nat outside
+      ```
+
+      **PAT with a pool**
+
+      ```
+      R2(config)# ip nat pool NAT-POOL2 209.165.200.226 209.165.200.240 netmask 255.255.255.224
+      R2(config)# ip nat inside source list 1 pool NAT-POOL2 overload
+      ```
+
+      The only difference from dynamic NAT is the word **overload**.
+
+      **Verify**
+
+      ```
+      R2# show ip nat translations
+      Pro Inside global        Inside local          Outside local        Outside global
+      tcp 209.165.200.225:1444 192.168.10.10:1444    209.165.201.1:80     209.165.201.1:80
+      tcp 209.165.200.225:1445 192.168.11.10:1444    209.165.201.1:80     209.165.201.1:80
+      ```
+
+      Both PCs used source port 1444. The second entry shows the next available port, 1445. `show ip nat statistics` reports hits, misses and the number of active translations. If nothing translates, check: interfaces marked inside and outside correctly, the ACL wildcard, the pool range, and routing between the outside and the destination.
+  - heading: NAT for IPv6
+    body: |
+      IPv6 has enough addresses that NAT is not needed to conserve them. Two ideas are easy to confuse.
+
+      - **Unique local addresses (ULAs)** are the IPv6 counterpart of RFC 1918 private addresses (fc00::/7). They are for **local use only**; they are not translated to a global address.
+      - **NAT64** translates between **IPv6-only and IPv4-only** networks, so an IPv6 host can reach an IPv4-only server. It is a **temporary migration aid**, not a way of converting private to public IPv6.
+
+      NAT64 uses a well-known prefix (64:ff9b::/96 by default) to embed the 32-bit IPv4 address in an IPv6 address, together with a DNS64 service that synthesises AAAA records for IPv4-only names.
+  - heading: Sources
+    body: |
+      - Cisco ENSA v7.0 lecture slides, Module 6 (NAT for IPv4)
+      - RFC 1918, Address Allocation for Private Internets: https://www.rfc-editor.org/rfc/rfc1918
+      - RFC 3022, Traditional IP Network Address Translator: https://www.rfc-editor.org/rfc/rfc3022
+      - RFC 2663, IP Network Address Translator (NAT) Terminology and Considerations: https://www.rfc-editor.org/rfc/rfc2663
+      - RFC 6146, Stateful NAT64: https://www.rfc-editor.org/rfc/rfc6146
+      - RFC 4193, Unique Local IPv6 Unicast Addresses: https://www.rfc-editor.org/rfc/rfc4193
+examples:
+  - title: Naming the four addresses
+    problem: PC1 (192.168.10.10) browses to a web server at 209.165.201.1. R2 translates PC1 to 209.165.200.226. Label the four addresses.
+    steps:
+      - "The inside host is PC1. Its own private address, 192.168.10.10, is the inside local address."
+      - "R2 replaces it with 209.165.200.226. The public address that represents PC1 is the inside global address."
+      - "The web server's real address, 209.165.201.1, is the outside global address."
+      - "PC1 addresses the server as 209.165.201.1 too, because the outside is not translated. The outside local address is therefore also 209.165.201.1."
+      - "On the way out the source changes from 192.168.10.10 to 209.165.200.226; the destination stays 209.165.201.1. On the reply the destination changes back from 209.165.200.226 to 192.168.10.10."
+    answer: Inside local 192.168.10.10, inside global 209.165.200.226, outside global 209.165.201.1, outside local 209.165.201.1.
+    takeaway: Inside local and inside global are two addresses for the same inside host. For internet destinations the outside pair is normally identical.
+  - title: Pool size and simultaneous hosts
+    problem: "ip nat pool NAT-POOL1 209.165.200.226 209.165.200.240 netmask 255.255.255.224 is used for dynamic NAT. How many addresses are in the pool? 40 inside hosts try to reach the internet together. How many succeed?"
+    steps:
+      - "Pool size = last − first + 1 = 240 − 226 + 1 = 15 addresses."
+      - "Check the netmask: 255.255.255.224 is /27, subnet 209.165.200.224/27 with usable hosts .225 to .254. The pool .226–.240 lies wholly inside it, so the configuration is valid."
+      - "Dynamic NAT maps one inside host to one pool address, so only 15 hosts are translated at once."
+      - "The other 40 − 15 = 25 hosts get no translation. Their packets are dropped, and the router sends an ICMP host unreachable. They work again when entries time out (24 hours by default) or are cleared."
+      - "Using overload would let all 40 share a single address."
+    answer: 15 pool addresses; 15 of the 40 hosts are translated, 25 fail.
+    takeaway: Dynamic NAT needs one public address per simultaneous host. PAT removes that limit.
+  - title: Building a PAT table
+    problem: "R2 uses PAT with the address 209.165.200.225. PC1 (192.168.10.10) and PC2 (192.168.11.10) both open a web session from source port 1444 to 209.165.201.1:80. What does the NAT table show?"
+    steps:
+      - "PC1 arrives first. Port 1444 is free, so PAT keeps it. Entry 1: inside global 209.165.200.225:1444, inside local 192.168.10.10:1444."
+      - "PC2 arrives with the same source port 1444. That port on 209.165.200.225 is already used, so PAT assigns the next available port in the same group (1024–65535): 1445."
+      - "Entry 2: inside global 209.165.200.225:1445, inside local 192.168.11.10:1444."
+      - "Replies arrive addressed to 209.165.200.225:1444 or :1445. The router looks up the port, swaps the destination back to 192.168.10.10:1444 or 192.168.11.10:1444, and forwards."
+    answer: Two entries, 209.165.200.225:1444 for PC1 and 209.165.200.225:1445 for PC2.
+    takeaway: The port number is what makes each PAT entry unique. The router keeps the original port when it can.
+  - title: PAT port group capacity
+    problem: How many ports does one public address provide in each PAT group, and how many simultaneous TCP translations can one address support in the 1024–65535 group?
+    steps:
+      - "Group 1: ports 0 to 511 = 512 ports."
+      - "Group 2: ports 512 to 1023 = 512 ports."
+      - "Group 3: ports 1024 to 65535 = 65,535 − 1,024 + 1 = 64,512 ports."
+      - "Total = 512 + 512 + 64,512 = 65,536 = 2^16, as expected for a 16-bit port field."
+      - "A host source port is normally in the third group, so one address supports up to 64,512 simultaneous translations. A pool of 2 addresses doubles this to 129,024."
+    answer: 512, 512 and 64,512 ports; 64,512 simultaneous translations per address in the top group.
+    takeaway: "PAT is very economical: one public address serves tens of thousands of conversations. The router moves to the next pool address only when a group is exhausted."
+  - title: Choosing the NAT type and writing the commands
+    problem: "A company has a web server at 192.168.10.254 that must always be reachable at 209.165.201.5, and 200 office PCs in 192.168.0.0/16 that need internet access using the single address on Serial0/1/1. Choose the NAT types and write the commands."
+    steps:
+      - "The server needs a permanent, predictable public address that can accept outside-initiated connections: static NAT."
+      - "The 200 PCs need to share one address: PAT with the interface address."
+      - "Static: ip nat inside source static 192.168.10.254 209.165.201.5."
+      - "PAT: access-list 1 permit 192.168.0.0 0.0.255.255, then ip nat inside source list 1 interface serial 0/1/1 overload. Note the wildcard 0.0.255.255, the inverse of /16."
+      - "Mark interfaces: ip nat inside on the LAN interface, ip nat outside on Serial0/1/1."
+      - "Verify with show ip nat translations (static entry appears at once, PAT entries after traffic) and show ip nat statistics."
+    answer: Static NAT for the server and PAT (overload on the Serial0/1/1 interface) for the PCs, with the inside and outside interfaces marked.
+    takeaway: Both can run together. The ACL selects who may be translated; the nat statements decide how.
+terms:
+  - term: RFC 1918
+    definition: The standard that reserves the private IPv4 blocks 10.0.0.0/8, 172.16.0.0/12 and 192.168.0.0/16. They are not routable on the internet.
+  - term: NAT
+    definition: Network Address Translation. Replaces the IPv4 address in packet headers, mainly to conserve public IPv4 addresses.
+  - term: Stub network
+    definition: A network with a single connection to its neighbour. The NAT router usually sits at its border.
+  - term: Inside local
+    definition: The private IPv4 address of an inside host, as configured on the host.
+  - term: Inside global
+    definition: The public address that represents the inside host on the internet.
+  - term: Outside global
+    definition: The real address of the outside destination.
+  - term: Outside local
+    definition: The destination's address as seen from the inside. Usually identical to the outside global address.
+  - term: Static NAT
+    definition: A permanent one-to-one mapping, used for servers that must be reachable from the internet.
+  - term: Dynamic NAT
+    definition: One-to-one mapping from a pool of public addresses, assigned first come, first served for as long as the translation exists.
+  - term: PAT / NAT overload
+    definition: Many inside addresses share one or a few public addresses, differentiated by Layer 4 source port.
+  - term: NAT pool
+    definition: A range of public addresses defined with ip nat pool, with a netmask or prefix length.
+  - term: Port groups
+    definition: The three PAT port ranges 0–511, 512–1023 and 1024–65535. PAT keeps the original port if free, otherwise takes the next available one in the same group.
+  - term: ip nat inside / ip nat outside
+    definition: Interface commands that mark which side of the router is the inside and which is the outside. Both are needed for NAT to work.
+  - term: Translation timeout
+    definition: How long a dynamic entry is kept. Default 24 hours, changed with ip nat translation timeout.
+  - term: NAT64
+    definition: Translation between IPv6-only and IPv4-only networks. A temporary migration aid, not a private-to-public IPv6 mechanism.
+  - term: ULA
+    definition: Unique local address. The IPv6 equivalent of RFC 1918 private space, for local use only.
+quiz:
+  - question: Which block is a private address range under RFC 1918?
+    options:
+      - 172.32.0.0/12
+      - 172.16.0.0/12
+      - 192.169.0.0/16
+      - 11.0.0.0/8
+    answer: 1
+    explanation: The RFC 1918 blocks are 10.0.0.0/8, 172.16.0.0/12 (172.16–172.31) and 192.168.0.0/16.
+  - question: The inside host 192.168.10.10 is translated to 209.165.200.226. What is 209.165.200.226 called?
+    options:
+      - Inside local
+      - Inside global
+      - Outside local
+      - Outside global
+    answer: 1
+    explanation: The public address that represents the inside host is the inside global address.
+  - question: Which address is the real address of the destination web server on the internet?
+    options:
+      - Inside local
+      - Inside global
+      - Outside global
+      - Outside local
+    answer: 2
+    explanation: Outside global is the destination's real address. Outside local is how it appears inside, usually the same value.
+  - question: Which type of NAT gives a permanent one-to-one mapping and is suited to a server reachable from the internet?
+    options:
+      - Dynamic NAT
+      - PAT
+      - Static NAT
+      - NAT64
+    answer: 2
+    explanation: Static NAT maps one inside address to one public address permanently.
+  - question: A dynamic NAT pool runs from 209.165.200.226 to 209.165.200.240. What is the maximum number of simultaneous inside hosts translated?
+    options:
+      - 14
+      - 15
+      - 16
+      - 254
+    answer: 1
+    explanation: 240 − 226 + 1 = 15 addresses, and each active host uses one.
+  - question: What additional keyword turns dynamic NAT into PAT?
+    options:
+      - pat
+      - overload
+      - static
+      - extended
+    answer: 1
+    explanation: ip nat inside source list 1 pool NAME overload (or interface ... overload) enables port translation.
+  - question: Two hosts both use source port 1444 and PAT already has 209.165.200.225:1444 in use. What does the second host receive?
+    options:
+      - The same entry, shared
+      - 209.165.200.225:1445
+      - A new public address always
+      - It is dropped
+    answer: 1
+    explanation: PAT tries the original port, and if taken uses the next available port in the group, here 1445.
+  - question: Which PAT port group is used for ports 1024–65535?
+    options:
+      - First group
+      - Second group
+      - Third group
+      - There are no groups
+    answer: 2
+    explanation: The groups are 0–511, 512–1023 and 1024–65535. 1024–65535 is the third.
+  - question: Which command lists the current NAT mappings?
+    options:
+      - show ip nat statistics
+      - show ip nat translations
+      - show ip route nat
+      - show nat table
+    answer: 1
+    explanation: show ip nat translations lists entries. statistics gives counters and the number of active translations.
+  - question: Which command selects the inside addresses to be translated for dynamic NAT?
+    options:
+      - access-list 1 permit 192.168.0.0 0.0.255.255
+      - ip nat inside 192.168.0.0
+      - ip nat pool 192.168.0.0
+      - route-map INSIDE
+    answer: 0
+    explanation: A standard ACL with a wildcard mask identifies the inside addresses. It is referenced by ip nat inside source list.
+  - question: Which is a disadvantage of NAT?
+    options:
+      - It increases the number of usable public addresses beyond 2^32
+      - It breaks end-to-end addressing and complicates IPsec
+      - It requires IPv6
+      - It removes the need for routing
+    answer: 1
+    explanation: NAT changes headers, which loses end-to-end addressing and traceability and complicates tunnelling protocols such as IPsec.
+  - question: What is the default timeout for a dynamic NAT translation?
+    options:
+      - 5 minutes
+      - 1 hour
+      - 24 hours
+      - Never expires
+    answer: 2
+    explanation: The default is 24 hours, adjustable with ip nat translation timeout.
+  - question: What is NAT64 used for?
+    options:
+      - Converting private IPv6 to public IPv6
+      - Translating between IPv6-only and IPv4-only networks
+      - Creating 64 pool addresses
+      - Providing a 64-bit encrypted tunnel
+    answer: 1
+    explanation: NAT64 is a temporary migration tool that lets IPv6-only hosts reach IPv4-only hosts and vice versa.
+questions:
+  - question: "Define inside local, inside global, outside local and outside global, using PC1 192.168.10.10 and a server 209.165.201.1 with public address 209.165.200.226. [4 marks]"
+    kind: short
+    marks: 4
+    keywords:
+      - inside local
+      - inside global
+      - outside local
+      - outside global
+      - 192.168.10.10
+      - 209.165.200.226
+    idealAnswer: "Inside local: the private address of the inside host, 192.168.10.10 (1). Inside global: the public address representing it on the internet, 209.165.200.226 (1). Outside global: the real address of the destination, 209.165.201.1 (1). Outside local: the destination's address as seen from the inside, normally also 209.165.201.1 (1)."
+  - question: "Compare static NAT, dynamic NAT and PAT, with one use for each. [6 marks]"
+    kind: short
+    marks: 6
+    keywords:
+      - one-to-one
+      - permanent
+      - pool
+      - first come
+      - overload
+      - port
+      - server
+    idealAnswer: "Static NAT is a permanent one-to-one mapping, used for servers that must be reachable from the internet (2). Dynamic NAT assigns a public address from a pool, first come first served, so enough addresses are needed for the simultaneous sessions (2). PAT (overload) maps many private addresses to one or a few public addresses, using source port numbers to distinguish them; it suits ordinary internet access for many users (2)."
+  - question: "Explain how PAT assigns source ports and describe what happens when two hosts use the same source port. [5 marks]"
+    kind: short
+    marks: 5
+    keywords:
+      - original source port
+      - next available
+      - 0–511
+      - 512–1023
+      - 1024–65535
+      - next address
+    idealAnswer: "PAT tries to preserve the original source port (1). If it is already in use, it assigns the first available port from the same group: 0–511, 512–1023 or 1024–65535 (2). When the group is exhausted it moves to the next address in the pool (1). Example: two hosts both using 1444 are shown as 209.165.200.225:1444 and 209.165.200.225:1445 (1)."
+  - question: "List four advantages and four disadvantages of NAT. [8 marks]"
+    kind: long
+    marks: 8
+    keywords:
+      - conserves
+      - hides
+      - flexibility
+      - delay
+      - end-to-end
+      - traceability
+      - IPsec
+      - tunnelling
+    idealAnswer: "Advantages (any four, 1 each): conserves public IPv4 addresses; PAT gives port-level multiplexing; flexibility in connecting to the internet; consistent internal addressing; easy readdressing when the ISP changes; hides internal addresses. Disadvantages (any four, 1 each): added forwarding delay; loss of end-to-end addressing; loss of traceability; complicates tunnelling protocols such as IPsec; outside-initiated and some UDP services are disrupted; troubleshooting is harder."
+  - question: "Write the IOS configuration for dynamic NAT using the pool 209.165.200.226–209.165.200.240 (mask 255.255.255.224) for inside network 192.168.0.0/16. State how to verify it. [8 marks]"
+    kind: long
+    marks: 8
+    keywords:
+      - ip nat pool
+      - access-list
+      - 0.0.255.255
+      - ip nat inside source list
+      - ip nat inside
+      - ip nat outside
+      - show ip nat translations
+    idealAnswer: "ip nat pool NAT-POOL1 209.165.200.226 209.165.200.240 netmask 255.255.255.224 (2). access-list 1 permit 192.168.0.0 0.0.255.255 (2). ip nat inside source list 1 pool NAT-POOL1 (2). Under the LAN interface ip nat inside and under the WAN interface ip nat outside (1). Verify with show ip nat translations and show ip nat statistics; clear ip nat translation * to reset (1)."
+  - question: "Convert the dynamic configuration of Question 5 to PAT using only the address on Serial0/1/1, and explain why the number of inside hosts is then no longer limited by the pool size. [5 marks]"
+    kind: short
+    marks: 5
+    keywords:
+      - overload
+      - interface serial 0/1/1
+      - port
+      - source port
+      - 64,512
+    idealAnswer: "ip nat inside source list 1 interface serial 0/1/1 overload (2), keeping the ACL and the inside and outside interface markings (1). Each translation is identified by the address and source port, so one address can carry tens of thousands of simultaneous conversations (up to about 64,512 in the 1024–65535 group) (2)."
+  - question: "Explain what NAT64 is and distinguish it from IPv6 unique local addresses. [4 marks]"
+    kind: short
+    marks: 4
+    keywords:
+      - NAT64
+      - IPv6-only
+      - IPv4-only
+      - ULA
+      - temporary
+      - local
+    idealAnswer: "NAT64 translates between IPv6-only and IPv4-only networks and is a temporary aid during migration (2). ULAs are the IPv6 equivalent of RFC 1918 private addresses and are for local use only; they are not translated by NAT64 into public IPv6 (2)."
+lab:
+  title: NAT numbers
+  variations:
+    - title: Usable addresses in a pool
+      question: "A pool is defined as <code>ip nat pool P 209.165.200.226 209.165.200.240 netmask 255.255.255.224</code>. How many addresses does it contain?"
+      answer: 15
+      tolerance: 0
+      hint: Count inclusively. Last minus first plus one.
+      explanation: 240 − 226 + 1 = 15 addresses.
+      unit: addresses
+    - title: A larger pool
+      question: "A pool runs from <code>203.0.113.33</code> to <code>203.0.113.62</code>. How many addresses does it hold?"
+      answer: 30
+      tolerance: 0
+      hint: Last minus first plus one.
+      explanation: 62 − 33 + 1 = 30. This is exactly the usable host range of 203.0.113.32/27.
+      unit: addresses
+    - title: Simultaneous hosts under dynamic NAT
+      question: "A dynamic NAT pool has 15 addresses and 200 inside hosts try to reach the internet at the same time. How many hosts are translated at once?"
+      answer: 15
+      tolerance: 0
+      hint: Dynamic NAT is one-to-one while a translation exists.
+      explanation: Each active host uses one pool address, so only 15 are translated. The other 185 are dropped until entries free up.
+      unit: hosts
+    - title: PAT port assigned
+      question: "R2 already has an entry using <code>209.165.200.225:1444</code>. A second host also uses source port 1444. Which source port does PAT assign it (taking the next available port)?"
+      answer: 1445
+      tolerance: 0
+      hint: PAT keeps the original port if free, otherwise takes the next available one in the same group.
+      explanation: 1444 is taken, so the next available port in the 1024–65535 group is 1445.
+    - title: Ports in the top PAT group
+      question: "How many ports are in the 1024–65535 PAT group on one address?"
+      answer: 64512
+      tolerance: 0
+      hint: Last minus first plus one.
+      explanation: 65,535 − 1,024 + 1 = 64,512, so one address supports up to 64,512 simultaneous translations there.
+      unit: ports
+    - title: Addresses in 172.16.0.0/12
+      question: "How many addresses are in the RFC 1918 block <code>172.16.0.0/12</code>?"
+      answer: 1048576
+      tolerance: 0
+      hint: 32 minus 12 host bits, then 2 to that power.
+      explanation: 2^20 = 1,048,576 addresses, from 172.16.0.0 to 172.31.255.255.
+      unit: addresses

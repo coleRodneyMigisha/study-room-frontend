@@ -1,0 +1,511 @@
+id: ospf-concepts
+title: Single-Area OSPF Concepts
+subtitle: How OSPF routers find neighbours, build one shared map of the network and elect a designated router
+recap: |
+  OSPF is a link-state routing protocol. Each router describes its links in LSAs, floods them inside its area, and every
+  router in the area builds the same link-state database (LSDB). Each router then runs Dijkstra's SPF algorithm with itself
+  as the root to choose the best routes. OSPF uses five packet types (Hello, DBD, LSR, LSU, LSAck) and three databases
+  (adjacency, link-state, forwarding). Neighbours climb through the states Down, Init, Two-Way, ExStart, Exchange, Loading
+  and Full. On multiaccess Ethernet a designated router (DR) and backup (BDR) cut the flooding: the winner has the highest
+  priority, then the highest router ID. Multiarea OSPF joins every area to backbone area 0 through ABRs to keep tables and
+  SPF runs small. OSPFv3 is the IPv6 version.
+traps:
+  - "Confusing the five packet types. Hello finds neighbours and keeps them alive; DBD summarises the database; LSR asks for specific records; LSU carries the full LSAs; LSAck confirms receipt. An LSU contains LSAs, so LSU and LSA are not the same thing."
+  - "Mixing up the three databases and their show commands. Adjacency database = neighbour table (show ip ospf neighbor). LSDB = topology table (show ip ospf database). Forwarding database = routing table (show ip route)."
+  - "Thinking each router has a different LSDB. Every router in the same area has an identical LSDB. The routing tables differ because each router runs SPF from its own position as the root of the tree."
+  - "Saying the DR election is won by the highest router ID only. The order is highest interface priority first, then highest router ID as the tie-break. Priority 0 means the interface can never be DR or BDR."
+  - "Believing a new router with a higher priority takes over as DR. The election is not pre-emptive. The DR stays until it fails or its OSPF process or interface goes down, then the BDR is promoted."
+  - "Treating Two-Way as a fault. On an Ethernet segment, two DROTHERs correctly stay in Two-Way with each other. Only the DR and BDR go to Full with everyone. A router stuck in Init, ExStart or Exchange is the real problem."
+  - "Saying a DR is needed on point-to-point links. It is not; only two routers share the link so there is nothing to optimise. DR and BDR exist for multiaccess networks such as Ethernet LANs."
+  - "Forgetting that the DR only distributes LSAs. It is not a gateway and does not forward user data. Also do not claim multiarea summarisation is automatic: it must be configured."
+lesson:
+  checkpointStep: 5
+  steps:
+    - "OSPF (Open Shortest Path First) is a link-state protocol made as an alternative to distance-vector RIP. It converges faster and scales to larger networks, and it uses areas to limit how far routing updates travel. A link is a router interface, and its link-state information is the network prefix, prefix length and cost."
+    - "Routers speak OSPF using five packet types, each with a number. Type 1 Hello discovers neighbours and keeps adjacencies alive. Type 2 DBD checks that databases match. Type 3 LSR requests specific records. Type 4 LSU sends the requested records and contains LSAs (OSPFv2 has 11 LSA types). Type 5 LSAck confirms receipt."
+    - "Each router keeps three databases. The adjacency database is the neighbour table (show ip ospf neighbor). The link-state database holds every LSA and is identical for all routers in an area (show ip ospf database). The forwarding database is the routing table (show ip route)."
+    - "SPF (Dijkstra) turns the LSDB into a tree with the router at the root. Lowest total cost wins and the best paths go into the routing table. The link-state steps are: establish neighbour adjacencies, exchange LSAs, build the LSDB, run SPF, choose the best route."
+    - "Neighbours move through states. Down: no hello seen. Init: a hello arrived containing the sender's router ID. Two-Way: each sees its own ID in the other's hello, so communication is bidirectional, and on a LAN the DR and BDR are elected here. ExStart: decide who sends DBDs first (highest router ID). Exchange: DBDs swapped. Loading: LSRs and LSUs fill the gaps. Full: LSDBs synchronised."
+    - "Checkpoint: five routers share one Ethernet LAN. How many adjacencies would a full mesh need, how many exist when a DR and BDR are used, and which routers become the DR and BDR when the priorities are R1=1 (RID 1.1.1.1), R2=1 (RID 2.2.2.2), R3=1 (RID 3.3.3.3), R4=1 (RID 4.4.4.4), R5=0 (RID 5.5.5.5)?"
+    - "On multiaccess networks every router would otherwise form an adjacency with every other, and each topology change would flood many times. The DR collects and distributes LSAs, and the BDR waits to take over. Everyone else is a DROTHER and forms Full adjacencies only with the DR and BDR. DROTHERs send to 224.0.0.6; the DR sends to 224.0.0.5. Election: highest priority, then highest router ID."
+    - "Single-area OSPF puts every router in one area, best practice area 0. Multiarea OSPF is hierarchical: every area connects to backbone area 0 and ABRs join them. Benefits are smaller routing tables (through summarisation, which is not automatic), less LSU flooding and fewer SPF runs because flooding stops at the area boundary."
+    - "OSPFv3 is the IPv6 equivalent. It uses the same SPF logic, runs as a separate process from OSPFv2 and sends its packets over IPv6. After the databases are Full, OSPF sends LSUs only when something changes, and refreshes each LSA every 30 minutes."
+checkpoint:
+  question: Five routers share one Ethernet LAN. How many adjacencies would a full mesh need, and how many exist when a DR and BDR are used? With priorities R1 to R4 = 1 and R5 = 0, and router IDs 1.1.1.1 to 5.5.5.5, which routers become the DR and the BDR?
+  hint: Full mesh is n(n-1)/2. With a DR and BDR, each DROTHER has two adjacencies and the DR and BDR also adjoin each other, giving 2n - 3. For the election, remove the priority 0 router first, then compare priority, then router ID.
+  keywords:
+    - 10 adjacencies
+    - 7
+    - n(n-1)/2
+    - 2n - 3
+    - priority 0
+    - R4 DR
+    - R3 BDR
+    - router ID
+  idealAnswer: "A full mesh of 5 routers needs 5 × 4 / 2 = 10 adjacencies. With a DR and BDR it needs 2n − 3 = 7 (each of the 3 DROTHERs forms 2, plus DR to BDR). R5 has priority 0 so it can never be DR or BDR. The other four tie on priority 1, so the highest router IDs win: R4 (4.4.4.4) becomes the DR and R3 (3.3.3.3) becomes the BDR. R1, R2 and R5 are DROTHERs."
+notes:
+  - heading: What OSPF is and why it exists
+    body: |
+      **OSPF (Open Shortest Path First)** is an open-standard **link-state** routing protocol (RFC 2328 for OSPFv2). It was built
+      to replace distance-vector RIP, which has a 15-hop limit, slow convergence and sends its whole table on a timer.
+
+      In a link-state protocol each router learns the *complete map* of its area instead of only hearing from neighbours
+      what the distance to a network is.
+
+      | Idea | Meaning |
+      |---|---|
+      | Link | A router interface, a segment or a stub network |
+      | Link-state | Prefix, prefix length and **cost** of the link, plus the neighbour at the other end |
+      | LSA | Link-State Advertisement: one record describing a router, a network or an external route |
+      | LSDB | The collection of all LSAs, identical on every router in the area |
+      | SPF | Shortest Path First (Dijkstra): turns the LSDB into a loop-free tree rooted at the local router |
+      | Cost | Metric, lower is better. On Cisco it is based on interface bandwidth |
+
+      **Features worth remembering**
+
+      - Fast convergence: changes are flooded immediately as small LSUs rather than waiting for a periodic timer.
+      - Scales through **areas** that limit flooding and the SPF workload.
+      - Classless: carries prefix lengths, so VLSM and summarisation work.
+      - Uses multicast **224.0.0.5** (AllSPFRouters) and **224.0.0.6** (AllDRouters); it runs directly over IP as **protocol 89**, not over TCP or UDP.
+      - Administrative distance 110.
+      - Supports authentication of its packets.
+  - heading: The five OSPF packet types
+    body: |
+      | Type | Name | Purpose |
+      |---|---|---|
+      | 1 | Hello | Discover neighbours, build and maintain adjacencies, advertise the parameters neighbours must agree on, elect the DR and BDR |
+      | 2 | DBD (Database Description) | A summary list of the LSAs in the sender's LSDB; used to check whether databases are in sync |
+      | 3 | LSR (Link-State Request) | Ask a neighbour for specific LSAs the router found missing or newer in the DBD |
+      | 4 | LSU (Link-State Update) | Carry the requested LSAs. Also used for flooding changes. An LSU **contains** one or more LSAs |
+      | 5 | LSAck (Link-State Acknowledgment) | Confirm receipt of DBDs and LSUs, which makes flooding reliable |
+
+      **Memory aid.** "Hello, Describe, Request, Update, Acknowledge". An LSU is the envelope, an LSA is the letter inside.
+
+      **Hello packets** carry the router ID, area ID, hello and dead intervals, network mask, priority, DR and BDR addresses and
+      a list of neighbours seen. For two routers to become neighbours, the area ID, hello and dead timers, subnet and
+      authentication must match, and the network types must be compatible. Default Hello and Dead intervals are **10 s and 40 s**
+      on broadcast and point-to-point links (30 s and 120 s on non-broadcast types).
+
+      OSPFv2 has **11 LSA types**. For this unit you only need to know that Type 1 (router LSA) and Type 2 (network LSA) describe
+      routers and multiaccess networks inside an area, and that other types carry inter-area and external routes.
+  - heading: Three databases and the SPF algorithm
+    body: |
+      | Database | Also called | Contents | Command |
+      |---|---|---|---|
+      | Adjacency database | Neighbour table | The routers a router has formed adjacencies with | `show ip ospf neighbor` |
+      | Link-state database (LSDB) | Topology table | All LSAs; **identical on every router in the area** | `show ip ospf database` |
+      | Forwarding database | Routing table | Best routes chosen by SPF | `show ip route` |
+
+      **Link-state routing in five steps**
+
+      1. Establish neighbour adjacencies (Hello packets).
+      2. Exchange link-state advertisements (LSAs inside LSUs).
+      3. Build the link-state database.
+      4. Execute the SPF algorithm.
+      5. Choose the best route and install it in the routing table.
+
+      **SPF.** Dijkstra's algorithm builds a shortest-path tree with the router itself at the root. The cost to a destination is
+      the sum of the outgoing interface costs along the path. The LSDB is the same everywhere, but each router runs SPF from its
+      own position, so the trees and routing tables differ.
+
+      Every router in the area re-runs SPF whenever the LSDB changes. This is why a very large single area becomes expensive,
+      which is the main reason for multiarea designs.
+  - heading: Neighbour states from Down to Full
+    body: |
+      | State | What is happening |
+      |---|---|
+      | **Down** | No hello has been received from the neighbour |
+      | **Init** | A hello was received from the neighbour. It contains the sender's router ID, but the receiver's own ID is not yet in it |
+      | **Two-Way** | Each router sees its own router ID in the other's hello, so communication is **bidirectional**. On a multiaccess network the **DR and BDR are elected here** |
+      | **ExStart** | The routers decide who sends the first DBD (the one with the **highest router ID**, the master) and agree an initial sequence number |
+      | **Exchange** | DBD packets are swapped. Each is acknowledged with an LSAck |
+      | **Loading** | LSRs ask for records that were missing or newer, and LSUs return them. SPF can then run |
+      | **Full** | The LSDBs are fully synchronised |
+
+      **Rules of thumb**
+
+      - Full is the normal end state. On a LAN, **Two-Way between two DROTHERs is normal**; they only go Full with the DR and BDR.
+      - Stuck in **Init**: hellos go out but nothing comes back (ACL, wrong subnet, one-way link, authentication).
+      - Stuck in **ExStart or Exchange**: often an **MTU mismatch** between the two interfaces.
+      - Flapping between Full and Down: timer or link problems.
+
+      After the neighbours are Full, OSPF sends **incremental LSUs** only when a change occurs, and each LSA is refreshed every
+      **30 minutes** even if nothing changed.
+
+      Hellos go to multicast **224.0.0.5**. The router ID is a 32-bit number written in dotted-decimal form and must be unique in the domain.
+  - heading: Why multiaccess networks need a DR and BDR
+    body: |
+      On an Ethernet LAN many routers can talk to each other. Without help, every router would form an adjacency with every other,
+      and an LSA change would be flooded by each router to all the others.
+
+      **Number of adjacencies for n routers**
+
+      | Routers | Full mesh n(n−1)/2 | With DR and BDR (2n − 3) |
+      |---|---|---|
+      | 3 | 3 | 3 |
+      | 5 | 10 | 7 |
+      | 10 | 45 | 17 |
+      | 20 | 190 | 37 |
+
+      **Roles**
+
+      | Role | Meaning |
+      |---|---|
+      | **DR** | Collection and distribution point for LSAs on that segment |
+      | **BDR** | Listens, keeps adjacencies with everyone, takes over instantly if the DR fails |
+      | **DROTHER** | Any router that is neither. Forms Full adjacency only with the DR and BDR |
+
+      - DROTHERs send updates to **224.0.0.6** (AllDRouters). The DR sends them to everyone on **224.0.0.5**.
+      - The DR is only used for **LSA dissemination**, not for forwarding data traffic.
+      - DR and BDR are **per segment**: a router can be DR on one LAN and a DROTHER on another.
+      - Point-to-point links do **not** elect a DR, because only two routers are present.
+
+      **Election rules (in order)**
+
+      1. Highest interface **priority** (0 to 255, default 1) wins DR; second highest becomes BDR.
+      2. If priorities tie, the **highest router ID** wins.
+      3. Priority **0** = never DR or BDR.
+      4. The election is **non-pre-emptive**: a new router with a higher priority does not displace an existing DR. It only matters when a DR or BDR is being chosen, such as at the start or after a failure.
+      5. If the DR fails, the BDR is promoted to DR and a new BDR election takes place among the DROTHERs.
+  - heading: Single-area versus multiarea OSPF
+    body: |
+      | | Single-area | Multiarea |
+      |---|---|---|
+      | Structure | All routers in one area (best practice: area 0) | Hierarchical, several areas, all joined to backbone area 0 |
+      | Suited to | Small to medium networks | Large networks |
+      | Flooding | Whole domain | Stops at the area boundary |
+      | SPF runs | Every router recomputes on any change | Only routers in the affected area recompute |
+      | Table size | Every prefix everywhere | Smaller, if summarisation is configured at the ABR |
+
+      **Router roles in multiarea OSPF**
+
+      - **Internal router**: all interfaces in one area.
+      - **Backbone router**: has an interface in area 0.
+      - **ABR (Area Border Router)**: interfaces in more than one area, holds an LSDB for each area and is the place to summarise.
+      - **ASBR (Autonomous System Boundary Router)**: injects routes from outside OSPF, such as a default route or redistributed routes.
+
+      **Three benefits of multiarea OSPF**
+
+      1. **Smaller routing tables**: networks can be summarised between areas. Summarisation is **not on by default**.
+      2. **Reduced LSU overhead**: detailed link-state changes are not flooded across area boundaries.
+      3. **Fewer SPF calculations**: a change in one area does not force routers in other areas to run SPF.
+
+      This unit configures single-area OSPFv2 only, but the concepts of areas and ABRs appear in written exams.
+  - heading: OSPFv3 for IPv6
+    body: |
+      **OSPFv3** is the IPv6 counterpart of OSPFv2, defined in RFC 5340. It keeps the same fundamentals (areas, LSAs, SPF, five
+      packet types, DR and BDR, cost, states) but is a **separate process** with its own databases and tables.
+
+      | Feature | OSPFv2 | OSPFv3 |
+      |---|---|---|
+      | Carries | IPv4 routes | IPv6 routes (and, with address families, IPv4) |
+      | Transport | IPv4 | **IPv6**, using link-local source addresses |
+      | Multicast | 224.0.0.5, 224.0.0.6 | FF02::5, FF02::6 |
+      | Router ID | 32-bit, dotted decimal | Still a 32-bit value in dotted-decimal form, even on an IPv6-only router; it must be set manually if no IPv4 address exists |
+      | Per-link or per-subnet | Per subnet | Per link |
+      | Authentication | Built into OSPF | Uses IPsec (AH or ESP) |
+
+      A router running both IPv4 and IPv6 runs both OSPFv2 and OSPFv3. The two do not share neighbour tables or LSDBs, so a
+      working OSPFv2 does not prove OSPFv3 works.
+  - heading: Quick comparison with other protocols
+    body: |
+      | Property | RIP | EIGRP | OSPF |
+      |---|---|---|---|
+      | Type | Distance vector | Advanced distance vector (Cisco) | Link state |
+      | Metric | Hop count | Bandwidth and delay | Cost (bandwidth based) |
+      | Updates | Full table every 30 s | Triggered partial | Triggered LSUs, refresh each 30 min |
+      | Scalability | Poor (15 hop limit) | High | High, with areas |
+      | Standard | Open | Now open (RFC 7868), Cisco originated | Open (RFC 2328) |
+      | Admin distance | 120 | 90 | 110 |
+
+      Link-state protocols need more memory and CPU than distance-vector protocols because each router stores the full topology and
+      runs SPF. In return they give faster convergence and a loop-free map of the network.
+  - heading: Sources
+    body: |
+      - RFC 2328, OSPF Version 2: https://www.rfc-editor.org/rfc/rfc2328
+      - RFC 5340, OSPF for IPv6: https://www.rfc-editor.org/rfc/rfc5340
+      - RFC 5709, OSPFv2 HMAC-SHA Cryptographic Authentication: https://www.rfc-editor.org/rfc/rfc5709
+      - Cisco Networking Academy, Enterprise Networking, Security, and Automation: https://www.netacad.com/courses/networking/enterprise-networking-security-automation
+      - Cisco ENSA v7.0 lecture slides, Module 1 (Single-Area OSPFv2 Concepts)
+examples:
+  - title: Counting adjacencies with and without a DR
+    problem: A single Ethernet segment connects 6 routers. How many adjacencies would a full mesh need, how many exist when a DR and BDR are elected, and how many of those does each DROTHER hold?
+    steps:
+      - "Full mesh formula: n(n − 1) / 2 = 6 × 5 / 2 = 15 adjacencies."
+      - "With a DR and BDR, the DR and BDR adjoin every other router. 4 DROTHERs × 2 adjacencies each = 8, plus 1 between the DR and BDR = 9. Check with 2n − 3 = 12 − 3 = 9."
+      - "Each DROTHER is Full with only two routers (the DR and the BDR). Between two DROTHERs the state stays Two-Way."
+      - "Saving: 15 − 9 = 6 fewer adjacencies, and each LSA change is sent to the DR instead of to every router."
+    answer: "15 adjacencies for a full mesh, 9 with a DR and BDR, and each DROTHER has 2 Full adjacencies."
+    takeaway: The saving grows quickly. With 20 routers it is 190 against 37.
+  - title: Electing the DR and BDR
+    problem: "Four routers join an Ethernet segment. R1 has RID 10.0.0.1 and priority 1. R2 has RID 2.2.2.2 and priority 100. R3 has RID 3.3.3.3 and priority 100. R4 has RID 9.9.9.9 and priority 0. They all start together. Find the DR and BDR, then say what happens if a fifth router R5 (priority 255) joins later, and finally if the DR fails."
+    steps:
+      - "R4 has priority 0, so it is removed from the contest and stays a DROTHER whatever its router ID."
+      - "Highest priority among the rest is 100, shared by R2 and R3. Priority ties, so compare router IDs: 3.3.3.3 is higher than 2.2.2.2. R3 is the DR and R2 is the BDR. R1 (priority 1) is a DROTHER."
+      - "R5 joins with priority 255. The election is non-pre-emptive, so nothing changes. R3 stays DR and R2 stays BDR; R5 becomes a DROTHER."
+      - "The DR (R3) fails. The BDR (R2) is promoted to DR immediately. A new BDR election happens among the DROTHERs R1, R4 and R5. R4 is ineligible (priority 0), and R5 (255) beats R1 (1), so R5 becomes the BDR."
+    answer: "DR = R3, BDR = R2, DROTHERs = R1 and R4. R5 changes nothing when it joins. After R3 fails, R2 is DR and R5 is the new BDR."
+    takeaway: "Order of tests: priority first, router ID second, and priority 0 means never. A late high-priority router has to wait for a failure or an OSPF process reset."
+  - title: Following two routers to the Full state
+    problem: R1 (router ID 1.1.1.1) and R2 (router ID 2.2.2.2) are connected by a point-to-point link and OSPF starts on both. Describe each state, which router sends the first DBD and what packets are used.
+    steps:
+      - "Down: neither has heard a hello. Each sends Hello packets to 224.0.0.5 listing no neighbours."
+      - "Init: R2 receives R1's hello, which contains router ID 1.1.1.1. R2 now knows about R1 and adds 1.1.1.1 to the neighbour list in its own hello."
+      - "Two-Way: R1 receives R2's hello and sees its own ID 1.1.1.1 inside it. Communication is bidirectional. No DR election is needed on a point-to-point link, so they go straight on."
+      - "ExStart: they negotiate master and slave and choose the initial DBD sequence number. R2 has the highest router ID, so R2 sends the first DBD."
+      - "Exchange: DBDs list the LSAs each router holds, and each DBD is acknowledged with an LSAck."
+      - "Loading: if R1 sees an LSA in the DBD it lacks or has older, it sends an LSR. R2 answers with an LSU containing the LSAs, and R1 acknowledges with an LSAck. SPF can now run."
+      - "Full: both LSDBs match."
+    answer: "Down, Init, Two-Way, ExStart, Exchange, Loading, Full. R2 sends the first DBD. Packets used are Hello, DBD, LSR, LSU and LSAck."
+    takeaway: "Know the order, the trigger for each state and what packet type does the work in each."
+  - title: Diagnosing a stuck neighbour
+    problem: "R1 is a DROTHER on a LAN and shows these neighbours. R2 is FULL/DR. R3 is 2WAY/DROTHER. A fourth neighbour R4 shows EXSTART and never reaches Full. Which states are normal, and what is the likely cause for R4?"
+    steps:
+      - "R1 and R3 are both DROTHERs, so Two-Way between them is correct and expected. Full is only needed with the DR and BDR."
+      - "R2 is the DR and R1 is Full with it, which is normal."
+      - "A neighbour stuck in ExStart (or Exchange) got as far as Two-Way, so the hello parameters match. The failure is in database exchange."
+      - "The classic cause is an MTU mismatch between the two interfaces, so the DBD packets do not fit and are dropped. Check with show interfaces and compare the MTU on both ends, then correct it or use ip ospf mtu-ignore."
+    answer: "2WAY/DROTHER between two DROTHERs is normal. R4's EXSTART state points to an MTU mismatch (or a DBD problem), not a hello timer mismatch."
+    takeaway: "Hello mismatches (timers, area, subnet, authentication) stop neighbours at Init or Down. Problems after Two-Way point to MTU or database exchange."
+terms:
+  - term: OSPF
+    definition: Open Shortest Path First, an open-standard link-state routing protocol that uses areas to control the spread of routing updates. Administrative distance 110.
+  - term: Link-state routing
+    definition: A routing method where each router floods descriptions of its own links, builds the same map of the area and computes best paths itself using SPF.
+  - term: LSA
+    definition: Link-State Advertisement, one record in the OSPF database. OSPFv2 has 11 LSA types.
+  - term: LSDB
+    definition: Link-State Database. The collection of all LSAs. Identical on every router in an area; also called the topology table.
+  - term: SPF algorithm
+    definition: Dijkstra's shortest path first algorithm. Builds a tree of lowest-cost paths with the local router at the root.
+  - term: Hello packet
+    definition: OSPF type 1 packet sent to 224.0.0.5 that discovers neighbours, keeps them alive, carries matching parameters and elects the DR and BDR.
+  - term: DBD
+    definition: Database Description packet (type 2). A summary of the LSAs in the sender's database used to check synchronisation.
+  - term: LSR / LSU / LSAck
+    definition: Link-State Request (type 3) asks for specific LSAs; Link-State Update (type 4) carries LSAs; Link-State Acknowledgment (type 5) confirms receipt.
+  - term: Adjacency
+    definition: A relationship between two neighbouring routers that have exchanged databases and reached the Full state.
+  - term: Router ID
+    definition: A unique 32-bit number written in dotted-decimal form that identifies an OSPF router. Used in the DBD exchange and the DR election.
+  - term: Two-Way state
+    definition: The state where each router sees its own ID in the neighbour's hello. On multiaccess networks the DR and BDR election takes place here, and two DROTHERs remain in this state.
+  - term: Full state
+    definition: The state where two neighbours have synchronised LSDBs. Normal end state for adjacent routers.
+  - term: DR (Designated Router)
+    definition: The router that collects and distributes LSAs on a multiaccess segment. Elected by highest priority, then highest router ID. It is not a data forwarder.
+  - term: BDR (Backup Designated Router)
+    definition: A router that mirrors the DR's adjacencies and takes over if the DR fails.
+  - term: DROTHER
+    definition: A router on a multiaccess segment that is neither DR nor BDR. It sends updates to 224.0.0.6 and is Full only with the DR and BDR.
+  - term: 224.0.0.5 and 224.0.0.6
+    definition: OSPF multicast addresses. 224.0.0.5 is AllSPFRouters; 224.0.0.6 is AllDRouters, used by DROTHERs to reach the DR and BDR.
+  - term: Backbone area (area 0)
+    definition: The central area in multiarea OSPF. Every other area must connect to it.
+  - term: ABR
+    definition: Area Border Router. Has interfaces in two or more areas, keeps an LSDB per area and is where inter-area summarisation is done.
+  - term: Multiarea OSPF
+    definition: A hierarchical design that splits a network into areas to reduce table size, LSU flooding and SPF calculations.
+  - term: OSPFv3
+    definition: The IPv6 version of OSPF. Same concepts and SPF, separate process, IPv6 transport and multicast FF02::5 and FF02::6.
+quiz:
+  - question: Which OSPF packet type is used to discover neighbours and elect the DR and BDR?
+    options:
+      - Database Description (DBD)
+      - Hello
+      - Link-State Request (LSR)
+      - Link-State Update (LSU)
+    answer: 1
+    explanation: The Hello packet (type 1) discovers neighbours, keeps adjacencies alive and carries the priority and DR/BDR fields used in the election.
+  - question: Which OSPF packet carries the actual link-state advertisements?
+    options:
+      - Hello
+      - DBD
+      - LSU
+      - LSAck
+    answer: 2
+    explanation: An LSU (type 4) contains one or more LSAs. A DBD only lists LSA headers, and an LSR only asks for records.
+  - question: Which command displays the OSPF adjacency database?
+    options:
+      - show ip route
+      - show ip ospf database
+      - show ip ospf neighbor
+      - show ip protocols
+    answer: 2
+    explanation: show ip ospf neighbor shows the neighbour (adjacency) table. The LSDB is shown with show ip ospf database and the forwarding database with show ip route.
+  - question: Which statement about the link-state database is true?
+    options:
+      - It is different on every router in an area
+      - It is identical on every router in the same area
+      - It holds only the best routes
+      - It exists only on the DR
+    answer: 1
+    explanation: All routers in an area flood and hold the same LSAs, so their LSDBs are identical. Their routing tables differ because SPF runs from each router's own position.
+  - question: Two routers have received hellos that contain their own router IDs. Which state have they reached?
+    options:
+      - Init
+      - Two-Way
+      - ExStart
+      - Full
+    answer: 1
+    explanation: Seeing your own router ID in the neighbour's hello means communication is bidirectional, which is the Two-Way state. The DR and BDR election takes place here on multiaccess networks.
+  - question: During which state do two OSPF routers decide who sends the first DBD packet?
+    options:
+      - Init
+      - Two-Way
+      - ExStart
+      - Loading
+    answer: 2
+    explanation: ExStart establishes the master and slave relationship (highest router ID sends first) and the initial sequence number. Exchange is where the DBDs are then swapped.
+  - question: Why is a DR elected on an Ethernet LAN?
+    options:
+      - To forward user traffic faster than other routers
+      - To reduce the number of adjacencies and the amount of LSA flooding
+      - To give the LAN an extra default gateway
+      - To allow routers with different hello timers to become neighbours
+    answer: 1
+    explanation: Without a DR every router would form an adjacency with every other and flood LSAs repeatedly. The DR is a collection and distribution point only; it does not carry data traffic.
+  - question: Four routers on a LAN have priority 1 and router IDs 1.1.1.1, 2.2.2.2, 3.3.3.3 and 4.4.4.4. Which router becomes the BDR?
+    options:
+      - 1.1.1.1
+      - 2.2.2.2
+      - 3.3.3.3
+      - 4.4.4.4
+    answer: 2
+    explanation: With equal priorities the highest router ID becomes the DR (4.4.4.4) and the second highest becomes the BDR (3.3.3.3).
+  - question: An OSPF interface is set to priority 0. What is the effect?
+    options:
+      - It is always the DR
+      - It can only be the BDR
+      - It can never be elected DR or BDR
+      - OSPF is disabled on the interface
+    answer: 2
+    explanation: Priority 0 makes the interface ineligible for both DR and BDR. Priority values 1 to 255 make it eligible, and higher is better.
+  - question: A new router with a higher priority than the current DR joins the segment. What happens?
+    options:
+      - It becomes the DR immediately
+      - It becomes the BDR immediately
+      - A new election takes place at once
+      - Nothing changes until the DR or BDR fails or OSPF is reset
+    answer: 3
+    explanation: The DR election is non-pre-emptive. The existing DR keeps its role until it fails or its OSPF process or interface goes down.
+  - question: Which of these is a benefit of multiarea OSPF?
+    options:
+      - Every router stores the full topology of the whole network
+      - Fewer SPF calculations because flooding stops at area boundaries
+      - Summarisation is performed automatically on all routers
+      - No backbone area is needed
+    answer: 1
+    explanation: Multiarea OSPF limits flooding and SPF runs to each area. Summarisation is possible at ABRs but is not on by default, and all areas must still connect to area 0.
+  - question: How are OSPFv3 and OSPFv2 related?
+    options:
+      - OSPFv3 is an extension of the same process and shares its LSDB
+      - OSPFv3 is the IPv6 equivalent and runs as a separate process
+      - OSPFv3 replaces OSPFv2 on dual-stack routers automatically
+      - OSPFv3 uses TCP port 179
+    answer: 1
+    explanation: OSPFv3 uses the same SPF logic but is a separate process that carries IPv6 prefixes and sends its packets over IPv6. Port 179 belongs to BGP.
+  - question: After the LSDBs are synchronised, when does OSPF send LSUs?
+    options:
+      - Every 10 seconds
+      - Only when there is a change, plus a refresh every 30 minutes
+      - Every 40 seconds
+      - Never, hellos carry all updates
+    answer: 1
+    explanation: OSPF sends triggered incremental updates on a change and re-floods each LSA every 30 minutes. Hellos every 10 seconds only maintain adjacencies.
+questions:
+  - question: Name the five OSPF packet types and state the purpose of each.
+    kind: short
+    marks: 5
+    keywords:
+      - Hello
+      - DBD
+      - LSR
+      - LSU
+      - LSAck
+      - neighbours
+      - synchronised
+    idealAnswer: "Type 1 Hello discovers neighbours, maintains adjacencies and elects the DR and BDR. Type 2 DBD (Database Description) lists the LSAs a router holds so neighbours can check synchronisation. Type 3 LSR (Link-State Request) requests specific LSAs that are missing or newer. Type 4 LSU (Link-State Update) carries the requested LSAs and also floods changes. Type 5 LSAck (Link-State Acknowledgment) confirms receipt of DBDs and LSUs."
+  - question: Describe the three databases an OSPF router maintains and the command that displays each.
+    kind: short
+    marks: 6
+    keywords:
+      - adjacency database
+      - neighbour table
+      - link-state database
+      - topology table
+      - forwarding database
+      - routing table
+      - show ip ospf neighbor
+      - show ip ospf database
+      - show ip route
+    idealAnswer: "The adjacency database is the neighbour table listing routers with which adjacencies have formed (show ip ospf neighbor). The link-state database holds all LSAs for the area and is identical on every router in the area; it is the topology table (show ip ospf database). The forwarding database is the routing table containing the best routes chosen by running SPF over the LSDB (show ip route)."
+  - question: List the OSPF neighbour states in order from Down to Full and explain what happens in each.
+    kind: long
+    marks: 10
+    keywords:
+      - Down
+      - Init
+      - Two-Way
+      - ExStart
+      - Exchange
+      - Loading
+      - Full
+      - router ID
+      - DBD
+      - LSR
+      - DR and BDR election
+    idealAnswer: "Down: no hello received. Init: a hello has been received that contains the sender's router ID. Two-Way: each router sees its own ID in the neighbour's hello, so communication is bidirectional; on multiaccess networks the DR and BDR are elected here. ExStart: the routers decide which sends the first DBD (highest router ID) and agree the initial sequence number. Exchange: DBD packets summarising the LSDBs are exchanged and acknowledged. Loading: LSRs request missing or newer LSAs and LSUs supply them, after which SPF can run. Full: the LSDBs are synchronised and the routers are fully adjacent."
+  - question: Explain why a designated router is needed on a multiaccess network and describe how the DR and BDR are elected.
+    kind: long
+    marks: 10
+    keywords:
+      - adjacencies
+      - flooding
+      - DR
+      - BDR
+      - DROTHER
+      - priority
+      - router ID
+      - 224.0.0.6
+      - non-pre-emptive
+    idealAnswer: "On a multiaccess segment every router would form an adjacency with every other, creating n(n-1)/2 adjacencies and excessive LSA flooding. The DR is a collection and distribution point for LSAs, and the BDR takes over if the DR fails. All other routers are DROTHERs that are Full only with the DR and BDR and send updates to 224.0.0.6. The DR is used only for LSA dissemination, not for forwarding data. The election chooses the highest interface priority (0 to 255, default 1; 0 means ineligible), and if priorities tie, the highest router ID. The second highest becomes the BDR. The election is non-pre-emptive, so a router that joins later does not take over until the DR fails or OSPF is reset."
+  - question: Compare single-area and multiarea OSPF and state three benefits of the multiarea design.
+    kind: long
+    marks: 8
+    keywords:
+      - area 0
+      - backbone
+      - ABR
+      - smaller routing tables
+      - summarisation
+      - LSU overhead
+      - SPF calculations
+      - hierarchical
+    idealAnswer: "Single-area OSPF places all routers in one area, best practice being area 0, and every router has the full LSDB and re-runs SPF for any change. Multiarea OSPF is hierarchical: all areas connect to the backbone area 0 and ABRs join the areas. Benefits are smaller routing tables (through summarisation, which is not enabled by default), reduced LSU flooding because detailed updates stop at the area boundary, and fewer SPF calculations because a topology change in one area does not force every router in the domain to recompute."
+  - question: State two similarities and two differences between OSPFv2 and OSPFv3.
+    kind: short
+    marks: 4
+    keywords:
+      - IPv6
+      - SPF
+      - separate process
+      - link-local
+      - FF02::5
+      - router ID
+    idealAnswer: "Similarities: both use the same SPF algorithm and the same five packet types and neighbour states. Differences: OSPFv3 carries IPv6 prefixes and sends its packets over IPv6 (using link-local addresses and multicast FF02::5 and FF02::6), while OSPFv2 carries IPv4 prefixes over IPv4 (224.0.0.5 and 224.0.0.6). OSPFv3 also runs as a separate process with its own databases."
+  - question: "A router on an Ethernet LAN is stuck in the Init state with its neighbour. Give three possible causes and explain how this differs from a router that is stuck in ExStart."
+    kind: short
+    marks: 6
+    keywords:
+      - Init
+      - one-way
+      - ACL
+      - mismatch
+      - ExStart
+      - MTU
+      - hello
+    idealAnswer: "In Init a hello has been received from the neighbour, but the neighbour has not yet seen our router ID in a hello, so communication is one-way. Causes include an ACL or firewall blocking hellos in one direction, mismatched parameters such as subnet, area ID, timers or authentication, and a faulty link or interface. ExStart is a later state reached only after Two-Way, so hello parameters match; being stuck there points to a database exchange problem such as an MTU mismatch."
+fact:
+  title: Why the router ID is a number that looks like an IPv4 address
+  body: "The OSPF router ID is a plain 32-bit number that is written in dotted-decimal form for convenience. It does not have to be a real or reachable address, which is why OSPFv3 on an IPv6-only router still needs a router ID that looks like an IPv4 address."
